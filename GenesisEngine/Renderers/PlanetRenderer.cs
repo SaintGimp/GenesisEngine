@@ -11,20 +11,15 @@ namespace GenesisEngine
 {
     public class PlanetRenderer : IPlanetRenderer
     {
-        private GraphicsDevice _graphicsDevice;
-        private ContentManager _contentManager;
-        private double _radius;
-        private Model _model;
+        readonly double _radius;
+        readonly GraphicsDevice _graphicsDevice;
+        readonly ContentManager _contentManager;
 
-        public PlanetRenderer(ContentManager contentManager, GraphicsDevice graphicsDevice)
-        {
-            _graphicsDevice = graphicsDevice;
-            _contentManager = contentManager;
-        }
-
-        public void Initialize(double radius)
+        public PlanetRenderer(double radius, ContentManager contentManager, GraphicsDevice graphicsDevice)
         {
             _radius = radius;
+            _graphicsDevice = graphicsDevice;
+            _contentManager = contentManager;
         }
 
         public void Draw(DoubleVector3 location, DoubleVector3 cameraLocation, Matrix originBasedViewMatrix, Matrix projectionMatrix)

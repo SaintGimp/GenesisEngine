@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
 using StructureMap;
 
 namespace GenesisEngine
@@ -18,13 +20,21 @@ namespace GenesisEngine
         public IPlanet Create(DoubleVector3 location, double radius)
         {
             var terrain = _terrainFactory.Create(radius);
-            var renderer = ObjectFactory.GetInstance<IPlanetRenderer>();
+            var renderer = CreateRenderer(radius);
             var generator = ObjectFactory.GetInstance<IHeightfieldGenerator>();
             var statistics = ObjectFactory.GetInstance<Statistics>();
 
             var planet = new Planet(location, radius, terrain, renderer, generator, statistics);
 
             return planet;
+        }
+
+        IPlanetRenderer CreateRenderer(double radius)
+        {
+            var contentManager = ObjectFactory.GetInstance<ContentManager>();
+            var graphicsDevice = ObjectFactory.GetInstance<GraphicsDevice>();
+
+            return new PlanetRenderer(radius, contentManager, graphicsDevice);
         }
     }
 }

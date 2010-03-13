@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Microsoft.Xna.Framework;
 
 namespace GenesisEngine
 {
     public interface IPlanetRenderer: IRenderer
     {
-        void Initialize(double radius);
     }
 }

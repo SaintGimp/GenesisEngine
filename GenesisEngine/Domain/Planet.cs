@@ -24,7 +24,6 @@ namespace GenesisEngine
             
             _terrain = terrain;
             _renderer = renderer;
-            _renderer.Initialize(_radius);
             _generator = generator;
             _statistics = statistics;
 
