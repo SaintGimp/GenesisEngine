@@ -8,23 +8,30 @@ namespace GenesisEngine
 {
     public class MainPresenter
     {
-        private IPlanet _planet;
+        private IPlanetFactory _planetFactory;
 		private ICamera _camera;
         private IWindowManager _windowManager;
         private Statistics _statistics;
         private ISettings _settings;
 
-        public MainPresenter(IPlanet planet, ICamera camera, IWindowManager windowManager, Statistics statistics, ISettings settings)
+        IPlanet _planet;
+
+        public MainPresenter(IPlanetFactory planetFactory, ICamera camera, IWindowManager windowManager, Statistics statistics, ISettings settings)
 		{
-            _planet = planet;
-            _planet.Initialize(DoubleVector3.Zero, PhysicalConstants.RadiusOfEarth);
+            _planetFactory = planetFactory;
 			_camera = camera;
             _windowManager = windowManager;
             _statistics = statistics;
-            _windowManager.ShowAllWindows();
 
             _settings = settings;
             _settings.ShouldUpdate = true;
+        }
+
+        public void Show()
+        {
+            _planet = _planetFactory.Create(DoubleVector3.Zero, PhysicalConstants.RadiusOfEarth);
+
+            _windowManager.ShowAllWindows();
         }
 
         public void Update(TimeSpan elapsedTime)

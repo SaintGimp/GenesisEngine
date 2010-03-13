@@ -61,6 +61,8 @@ namespace GenesisEngine
             this.IsMouseVisible = true;
 
             _mainPresenter = ObjectFactory.GetInstance<MainPresenter>();
+            _mainPresenter.Show();
+
             // TODO: we really don't need a reference to the camera controller here but
             // no one else seems to need a reference to it either and it needs to be
             // created otherwise the event aggregator won't subscribe it.  Is there a

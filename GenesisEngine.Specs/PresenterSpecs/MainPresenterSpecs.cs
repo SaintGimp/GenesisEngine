@@ -10,10 +10,13 @@ using Rhino.Mocks;
 namespace GenesisEngine.Specs.PresenterSpecs
 {
     [Subject(typeof(MainPresenter))]
-    public class when_it_is_constructed : MainPresenterContext
+    public class when_it_is_shown : MainPresenterContext
     {
-        It should_initialize_the_planet = () =>
-            _planet.AssertWasCalled(x => x.Initialize(DoubleVector3.Zero, 0), s => s.IgnoreArguments());
+        Because of = () =>
+            _mainPresenter.Show();
+
+        It should_create_at_least_one_planet = () =>
+            _planetFactory.AssertWasCalled(x => x.Create(Arg<DoubleVector3>.Is.Anything, Arg<double>.Is.Anything));
 
         It should_show_all_ui_windows = () =>
             _windowManager.AssertWasCalled(x => x.ShowAllWindows());
@@ -23,7 +26,10 @@ namespace GenesisEngine.Specs.PresenterSpecs
     public class when_updating_is_enabled_and_the_presenter_is_updated : MainPresenterContext
     {
         Establish context = () =>
+        {
             _settings.ShouldUpdate = true;
+            _mainPresenter.Show();
+        };
 
         Because of = () =>
             _mainPresenter.Update(TimeSpan.FromMilliseconds(250));
@@ -39,7 +45,10 @@ namespace GenesisEngine.Specs.PresenterSpecs
     public class when_updating_is_disabled_and_the_presenter_is_updated : MainPresenterContext
     {
         Establish context = () =>
+        {
             _settings.ShouldUpdate = false;
+            _mainPresenter.Show();
+        };
 
         Because of = () =>
             _mainPresenter.Update(TimeSpan.FromMilliseconds(250));
@@ -58,6 +67,7 @@ namespace GenesisEngine.Specs.PresenterSpecs
         {
             _settings.ShouldUpdate = false;
             _settings.ShouldSingleStep = true;
+            _mainPresenter.Show();
         };
 
         Because of = () =>
@@ -76,6 +86,9 @@ namespace GenesisEngine.Specs.PresenterSpecs
     [Subject(typeof(MainPresenter))]
     public class when_the_presenter_is_drawn : MainPresenterContext
     {
+        Establish context = () =>
+            _mainPresenter.Show();
+
         Because of = () =>
             _mainPresenter.Draw();
 
@@ -86,6 +99,9 @@ namespace GenesisEngine.Specs.PresenterSpecs
     [Subject(typeof(MainPresenter))]
     public class when_the_viewport_size_is_set : MainPresenterContext
     {
+        Establish context = () =>
+            _mainPresenter.Show();
+
         Because of = () =>
             _mainPresenter.SetViewportSize(640, 480);
 
@@ -95,6 +111,7 @@ namespace GenesisEngine.Specs.PresenterSpecs
 
     public class MainPresenterContext
     {
+        public static IPlanetFactory _planetFactory;
         public static IPlanet _planet;
         public static ICamera _camera;
         public static IWindowManager _windowManager;
@@ -105,12 +122,14 @@ namespace GenesisEngine.Specs.PresenterSpecs
         Establish context = () =>
         {
             _planet = MockRepository.GenerateStub<IPlanet>();
+            _planetFactory = MockRepository.GenerateStub<IPlanetFactory>();
+            _planetFactory.Stub(x => x.Create(Arg<DoubleVector3>.Is.Anything, Arg<double>.Is.Anything)).Return(_planet);
             _camera = MockRepository.GenerateStub<ICamera>();
             _windowManager = MockRepository.GenerateStub<IWindowManager>();
             _statistics = new Statistics();
             _settings = MockRepository.GenerateStub<ISettings>();
 
-            _mainPresenter = new MainPresenter(_planet, _camera, _windowManager, _statistics, _settings);
+            _mainPresenter = new MainPresenter(_planetFactory, _camera, _windowManager, _statistics, _settings);
         };
     }
 }

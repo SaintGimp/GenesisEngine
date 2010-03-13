@@ -29,6 +29,7 @@ namespace GenesisEngine
             MakeSingleton<ISettings>();
             MakeSingleton<Statistics>();
             MakeSingleton<IPlanet>();
+            MakeSingleton<MainPresenter>();
 
             For<IScreenCustodian<SettingsView, SettingsViewModel>>().Use<ScreenCustodian<SettingsView, SettingsViewModel>>();
             For<IScreenCustodian<StatisticsView, StatisticsViewModel>>().Use<ScreenCustodian<StatisticsView, StatisticsViewModel>>();
