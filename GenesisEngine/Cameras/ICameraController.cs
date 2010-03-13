@@ -7,5 +7,6 @@ namespace GenesisEngine
 {
     public interface ICameraController
     {
+        void AttachToPlanet(IPlanet planet);
     }
 }

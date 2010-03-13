@@ -8,18 +8,20 @@ namespace GenesisEngine
 {
     public class MainPresenter
     {
-        private IPlanetFactory _planetFactory;
-		private ICamera _camera;
-        private IWindowManager _windowManager;
-        private Statistics _statistics;
-        private ISettings _settings;
+        readonly IPlanetFactory _planetFactory;
+        readonly ICamera _camera;
+        readonly ICameraController _cameraController;
+        readonly IWindowManager _windowManager;
+        readonly Statistics _statistics;
+        readonly ISettings _settings;
 
         IPlanet _planet;
 
-        public MainPresenter(IPlanetFactory planetFactory, ICamera camera, IWindowManager windowManager, Statistics statistics, ISettings settings)
+        public MainPresenter(IPlanetFactory planetFactory, ICamera camera, ICameraController cameraController, IWindowManager windowManager, Statistics statistics, ISettings settings)
 		{
             _planetFactory = planetFactory;
 			_camera = camera;
+            _cameraController = cameraController;
             _windowManager = windowManager;
             _statistics = statistics;
 
@@ -30,7 +32,7 @@ namespace GenesisEngine
         public void Show()
         {
             _planet = _planetFactory.Create(DoubleVector3.Zero, PhysicalConstants.RadiusOfEarth);
-
+            _cameraController.AttachToPlanet(_planet);
             _windowManager.ShowAllWindows();
         }
 

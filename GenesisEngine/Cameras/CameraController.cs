@@ -15,15 +15,20 @@ namespace GenesisEngine
                                     IListener<MouseLook>,
                                     IListener<GoToGround>
     {
-        private ICamera _camera;
-        readonly IPlanet _planet;
-        ISettings _settings;
+        readonly ICamera _camera;
+        readonly ISettings _settings;
 
-        public CameraController(ICamera camera, IPlanet planet, ISettings settings)
+        IPlanet _planet;
+
+        public CameraController(ICamera camera, ISettings settings)
         {
             _camera = camera;
-            _planet = planet;
             _settings = settings;
+        }
+
+        public void AttachToPlanet(IPlanet planet)
+        {
+            _planet = planet;
         }
 
         public void Handle(MoveForward message)

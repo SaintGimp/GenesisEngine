@@ -10,19 +10,6 @@ using Rhino.Mocks;
 namespace GenesisEngine.Specs.DomainSpecs
 {
     [Subject(typeof(Planet))]
-    public class when_the_planet_is_initialized : PlanetContext
-    {
-        Because of = () =>
-            _planet.Initialize(_location, _radius);
-
-        It should_initialize_the_renderer = () =>
-            _planetRenderer.AssertWasCalled(x => x.Initialize(_radius));
-
-        It should_create_terrain = () =>
-            _terrainFactory.AssertWasCalled(x => x.Create(_radius));
-    }
-
-    [Subject(typeof(Planet))]
     public class when_the_planet_is_drawn : PlanetContext
     {
         public static DoubleVector3 _cameraLocation;
@@ -40,8 +27,6 @@ namespace GenesisEngine.Specs.DomainSpecs
             _camera.Location = _cameraLocation;
             _camera.Stub(x => x.OriginBasedViewTransformation).Return(_viewMatrix);
             _camera.Stub(x => x.ProjectionTransformation).Return(_projectionMatrix);
-
-            _planet.Initialize(_location, _radius);
         };
 
         Because of = () =>
@@ -57,9 +42,6 @@ namespace GenesisEngine.Specs.DomainSpecs
     [Subject(typeof(Planet))]
     public class when_the_planet_is_updated : PlanetContext
     {
-        Establish context = () =>
-            _planet.Initialize(_location, _radius);
-
         Because of = () =>
             _planet.Update(new TimeSpan(), DoubleVector3.Up);
 
@@ -77,8 +59,6 @@ namespace GenesisEngine.Specs.DomainSpecs
         {
             _observerLocation = DoubleVector3.Forward * 100;
             _generator.Stub(x => x.GetHeight(DoubleVector3.Forward, 19, 8000)).Return(1234);
-
-            _planet.Initialize(_location, _radius);
         };
 
         Because of = () =>
@@ -105,17 +85,12 @@ namespace GenesisEngine.Specs.DomainSpecs
             _radius = 100;
             _location = DoubleVector3.Zero;
 
-            _planetRenderer = MockRepository.GenerateStub<IPlanetRenderer>();
-
             _terrain = MockRepository.GenerateStub<ITerrain>();
-            _terrainFactory = MockRepository.GenerateStub<ITerrainFactory>();
-            _terrainFactory.Stub(x => x.Create(_radius)).Return(_terrain);
-
+            _planetRenderer = MockRepository.GenerateStub<IPlanetRenderer>();
             _generator = MockRepository.GenerateStub<IHeightfieldGenerator>();
-
             _statistics = new Statistics();
 
-            _planet = new Planet(_planetRenderer, _terrainFactory, _generator, _statistics);
+            _planet = new Planet(_location, _radius, _terrain, _planetRenderer, _generator, _statistics);
         };
     }
 }

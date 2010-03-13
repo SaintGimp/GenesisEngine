@@ -86,7 +86,10 @@ namespace GenesisEngine.Specs.CameraSpecs
         Establish context = () =>
         {
             _camera.Location = DoubleVector3.Up;
+
+            _planet = MockRepository.GenerateStub<IPlanet>();
             _planet.Stub(x => x.GetGroundHeight(_camera.Location)).Return(123);
+            _controller.AttachToPlanet(_planet);
         };
 
         Because of = () =>
@@ -113,8 +116,6 @@ namespace GenesisEngine.Specs.CameraSpecs
         {
             _camera = MockRepository.GenerateStub<ICamera>();
 
-            _planet = MockRepository.GenerateStub<IPlanet>();
-
             _settings = MockRepository.GenerateStub<ISettings>();
             _settings.CameraMoveSpeedPerSecond = 10;
             _settings.CameraMouseLookDamping = 300f;
@@ -128,7 +129,7 @@ namespace GenesisEngine.Specs.CameraSpecs
             _expectedYaw = -100 / 300.0f;
             _expectedPitch = -150 / 300.0f;
 
-            _controller = new CameraController(_camera, _planet, _settings);
+            _controller = new CameraController(_camera, _settings);
         };
     }
 }

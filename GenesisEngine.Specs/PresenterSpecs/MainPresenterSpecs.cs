@@ -18,6 +18,9 @@ namespace GenesisEngine.Specs.PresenterSpecs
         It should_create_at_least_one_planet = () =>
             _planetFactory.AssertWasCalled(x => x.Create(Arg<DoubleVector3>.Is.Anything, Arg<double>.Is.Anything));
 
+        It should_attach_the_controller_to_a_planet = () =>
+            _cameraController.AssertWasCalled(x => x.AttachToPlanet(Arg<IPlanet>.Is.Anything));
+
         It should_show_all_ui_windows = () =>
             _windowManager.AssertWasCalled(x => x.ShowAllWindows());
     }
@@ -114,6 +117,7 @@ namespace GenesisEngine.Specs.PresenterSpecs
         public static IPlanetFactory _planetFactory;
         public static IPlanet _planet;
         public static ICamera _camera;
+        public static ICameraController _cameraController;
         public static IWindowManager _windowManager;
         public static Statistics _statistics;
         public static ISettings _settings;
@@ -125,11 +129,12 @@ namespace GenesisEngine.Specs.PresenterSpecs
             _planetFactory = MockRepository.GenerateStub<IPlanetFactory>();
             _planetFactory.Stub(x => x.Create(Arg<DoubleVector3>.Is.Anything, Arg<double>.Is.Anything)).Return(_planet);
             _camera = MockRepository.GenerateStub<ICamera>();
+            _cameraController = MockRepository.GenerateStub<ICameraController>();
             _windowManager = MockRepository.GenerateStub<IWindowManager>();
             _statistics = new Statistics();
             _settings = MockRepository.GenerateStub<ISettings>();
 
-            _mainPresenter = new MainPresenter(_planetFactory, _camera, _windowManager, _statistics, _settings);
+            _mainPresenter = new MainPresenter(_planetFactory, _camera, _cameraController, _windowManager, _statistics, _settings);
         };
     }
 }

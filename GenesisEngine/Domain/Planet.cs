@@ -8,38 +8,27 @@ namespace GenesisEngine
 {
     public class Planet : IPlanet
     {
-        private DoubleVector3 _location;
-        private double _radius;
-        private IPlanetRenderer _renderer;
-        private ITerrainFactory _terrainFactory;
+        DoubleVector3 _location;
+        readonly double _radius;
+        readonly ITerrain _terrain;
+        readonly IPlanetRenderer _renderer;
         readonly IHeightfieldGenerator _generator;
         readonly Statistics _statistics;
-        private ITerrain _terrain;
+        
         ClippingPlanes _clippingPlanes;
 
-        public Planet(IPlanetRenderer renderer, ITerrainFactory terrainFactory, IHeightfieldGenerator generator, Statistics statistics)
+        public Planet(DoubleVector3 location, double radius, ITerrain terrain, IPlanetRenderer renderer, IHeightfieldGenerator generator, Statistics statistics)
         {
+            _location = location;
+            _radius = radius;
+            
+            _terrain = terrain;
             _renderer = renderer;
-            _terrainFactory = terrainFactory;
+            _renderer.Initialize(_radius);
             _generator = generator;
             _statistics = statistics;
 
             _clippingPlanes = new ClippingPlanes();
-        }
-
-        public void Initialize(DoubleVector3 location, double radius)
-        {
-            _location = location;
-            _radius = radius;
-
-            CreateTerrain();
-            
-            _renderer.Initialize(_radius);
-        }
-
-        private void CreateTerrain()
-        {
-            _terrain = _terrainFactory.Create(_radius);
         }
 
         public void Update(TimeSpan elapsedTime, DoubleVector3 cameraLocation)
