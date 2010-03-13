@@ -19,6 +19,10 @@ namespace GenesisEngine
 
         public IPlanet Create(DoubleVector3 location, double radius)
         {
+            // TODO: should we inject into the factory everything it will need to inject
+            // into the planets?  That reduces calls to the container but makes an assumption
+            // about dependency lifetimes.
+
             var terrain = _terrainFactory.Create(radius);
             var renderer = CreateRenderer(radius);
             var generator = ObjectFactory.GetInstance<IHeightfieldGenerator>();
@@ -31,6 +35,7 @@ namespace GenesisEngine
 
         IPlanetRenderer CreateRenderer(double radius)
         {
+            // TODO: put this in a separate factory class
             var contentManager = ObjectFactory.GetInstance<ContentManager>();
             var graphicsDevice = ObjectFactory.GetInstance<GraphicsDevice>();
 

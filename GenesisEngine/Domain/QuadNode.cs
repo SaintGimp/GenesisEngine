@@ -49,6 +49,9 @@ namespace GenesisEngine
 
         public int Level { get; private set; }
 
+        // TODO: push this data in through the constructor, probably in a QuadNodeDefintion class, and make
+        // this method private
+        // Except that does real work in construction.  Hmmm.
         public void InitializeMesh(double planetRadius, DoubleVector3 planeNormalVector, DoubleVector3 uVector, DoubleVector3 vVector, QuadNodeExtents extents, int level)
         {
             _planetRadius = planetRadius;
