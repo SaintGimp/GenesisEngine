@@ -14,7 +14,6 @@ namespace GenesisEngine
                            IListener<GarbageCollect>
     {
         private MainPresenter _mainPresenter;
-        ICameraController _cameraController;
         private IInputState _inputState;
         IInputMapper _inputMapper;
 
@@ -63,11 +62,6 @@ namespace GenesisEngine
             _mainPresenter = ObjectFactory.GetInstance<MainPresenter>();
             _mainPresenter.Show();
 
-            // TODO: we really don't need a reference to the camera controller here but
-            // no one else seems to need a reference to it either and it needs to be
-            // created otherwise the event aggregator won't subscribe it.  Is there a
-            // better way to handle this?
-            _cameraController = ObjectFactory.GetInstance<ICameraController>();
             _inputState = ObjectFactory.GetInstance<IInputState>();
             _inputMapper = ObjectFactory.GetInstance<IInputMapper>();
             
