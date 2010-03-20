@@ -46,9 +46,9 @@ I've got a decent start on basic terrain generation.  I can zoom all the way fro
 
 Here's a non-exhaustive list of links to get your started if you want to find people who know what they're doing:
 
-[Interactive Visualization of a Planetary System](http://i31www.ira.uka.de/publikationen/files/4_Studproject_JWinzen.pdf)
-[A Real-Time Procedural Universe](http://www.sponeil.net/)
-[Infinity: The Quest For Earth](http://www.infinity-universe.com)
-[Outerra](http://outerra.blogspot.com/)
-[Britonia](http://britonia-game.com/)
-[Virtual Terrain Project](http://vterrain.org/)
+* [Interactive Visualization of a Planetary System](http://i31www.ira.uka.de/publikationen/files/4_Studproject_JWinzen.pdf)
+* [A Real-Time Procedural Universe](http://www.sponeil.net/)
+* [Infinity: The Quest For Earth](http://www.infinity-universe.com)
+* [Outerra](http://outerra.blogspot.com/)
+* [Britonia](http://britonia-game.com/)
+* [Virtual Terrain Project](http://vterrain.org/)
