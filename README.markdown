@@ -7,7 +7,7 @@ Licensed under the [Ms-PL](http://www.microsoft.com/opensource/licenses.mspx#Ms-
 
 # What is it?
 
-GenesisEngine allows you to create and explore procedurally-generated planetary systems, from ground level all the way out into space.  At the moment there's no larger purpose other than to wander around in a virtual world.
+GenesisEngine allows you to create and explore procedurally-generated planetary systems, from ground level all the way out into space.  At the moment there's no larger purpose other than to wander around in a virtual world.  It's written in C# with the XNA framework.
 
 Mostly, this is a personal project that I'm using to experiment with new software development techniques and maybe learn something about procedural terrain generation and rendering along the way.  This project is NOT intended to be some kind of best-practices reference for, well, anything.  Some stuff is well-written and some stuff is terrible.  Over time I hope to improve the terrible stuff and add more good stuff.  I'd be happy to receive constructive feedback.
 
@@ -16,6 +16,10 @@ If you're looking to learn something about procedurally-generated terrain or ren
 This project is also not a good reference for high-performance game engines.  I'm explicitly choosing to favor clarity of code design over high performance when those two principles are in conflict.  My computer is reasonably fast and hardware is cheap - so there!
 
 I'm going to [blog](http://blogs.msdn.com/elee) occasionally about the journey so feel free to follow along.
+
+# Can I build and run it?
+
+Please do!  The GenesisEngine project is a Visual Studio 2008 solution with dependencies on StructureMap, Machine.Specifications, and Rhino Mocks (all included) and Microsoft's XNA Framework (not included).  Right now the project is Windows-only and won't run on the Xbox or Zune.  If you run into any problems, let me know.
 
 # What are the controls?
 
