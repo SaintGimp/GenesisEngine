@@ -7,8 +7,8 @@ namespace GenesisEngine
 {
     public interface IEventAggregator
     {
-        void SendMessage<T>(T message);
-
         void AddListener(object listener);
+
+        void SendMessage<T>(T message);
     }
 }

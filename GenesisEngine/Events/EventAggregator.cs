@@ -15,9 +15,7 @@ namespace GenesisEngine
             IEnumerable<IListener<T>> recipients;
             lock (_lockObject)
             {
-                // Force evaluation now while locked so we avoid collisions
-                // and allow listeners to modify the aggregator if desired
-                recipients = FindEligibleListeners<T>().ToList();
+                recipients = FindEligibleListeners<T>();
             }
 
             SendMessageToRecipients(message, recipients);
@@ -33,6 +31,7 @@ namespace GenesisEngine
 
         private IEnumerable<IListener<T>> FindEligibleListeners<T>()
         {
+            var eligibleListeners = new List<IListener<T>>();
             foreach (var weakReference in _listeners)
             {
                 // We need to create a strong reference before testing aliveness
@@ -41,9 +40,11 @@ namespace GenesisEngine
                 var strongReference = weakReference.Target as IListener<T>;
                 if (strongReference != null)
                 {
-                    yield return strongReference;
+                    eligibleListeners.Add(strongReference);
                 }
             }
+
+            return eligibleListeners;
         }
 
         public void AddListener(object listener)
