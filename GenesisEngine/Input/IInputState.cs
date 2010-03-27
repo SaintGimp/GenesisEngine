@@ -5,10 +5,6 @@ using Microsoft.Xna.Framework.Input;
 
 namespace GenesisEngine
 {
-    // TODO: this isn't tied strictly to a camera controller, so it could
-    // arguably be broken out into its own library.  It'll probably be used
-    // in conjunction with cameras, though, so we'll leave it here for now.
-
     public interface IInputState
     {
         bool IsKeyDown(Keys key);
@@ -23,6 +19,6 @@ namespace GenesisEngine
         
         TimeSpan ElapsedTime { get; }
 
-        void Update(TimeSpan elapsedTime, KeyboardState currentkeyboardState, MouseState currentMouseState);
+        void Update(TimeSpan elapsedTime, KeyboardState newKeyboardState, MouseState newMouseState);
     }
 }

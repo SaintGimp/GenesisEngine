@@ -10,10 +10,10 @@ namespace GenesisEngine
 
     public class InputMapper : IInputMapper
     {
-        private readonly IEventAggregator _eventAggregator;
-        private readonly List<KeyEvent> _keyPressEvents = new List<KeyEvent>();
-        private readonly List<KeyEvent> _keyDownEvents = new List<KeyEvent>();
-        private readonly List<MouseMoveEvent> _mouseMoveEvents = new List<MouseMoveEvent>();
+        readonly IEventAggregator _eventAggregator;
+        readonly List<KeyEvent> _keyPressEvents = new List<KeyEvent>();
+        readonly List<KeyEvent> _keyDownEvents = new List<KeyEvent>();
+        readonly List<MouseMoveEvent> _mouseMoveEvents = new List<MouseMoveEvent>();
 
         public InputMapper(IEventAggregator eventAggregator)
         {
@@ -45,7 +45,8 @@ namespace GenesisEngine
 
         private void SendMouseMoveMessages(IInputState inputState)
         {
-            if (inputState.IsRightMouseButtonDown && (inputState.MouseDeltaX != 0 | inputState.MouseDeltaY != 0))
+            // TODO: we have the "right mouse button down" requirement hardcoded here for now
+            if (inputState.IsRightMouseButtonDown && (inputState.MouseDeltaX != 0 || inputState.MouseDeltaY != 0))
             {
                 foreach (var moveEvent in _mouseMoveEvents)
                 {
@@ -54,19 +55,22 @@ namespace GenesisEngine
             }
         }
 
+        // We put the key/action pairs into a list rather than a dictionary because
+        // we want to be able to support multiple actions per key
+
         public void AddKeyPressMessage<T>(Keys key) where T : InputMessage, new()
         {
-            _keyPressEvents.Add(new KeyEvent() { Key = key, Send = x => _eventAggregator.SendMessage(new T() { InputState = x}) });
+            _keyPressEvents.Add(new KeyEvent { Key = key, Send = x => _eventAggregator.SendMessage(new T { InputState = x}) });
         }
 
         public void AddKeyDownMessage<T>(Keys key) where T : InputMessage, new()
         {
-            _keyDownEvents.Add(new KeyEvent() { Key = key, Send = x => _eventAggregator.SendMessage(new T() { InputState = x }) });
+            _keyDownEvents.Add(new KeyEvent { Key = key, Send = x => _eventAggregator.SendMessage(new T { InputState = x }) });
         }
 
         public void AddMouseMoveMessage<T>() where T : InputMessage, new()
         {
-            _mouseMoveEvents.Add(new MouseMoveEvent() { Send = x => _eventAggregator.SendMessage(new T() { InputState = x }) });
+            _mouseMoveEvents.Add(new MouseMoveEvent { Send = x => _eventAggregator.SendMessage(new T { InputState = x }) });
         }
 
         private class KeyEvent

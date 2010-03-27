@@ -43,12 +43,12 @@ namespace GenesisEngine
             get { return _elapsedTime; }
         }
 
-        public void Update(TimeSpan elapsedTime, KeyboardState currentkeyboardState, MouseState currentMouseState)
+        public void Update(TimeSpan elapsedTime, KeyboardState newKeyboardState, MouseState newMouseState)
         {
             _previousKeyboardState = _currentKeyboardState;
-            _currentKeyboardState = currentkeyboardState;
+            _currentKeyboardState = newKeyboardState;
             _previousMouseState = _currentMouseState;
-            _currentMouseState = currentMouseState;
+            _currentMouseState = newMouseState;
             _elapsedTime = elapsedTime;
         }
     }

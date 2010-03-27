@@ -28,6 +28,26 @@ namespace GenesisEngine.Specs.InputSpecs
     }
 
     [Subject(typeof(InputMapper))]
+    public class when_a_multimapped_key_is_pressed : InputMapperContext
+    {
+        Establish context = () =>
+        {
+            _inputMapper.AddKeyPressMessage<DoSomething>(Keys.K);
+            _inputMapper.AddKeyPressMessage<DoSomethingElse>(Keys.K);
+            _input.Stub(x => x.IsKeyPressed(Keys.K)).Return(true);
+        };
+
+        Because of = () =>
+            _inputMapper.HandleInput(_input);
+
+        It should_send_the_first_keypress_message = () =>
+            _eventAggregator.AssertWasCalled(x => x.SendMessage(Arg<DoSomething>.Is.Anything));
+
+        It should_send_the_second_keypress_message = () =>
+            _eventAggregator.AssertWasCalled(x => x.SendMessage(Arg<DoSomethingElse>.Is.Anything));
+    }
+
+    [Subject(typeof(InputMapper))]
     public class when_an_unmapped_key_is_pressed : InputMapperContext
     {
         Establish context = () =>
@@ -73,6 +93,26 @@ namespace GenesisEngine.Specs.InputSpecs
 
         It should_send_a_message_containing_the_current_input_state = () =>
             _eventAggregator.AssertWasCalled(x => x.SendMessage(Arg<DoSomething>.Matches(p => p.InputState == _input)));
+    }
+
+    [Subject(typeof(InputMapper))]
+    public class when_a_multimapped_mapped_key_is_down : InputMapperContext
+    {
+        Establish context = () =>
+        {
+            _inputMapper.AddKeyDownMessage<DoSomething>(Keys.K);
+            _inputMapper.AddKeyDownMessage<DoSomethingElse>(Keys.K);
+            _input.Stub(x => x.IsKeyDown(Keys.K)).Return(true);
+        };
+
+        Because of = () =>
+            _inputMapper.HandleInput(_input);
+
+        It should_send_the_first_keydown_message = () =>
+            _eventAggregator.AssertWasCalled(x => x.SendMessage(Arg<DoSomething>.Is.Anything));
+
+        It should_send_the_second_keydown_message = () =>
+        _eventAggregator.AssertWasCalled(x => x.SendMessage(Arg<DoSomethingElse>.Is.Anything));
     }
 
     [Subject(typeof(InputMapper))]
@@ -168,6 +208,10 @@ namespace GenesisEngine.Specs.InputSpecs
     }
 
     public class DoSomething : InputMessage
+    {
+    }
+
+    public class DoSomethingElse : InputMessage
     {
     }
 }

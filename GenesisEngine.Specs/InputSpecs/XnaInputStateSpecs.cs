@@ -34,7 +34,7 @@ namespace GenesisEngine.Specs.InputSpecs
     public class when_a_key_is_down_for_the_first_time : XnaInputStateContext
     {
         Establish context = () =>
-            _currentKeyboardState = SetKey(_currentKeyboardState, Keys.A);
+            _currentKeyboardState = CreateKeyboardState(Keys.A);
 
         Because of = () =>
             _inputState.Update(_elapsedTime, _currentKeyboardState, _currentMouseState);
@@ -57,9 +57,9 @@ namespace GenesisEngine.Specs.InputSpecs
     {
         Establish context = () =>
         {
-            _previousKeyboardState = SetKey(_previousKeyboardState, Keys.A);
+            _previousKeyboardState = CreateKeyboardState(Keys.A);
             _inputState.Update(_elapsedTime, _previousKeyboardState, _previousMouseState);
-            _currentKeyboardState = SetKey(_currentKeyboardState, Keys.A);
+            _currentKeyboardState = CreateKeyboardState(Keys.A);
         };
 
         Because of = () =>
@@ -92,7 +92,7 @@ namespace GenesisEngine.Specs.InputSpecs
     public class when_the_right_mouse_button_is_down : XnaInputStateContext
     {
         Establish context = () =>
-            _currentMouseState = SetMouseRightButton(_currentMouseState, ButtonState.Pressed);
+            _currentMouseState = CreateMouseState(ButtonState.Pressed);
 
         Because of = () =>
             _inputState.Update(_elapsedTime, _currentKeyboardState, _currentMouseState);
@@ -119,9 +119,9 @@ namespace GenesisEngine.Specs.InputSpecs
     {
         Because of = () =>
         {
-            _previousMouseState = SetMouseXY(_previousMouseState, 3, 15);
+            _previousMouseState = CreateMouseState(3, 15);
             _inputState.Update(_elapsedTime, _previousKeyboardState, _previousMouseState);
-            _currentMouseState = SetMouseXY(_currentMouseState, 10, 13);
+            _currentMouseState = CreateMouseState(10, 13);
             _inputState.Update(_elapsedTime, _currentKeyboardState, _currentMouseState);
         };
 
@@ -151,40 +151,19 @@ namespace GenesisEngine.Specs.InputSpecs
             _inputState = new XnaInputState();
         };
 
-        static public MouseState SetMouseXY(MouseState state, int x, int y)
+        static public MouseState CreateMouseState(int x, int y)
         {
-            ValueType boxedState = state;
-
-            FieldInfo field = typeof(MouseState).GetField("x", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.GetField);
-            field.SetValue(boxedState, x);
-            field = typeof(MouseState).GetField("y", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.GetField);
-            field.SetValue(boxedState, y);
-            
-            return (MouseState)boxedState;
+            return new MouseState(x, y, 0, ButtonState.Released, ButtonState.Released, ButtonState.Released, ButtonState.Released, ButtonState.Released);
         }
 
-        static public MouseState SetMouseRightButton(MouseState state, ButtonState buttonState)
+        static public MouseState CreateMouseState(ButtonState rightMouseButtonState)
         {
-            ValueType boxedState = state;
-            
-            FieldInfo field = typeof(MouseState).GetField("rightButton", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.GetField);
-            field.SetValue(boxedState, buttonState);
-            
-            return (MouseState)boxedState;
+            return new MouseState(0, 0, 0, ButtonState.Released, ButtonState.Released, rightMouseButtonState, ButtonState.Released, ButtonState.Released);
         }
 
-        static public KeyboardState SetKey(KeyboardState state, Keys key)
+        static public KeyboardState CreateKeyboardState(Keys key)
         {
-            // it would probably be better to use .GetPressedKeys and the constructor that takes
-            // a KeyState array to do this work.
-
-            ValueType boxedState = state;
-
-            MethodInfo addPressedKeyMethod = typeof(KeyboardState).GetMethod("AddPressedKey", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.InvokeMethod);
-            object[] argumentArray = { key };
-            addPressedKeyMethod.Invoke(boxedState, argumentArray);
-
-            return (KeyboardState)boxedState;
+            return new KeyboardState(key);
         }
     }
 }
