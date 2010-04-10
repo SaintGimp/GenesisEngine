@@ -46,6 +46,7 @@ namespace GenesisEngine.Specs.DomainSpecs.SimplexNoiseGeneratorSpecs
         Establish context = () =>
         {
             _generator = new SimplexNoiseGenerator();
+            string path = Environment.CurrentDirectory;
         };
     }
 }
