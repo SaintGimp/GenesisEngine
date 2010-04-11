@@ -9,6 +9,10 @@ using Microsoft.Xna.Framework;
 
 namespace GenesisEngine.Specs.DomainSpecs
 {
+    // TODO: the QuadNode class is a flagrant SRP violation and it shows in these tests.
+    // The class needs to be refactored and the tests needs to be extended to fully
+    // cover everything.
+
     [Subject(typeof(QuadNode))]
     public class when_the_node_is_initialized : QuadNodeContext
     {

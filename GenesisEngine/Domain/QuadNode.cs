@@ -13,6 +13,8 @@ namespace GenesisEngine
         // XNA is a right-handed system so the positive z axis points out of the screen
         // and the winding order is clockwise (counter-clockwise faces are culled).
 
+        // TODO: this class is a serious SRP violation and needs to be refactored ASAP!
+
         // This should be 2^n+1
         readonly int _gridSize = 65;
 
