@@ -43,7 +43,7 @@ namespace GenesisEngine.Specs.CameraSpecs
             _camera.Yaw.ShouldEqual(0f);
 
         It should_set_the_pitch_to_face_toward_the_look_at_point = () =>
-            _camera.Pitch.ShouldEqual((float)(-Math.PI / 4));
+            _camera.Pitch.ShouldEqual(-MathHelper.Pi / 4);
 
         It should_set_the_roll_to_face_toward_the_look_at_point = () =>
             _camera.Roll.ShouldEqual(0f);
@@ -137,7 +137,7 @@ namespace GenesisEngine.Specs.CameraSpecs
     public class when_the_pitch_is_set_to_straight_up_or_more : CameraContext
     {
         Because of = () =>
-            _camera.Pitch = (float)Math.PI / 2;
+            _camera.Pitch = MathHelper.Pi / 2;
 
         It should_limit_the_pitch_to_the_maximum_allowable = () =>
             _camera.Pitch.ShouldEqual(Camera.MaximumPitch);
@@ -147,7 +147,7 @@ namespace GenesisEngine.Specs.CameraSpecs
     public class when_the_pitch_is_set_to_straight_down_or_more : CameraContext
     {
         Because of = () =>
-            _camera.Pitch = -(float)Math.PI / 2;
+            _camera.Pitch = -MathHelper.Pi / 2;
 
         It should_limit_the_pitch_to_the_minimum_allowable = () =>
             _camera.Pitch.ShouldEqual(Camera.MinimumPitch);
@@ -220,13 +220,13 @@ namespace GenesisEngine.Specs.CameraSpecs
             _camera.Roll.ShouldEqual(0);
 
         It should_set_the_yaw_to_face_toward_the_look_at_point = () =>
-            _camera.Yaw.ShouldEqual((float)Math.PI / 2);
+            _camera.Yaw.ShouldEqual(MathHelper.Pi / 2);
 
         It should_set_the_pitch_to_face_toward_the_look_at_point = () =>
-            _camera.Pitch.ShouldEqual((float)Math.PI / 4);
+            _camera.Pitch.ShouldEqual(MathHelper.Pi / 4);
 
         It should_generate_a_view_transformation_for_the_current_state = () =>
-            _camera.OriginBasedViewTransformation.ShouldEqual(GenerateOriginBasedViewMatrix(DoubleVector3.Right, (float)Math.PI / 2, (float)Math.PI / 4, 0));
+            _camera.OriginBasedViewTransformation.ShouldEqual(GenerateOriginBasedViewMatrix(DoubleVector3.Right, MathHelper.Pi / 2, MathHelper.Pi / 4, 0));
     }
 
     [Subject(typeof(Camera))]
@@ -265,7 +265,7 @@ namespace GenesisEngine.Specs.CameraSpecs
     public class when_the_pitch_is_changed_to_point_straight_up_or_more : CameraContext
     {
         Because of = () =>
-            _camera.ChangePitch((float)Math.PI / 2);
+            _camera.ChangePitch(MathHelper.Pi / 2);
 
         It should_limit_the_pitch_to_the_maximum_allowable = () =>
             _camera.Pitch.ShouldEqual(Camera.MaximumPitch);
@@ -275,7 +275,7 @@ namespace GenesisEngine.Specs.CameraSpecs
     public class when_the_pitch_is_changed_to_point_straight_down_or_more : CameraContext
     {
         Because of = () =>
-            _camera.ChangePitch(-(float)Math.PI / 2);
+            _camera.ChangePitch(-MathHelper.Pi / 2);
 
         It should_limit_the_pitch_to_the_minimum_allowable = () =>
             _camera.Pitch.ShouldEqual(Camera.MinimumPitch);
@@ -286,7 +286,7 @@ namespace GenesisEngine.Specs.CameraSpecs
     {
         Establish context = () =>
         {
-            _camera.ChangeYaw((float)Math.PI / 4);
+            _camera.ChangeYaw(MathHelper.Pi / 4);
             _camera.ChangePitch(1);
         };
 
@@ -305,7 +305,7 @@ namespace GenesisEngine.Specs.CameraSpecs
     {
         Establish context = () =>
         {
-            _camera.ChangeYaw((float)Math.PI / 4);
+            _camera.ChangeYaw(MathHelper.Pi / 4);
             _camera.ChangePitch(1);
         };
 
@@ -324,7 +324,7 @@ namespace GenesisEngine.Specs.CameraSpecs
     {
         Establish context = () =>
         {
-            _camera.ChangeYaw((float)Math.PI / 4);
+            _camera.ChangeYaw(MathHelper.Pi / 4);
             _camera.ChangePitch(1);
         };
 
@@ -343,7 +343,7 @@ namespace GenesisEngine.Specs.CameraSpecs
     {
         Establish context = () =>
         {
-            _camera.ChangeYaw((float)Math.PI / 4);
+            _camera.ChangeYaw(MathHelper.Pi / 4);
             _camera.ChangePitch(1);
         };
 
@@ -362,7 +362,7 @@ namespace GenesisEngine.Specs.CameraSpecs
     {
         Establish context = () =>
         {
-            _camera.ChangeYaw((float)Math.PI / 4);
+            _camera.ChangeYaw(MathHelper.Pi / 4);
             _camera.ChangePitch(1);
         };
 
@@ -381,7 +381,7 @@ namespace GenesisEngine.Specs.CameraSpecs
     {
         Establish context = () =>
         {
-            _camera.ChangeYaw((float)Math.PI / 4);
+            _camera.ChangeYaw(MathHelper.Pi / 4);
             _camera.ChangePitch(1);
         };
 
