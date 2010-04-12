@@ -14,17 +14,17 @@ namespace GenesisEngine.Specs.CameraSpecs
         Because of = () =>
             _camera.SetViewParameters(new DoubleVector3(1, 2, 3), 4, 5, 6);
 
-        It should_set_the_camera_location_to_the_requested_location = () =>
+        It should_go_to_the_requested_location = () =>
             _camera.Location.ShouldEqual(new DoubleVector3(1, 2, 3));
 
-        It should_set_the_camera_yaw_to_the_requested_yaw = () =>
+        It should_have_the_requested_yaw = () =>
             _camera.Yaw.ShouldEqual(4f);
 
-        It should_set_the_camera_pitch_to_the_requested_pitch = () =>
+        It should_have_the_requested_pitch = () =>
             _camera.Pitch.ShouldEqual(5f);
 
-        It should_set_the_camera_roll_to_the_requested_roll = () =>
-        _camera.Roll.ShouldEqual(6f);
+        It should_have_the_requested_roll = () =>
+            _camera.Roll.ShouldEqual(6f);
 
         It should_generate_a_view_transformation_for_the_current_state = () =>
             _camera.OriginBasedViewTransformation.ShouldEqual(GenerateOriginBasedViewMatrix(_camera.Location, _camera.Yaw, _camera.Pitch, _camera.Roll));
@@ -36,17 +36,17 @@ namespace GenesisEngine.Specs.CameraSpecs
         Because of = () =>
             _camera.SetViewParameters(new DoubleVector3(0, 1, 1), DoubleVector3.Zero);
 
-        It should_set_the_camera_location_to_the_requested_location = () =>
+        It should_go_to_the_requested_location = () =>
             _camera.Location.ShouldEqual(new DoubleVector3(0, 1, 1));
 
-        It should_set_the_camera_yaw_to_face_toward_the_look_at_point = () =>
+        It should_set_the_yaw_to_face_toward_the_look_at_point = () =>
             _camera.Yaw.ShouldEqual(0f);
 
-        It should_set_the_camera_pitch_to_face_toward_the_look_at_point = () =>
+        It should_set_the_pitch_to_face_toward_the_look_at_point = () =>
             _camera.Pitch.ShouldEqual((float)(-Math.PI / 4));
 
-        It should_set_the_camera_roll_to_face_toward_the_look_at_point = () =>
-        _camera.Roll.ShouldEqual(0f);
+        It should_set_the_roll_to_face_toward_the_look_at_point = () =>
+            _camera.Roll.ShouldEqual(0f);
 
         It should_generate_a_view_transformation_for_the_current_state = () =>
             _camera.OriginBasedViewTransformation.ShouldEqual(GenerateOriginBasedViewMatrix(_camera.Location, _camera.Yaw, _camera.Pitch, _camera.Roll));
@@ -61,11 +61,11 @@ namespace GenesisEngine.Specs.CameraSpecs
         It should_have_no_yaw = () =>
             _camera.Yaw.ShouldEqual(0f);
 
-        It should_set_the_camera_pitch_to_the_maximum_allowable_pitch = () =>
+        It should_have_the_maximum_allowable_pitch = () =>
             _camera.Pitch.ShouldEqual(Camera.MaximumPitch);
 
         It should_have_no_roll = () =>
-        _camera.Roll.ShouldEqual(0f);
+            _camera.Roll.ShouldEqual(0f);
 
         It should_generate_a_view_transformation_for_the_current_state = () =>
             _camera.OriginBasedViewTransformation.ShouldEqual(GenerateOriginBasedViewMatrix(_camera.Location, _camera.Yaw, _camera.Pitch, _camera.Roll));
@@ -80,11 +80,11 @@ namespace GenesisEngine.Specs.CameraSpecs
         It should_have_no_yaw = () =>
             _camera.Yaw.ShouldEqual(0f);
 
-        It should_set_the_camera_pitch_to_the_minimum_allowable_pitch = () =>
+        It should_set_the_pitch_to_the_minimum_allowable_pitch = () =>
             _camera.Pitch.ShouldEqual(Camera.MinimumPitch);
 
         It should_have_no_roll = () =>
-        _camera.Roll.ShouldEqual(0f);
+            _camera.Roll.ShouldEqual(0f);
 
         It should_generate_a_view_transformation_for_the_current_state = () =>
             _camera.OriginBasedViewTransformation.ShouldEqual(GenerateOriginBasedViewMatrix(_camera.Location, _camera.Yaw, _camera.Pitch, _camera.Roll));
