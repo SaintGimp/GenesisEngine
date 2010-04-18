@@ -13,6 +13,7 @@ namespace GenesisEngine
         IContainer _container;
         IScreenCustodian<SettingsView, SettingsViewModel> _settingsCustodian;
         IScreenCustodian<StatisticsView, StatisticsViewModel> _statisticsCustodian;
+        // TODO: use SynchronizationContext instead?
         Dispatcher _windowDispatcher;
 
         public WindowManager(IContainer container)
