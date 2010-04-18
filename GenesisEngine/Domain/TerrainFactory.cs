@@ -52,7 +52,7 @@ namespace GenesisEngine
             var orientationVectors = _faceOrientations[normalVector];
             var u = orientationVectors[0];
             var v = orientationVectors[1];
-            face.InitializeMesh(planetRadius, normalVector, u, v, new QuadNodeExtents(-1.0, 1.0, -1.0, 1.0), 0);
+            face.Initialize(planetRadius, normalVector, u, v, new QuadNodeExtents(-1.0, 1.0, -1.0, 1.0), 0);
 
             return face;
         }

@@ -425,6 +425,18 @@ namespace GenesisEngine
             }
         }
 
+        public DoubleVector3 ProjectUnitPlaneToUnitSphere()
+        {
+            // http://mathproofs.blogspot.com/2005/07/mapping-cube-to-sphere.html
+            DoubleVector3 sphereUnitVector;
+
+            sphereUnitVector.X = X * Math.Sqrt(1.0 - (Math.Pow(Y, 2) / 2) - (Math.Pow(Z, 2) / 2) + (Math.Pow(Y, 2) * Math.Pow(Z, 2) / 3));
+            sphereUnitVector.Y = Y * Math.Sqrt(1.0 - (Math.Pow(Z, 2) / 2) - (Math.Pow(X, 2) / 2) + (Math.Pow(Z, 2) * Math.Pow(X, 2) / 3));
+            sphereUnitVector.Z = Z * Math.Sqrt(1.0 - (Math.Pow(X, 2) / 2) - (Math.Pow(Y, 2) / 2) + (Math.Pow(X, 2) * Math.Pow(Y, 2) / 3));
+
+            return sphereUnitVector;
+        }
+
         public static DoubleVector3 Negate(DoubleVector3 value)
         {
             DoubleVector3 negatedVector;

@@ -8,6 +8,5 @@ namespace GenesisEngine
 {
     public interface IQuadNodeRenderer : IRenderer
     {
-        void Initialize(VertexPositionNormalColored[] vertices, int[] indices);
     }
 }

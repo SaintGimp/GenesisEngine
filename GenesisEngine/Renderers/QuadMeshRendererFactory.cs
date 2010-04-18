@@ -7,22 +7,22 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace GenesisEngine
 {
-    public class QuadNodeRendererFactory : IQuadNodeRendererFactory
+    public class QuadMeshRendererFactory : IQuadMeshRendererFactory
     {
         ContentManager _contentManager;
         GraphicsDevice _graphicsDevice;
         ISettings _settings;
 
-        public QuadNodeRendererFactory(ContentManager contentManager, GraphicsDevice graphicsDevice, ISettings settings)
+        public QuadMeshRendererFactory(ContentManager contentManager, GraphicsDevice graphicsDevice, ISettings settings)
         {
             _contentManager = contentManager;
             _graphicsDevice = graphicsDevice;
             _settings = settings;
         }
 
-        public IQuadNodeRenderer Create()
+        public IQuadMeshRenderer Create()
         {
-            return new QuadNodeRenderer(_contentManager, _graphicsDevice, _settings);
+            return new QuadMeshRenderer(_contentManager, _graphicsDevice, _settings);
         }
     }
 }

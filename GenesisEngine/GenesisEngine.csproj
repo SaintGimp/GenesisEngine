@@ -97,6 +97,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Domain\IQuadMesh.cs" />
+    <Compile Include="Domain\IQuadMeshFactory.cs" />
+    <Compile Include="Renderers\IQuadMeshRendererFactory.cs" />
+    <Compile Include="Domain\QuadMeshFactory.cs" />
+    <Compile Include="Renderers\IQuadMeshRenderer.cs" />
+    <Compile Include="Domain\QuadMesh.cs" />
     <Compile Include="Infrastructure\Bootstrapper.cs" />
     <Compile Include="Cameras\Camera.cs" />
     <Compile Include="Cameras\CameraController.cs" />
@@ -141,6 +147,9 @@
     <Compile Include="Input\IInputMapper.cs" />
     <Compile Include="Events\IListener.cs" />
     <Compile Include="Input\InputMapper.cs" />
+    <Compile Include="Renderers\IQuadNodeRendererFactory.cs" />
+    <Compile Include="Renderers\QuadMeshRenderer.cs" />
+    <Compile Include="Renderers\QuadMeshRendererFactory.cs" />
     <Compile Include="Settings\ISettings.cs" />
     <Compile Include="Noise\NoiseFilter.cs" />
     <Compile Include="Noise\TurbulenceSpectralGenerator.cs" />

@@ -14,13 +14,13 @@ namespace GenesisEngine.Specs.DomainSpecs
     // cover everything.
 
     [Subject(typeof(QuadNode))]
-    public class when_the_node_is_initialized : QuadNodeContext
+    public class when_a_node_is_initialized : QuadNodeContext
     {
         Because of = () =>
-            _node.InitializeMesh(_radius, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 7);
+            _node.Initialize(_radius, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 7);
 
-        It should_initialize_the_renderer = () =>
-            _renderer.InitializeWasCalled.ShouldBeTrue();
+        It should_initialize_the_mesh = () =>
+            _mesh.AssertWasCalled(x => x.Initialize(_radius, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 7));
 
         It should_increment_the_node_count_statistic = () =>
             _statistics.NumberOfQuadNodes.ShouldEqual(1);
@@ -33,69 +33,27 @@ namespace GenesisEngine.Specs.DomainSpecs
     }
 
     [Subject(typeof(QuadNode))]
-    public class when_a_top_facing_node_creates_a_mesh : QuadNodeContext
-    {
-        Because of = () =>
-            _node.InitializeMesh(_radius, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 0);
-
-        It should_project_center_point_into_spherical_mesh_space = () =>
-        {
-            var centerPosition = _renderer.Vertices[_renderer.Vertices.Length / 2].Position;
-            centerPosition.ShouldBeCloseTo(Vector3.Zero);
-        };
-
-        It should_calculate_center_point_normal = () =>
-        {
-            var centerNormal = _renderer.Vertices[_renderer.Vertices.Length / 2].Normal;
-            centerNormal.ShouldBeCloseTo(Vector3.Up);
-        };
-
-        It should_project_top_left_corner_into_spherical_mesh_space = () =>
-        {
-            var vertex = _renderer.Vertices[0].Position;
-            AssertCornerIsProjected(vertex, Vector3.Up, Vector3.Left, Vector3.Forward);
-        };
-
-        It should_project_bottom_right_corner_into_spherical_mesh_space = () =>
-        {
-            var vertex = _renderer.Vertices[_renderer.Vertices.Length - 1].Position;
-            AssertCornerIsProjected(vertex, Vector3.Up, Vector3.Backward, Vector3.Right);
-        };
-
-        // TODO: verify that it captures corner and center samples?
-    }
-
-    [Subject(typeof(QuadNode))]
-    public class when_a_node_is_below_the_horizon : QuadNodeContext
+    public class when_a_node_is_updated : QuadNodeContext
     {
         Establish context = () =>
-            _node.InitializeMesh(10, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 5);
+            _node.Initialize(10, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 5);
 
         Because of = () =>
-            _node.Update(new TimeSpan(), DoubleVector3.Down * 100, DoubleVector3.Zero, _clippingPlanes);
+            _node.Update(TimeSpan.Zero, DoubleVector3.Up * 11, DoubleVector3.Zero, _clippingPlanes);
 
-        It should_not_be_visible = () =>
-            _node.Visible.ShouldBeFalse();
-    }
-
-    [Subject(typeof(QuadNode))]
-    public class when_a_node_is_not_below_the_horizon : QuadNodeContext
-    {
-        Establish context = () =>
-            _node.InitializeMesh(10, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 5);
-
-        Because of = () =>
-            _node.Update(new TimeSpan(), DoubleVector3.Up * 100, DoubleVector3.Zero, _clippingPlanes);
-
-        It should_be_visible = () =>
-            _node.Visible.ShouldBeTrue();
+        It should_update_the_mesh = () =>
+            _mesh.AssertWasCalled(x => x.Update(TimeSpan.Zero, DoubleVector3.Up * 11, DoubleVector3.Zero, _clippingPlanes));
     }
 
     [Subject(typeof(QuadNode))]
     public class when_a_leaf_node_is_updated_and_the_camera_is_close : QuadNodeContext
     {
         Establish context = () =>
-            _node.InitializeMesh(10, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 5);
+        {
+            _mesh.Stub(x => x.IsVisibleToCamera).Return(true);
+
+            _node.Initialize(10, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 5);
+        };
 
         Because of = () =>
             _node.Update(new TimeSpan(), DoubleVector3.Up * 11, DoubleVector3.Zero, _clippingPlanes);
@@ -107,7 +65,7 @@ namespace GenesisEngine.Specs.DomainSpecs
         {
             foreach (var subnode in _node.Subnodes)
             {
-                subnode.AssertWasCalled(x => x.InitializeMesh(Arg<double>.Is.Anything, Arg<DoubleVector3>.Is.Anything, Arg<DoubleVector3>.Is.Anything, Arg<DoubleVector3>.Is.Anything, Arg<QuadNodeExtents>.Is.Anything, Arg.Is(6)));
+                subnode.AssertWasCalled(x => x.Initialize(Arg<double>.Is.Anything, Arg<DoubleVector3>.Is.Anything, Arg<DoubleVector3>.Is.Anything, Arg<DoubleVector3>.Is.Anything, Arg<QuadNodeExtents>.Is.Anything, Arg.Is(6)));
             }
         };
 
@@ -125,7 +83,9 @@ namespace GenesisEngine.Specs.DomainSpecs
     {
         Establish context = () =>
         {
-            _node.InitializeMesh(10, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 0);
+            _mesh.Stub(x => x.IsVisibleToCamera).Return(true);
+
+            _node.Initialize(10, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 0);
             _node.Update(new TimeSpan(), DoubleVector3.Up * 11, DoubleVector3.Zero, _clippingPlanes);
         };
 
@@ -141,7 +101,9 @@ namespace GenesisEngine.Specs.DomainSpecs
     {
         Establish context = () =>
         {
-            _node.InitializeMesh(10, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 19);
+            _mesh.Stub(x => x.IsVisibleToCamera).Return(true);
+
+            _node.Initialize(10, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 19);
             _node.Update(new TimeSpan(), DoubleVector3.Up * 11, DoubleVector3.Zero, _clippingPlanes);
         };
 
@@ -160,11 +122,15 @@ namespace GenesisEngine.Specs.DomainSpecs
 
         Establish context = () =>
         {
+            _mesh.Stub(x => x.IsVisibleToCamera).Return(true);
+
             _nearCameraLocation = DoubleVector3.Up * 11;
             _farCameraLocation = DoubleVector3.Up * 15 * 10 * 2;
 
-            _node.InitializeMesh(10, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 0);
+            _node.Initialize(10, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 0);
             _node.Update(new TimeSpan(), _nearCameraLocation, DoubleVector3.Zero, _clippingPlanes);
+
+            _mesh.Stub(x => x.WidthToCameraDistanceRatio).Return(2);
         };
 
         Because of = () =>
@@ -191,7 +157,7 @@ namespace GenesisEngine.Specs.DomainSpecs
         {
             _cameraLocation = DoubleVector3.Up;
 
-            _node.InitializeMesh(10, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 0);
+            _node.Initialize(10, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 0);
             _node.Update(new TimeSpan(), _cameraLocation, DoubleVector3.Zero, _clippingPlanes);
         };
 
@@ -218,11 +184,13 @@ namespace GenesisEngine.Specs.DomainSpecs
 
         Establish context = () =>
         {
+            _mesh.Stub(x => x.IsVisibleToCamera).Return(true);
+
             _cameraLocation = DoubleVector3.Up;
             _viewMatrix = Matrix.Identity;
             _projectionMatrix = Matrix.Identity;
 
-            _node.InitializeMesh(10, Vector3.Up, Vector3.Backward, Vector3.Right, new QuadNodeExtents(-1.0, 1.0, -1.0, 1.0), 0);
+            _node.Initialize(10, Vector3.Up, Vector3.Backward, Vector3.Right, new QuadNodeExtents(-1.0, 1.0, -1.0, 1.0), 0);
             _node.Update(TimeSpan.Zero, DoubleVector3.Up, DoubleVector3.Zero, _clippingPlanes);
         };
 
@@ -231,6 +199,9 @@ namespace GenesisEngine.Specs.DomainSpecs
 
         It should_not_draw_the_node = () =>
             _renderer.DrawWasCalled.ShouldBeFalse();
+
+        It should_not_draw_the_mesh = () =>
+            _mesh.AssertWasNotCalled(x => x.Draw(Arg<DoubleVector3>.Is.Anything, Arg<Matrix>.Is.Anything, Arg<Matrix>.Is.Anything));
 
         It should_draw_the_subnodes_in_the_correct_location = () =>
         {
@@ -250,11 +221,13 @@ namespace GenesisEngine.Specs.DomainSpecs
 
         Establish context = () =>
         {
+            _mesh.Stub(x => x.IsVisibleToCamera).Return(true);
+
             _cameraLocation = DoubleVector3.Up;
             _viewMatrix = Matrix.Identity;
             _projectionMatrix = Matrix.Identity;
 
-            _node.InitializeMesh(10, Vector3.Up, Vector3.Backward, Vector3.Right, new QuadNodeExtents(-1.0, 1.0, -1.0, 1.0), 0);
+            _node.Initialize(10, Vector3.Up, Vector3.Backward, Vector3.Right, new QuadNodeExtents(-1.0, 1.0, -1.0, 1.0), 0);
         };
 
         Because of = () =>
@@ -262,6 +235,9 @@ namespace GenesisEngine.Specs.DomainSpecs
 
         It should_draw_the_node = () =>
             _renderer.DrawWasCalled.ShouldBeTrue();
+
+        It should_draw_the_mesh = () =>
+            _mesh.AssertWasCalled(x => x.Draw(_cameraLocation, _viewMatrix, _projectionMatrix));
 
         It should_draw_the_node_in_the_correct_location = () =>
             _renderer.Location.ShouldEqual(Vector3.Up * 10);
@@ -271,7 +247,7 @@ namespace GenesisEngine.Specs.DomainSpecs
     public class when_a_leaf_node_is_disposed : QuadNodeContext
     {
         Establish context = () =>
-            _node.InitializeMesh(_radius, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 0);
+            _node.Initialize(_radius, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 0);
 
         Because of = () =>
             _node.Dispose();
@@ -288,7 +264,7 @@ namespace GenesisEngine.Specs.DomainSpecs
     {
         Establish context = () =>
         {
-            _node.InitializeMesh(_radius, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 0);
+            _node.Initialize(_radius, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 0);
             _node.Update(new TimeSpan(), DoubleVector3.Up, DoubleVector3.Zero, _clippingPlanes);
         };
 
@@ -316,8 +292,8 @@ namespace GenesisEngine.Specs.DomainSpecs
         public static DoubleVector3 _location;
         public static QuadNodeExtents _extents = new QuadNodeExtents(-1.0, 1.0, -1.0, 1.0);
 
+        public static IQuadMesh _mesh;
         public static IQuadNodeFactory _quadNodeFactory;
-        public static IHeightfieldGenerator _generator;
         public static MockQuadNodeRenderer _renderer;
         public static ISettings _settings;
         public static Statistics _statistics;
@@ -327,10 +303,10 @@ namespace GenesisEngine.Specs.DomainSpecs
 
         Establish context = () =>
         {
+            _mesh = MockRepository.GenerateStub<IQuadMesh>();
+
             _quadNodeFactory = MockRepository.GenerateStub<IQuadNodeFactory>();
             _quadNodeFactory.Stub(x => x.Create()).Do((Func<IQuadNode>)(() => (IQuadNode)MockRepository.GenerateMock(typeof(IQuadNode), new Type[] { typeof(IDisposable) })));
-
-            _generator = MockRepository.GenerateStub<IHeightfieldGenerator>();
 
             // We're using a hand-rolled fake here because of a bug
             // in .Net that prevents mocking of multi-dimentional arrays:
@@ -344,7 +320,7 @@ namespace GenesisEngine.Specs.DomainSpecs
 
             _clippingPlanes = new ClippingPlanes();
 
-            _node = new TestableQuadNode(_quadNodeFactory, _generator, _renderer, _settings, _statistics);
+            _node = new TestableQuadNode(_mesh, _quadNodeFactory, _renderer, _settings, _statistics);
         };
 
         public static void AssertCornerIsProjected(Vector3 projectedVector, Vector3 normalVector, Vector3 uVector, Vector3 vVector)
@@ -360,8 +336,8 @@ namespace GenesisEngine.Specs.DomainSpecs
 
     public class TestableQuadNode : QuadNode
     {
-        public TestableQuadNode(IQuadNodeFactory quadNodeFactory, IHeightfieldGenerator generator, IQuadNodeRenderer renderer, ISettings settings, Statistics statistics)
-            : base(quadNodeFactory, generator, renderer, settings, statistics)
+        public TestableQuadNode(IQuadMesh mesh, IQuadNodeFactory quadNodeFactory, IQuadNodeRenderer renderer, ISettings settings, Statistics statistics)
+            : base(mesh, quadNodeFactory, renderer, settings, statistics)
         {
         }
 
@@ -373,11 +349,6 @@ namespace GenesisEngine.Specs.DomainSpecs
         public double Width
         {
             get { return _extents.Width; }
-        }
-
-        public bool Visible
-        {
-            get { return _isVisible; }
         }
     }
 
