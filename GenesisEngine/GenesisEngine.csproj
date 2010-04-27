@@ -99,6 +99,7 @@
   <ItemGroup>
     <Compile Include="Domain\IQuadMesh.cs" />
     <Compile Include="Domain\IQuadMeshFactory.cs" />
+    <Compile Include="Infrastructure\StopwatchExtensions.cs" />
     <Compile Include="Renderers\IQuadMeshRendererFactory.cs" />
     <Compile Include="Domain\QuadMeshFactory.cs" />
     <Compile Include="Renderers\IQuadMeshRenderer.cs" />

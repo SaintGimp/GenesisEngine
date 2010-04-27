@@ -13,20 +13,13 @@ namespace GenesisEngine.Specs.DomainSpecs
     public class when_the_mesh_is_initialized : QuadMeshContext
     {
         Because of = () =>
-            _mesh.Initialize(_radius, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 7);
+            InitializeTopFacingMesh();
 
         It should_initialize_the_renderer = () =>
             _renderer.InitializeWasCalled.ShouldBeTrue();
 
-        It should_remember_its_level = () =>
-            _mesh.Level.ShouldEqual(7);
-    }
-
-    [Subject(typeof(QuadMesh))]
-    public class when_a_top_facing_mesh_creates_a_mesh : QuadMeshContext
-    {
-        Because of = () =>
-            _mesh.Initialize(_radius, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 0);
+        It should_get_height_data_from_the_generator = () =>
+            _generator.AssertWasCalled(x => x.GetHeight(Arg<DoubleVector3>.Is.Anything, Arg<int>.Is.Equal(5), Arg<double>.Is.Anything), s => s.Repeat.AtLeastOnce());
 
         It should_project_center_point_into_spherical_mesh_space = () =>
         {
@@ -42,24 +35,22 @@ namespace GenesisEngine.Specs.DomainSpecs
 
         It should_project_top_left_corner_into_spherical_mesh_space = () =>
         {
-            var vertex = _renderer.Vertices[0].Position;
-            AssertCornerIsProjected(vertex, Vector3.Up, Vector3.Left, Vector3.Forward);
+            var topLeftPosition = _renderer.Vertices[0].Position;
+            AssertCornerIsProjected(topLeftPosition, Vector3.Up, Vector3.Left, Vector3.Forward);
         };
 
         It should_project_bottom_right_corner_into_spherical_mesh_space = () =>
         {
-            var vertex = _renderer.Vertices[_renderer.Vertices.Length - 1].Position;
-            AssertCornerIsProjected(vertex, Vector3.Up, Vector3.Backward, Vector3.Right);
+            var bottomRightPosition = _renderer.Vertices[_renderer.Vertices.Length - 1].Position;
+            AssertCornerIsProjected(bottomRightPosition, Vector3.Up, Vector3.Backward, Vector3.Right);
         };
-
-        // TODO: verify that it captures corner and center samples?
     }
 
     [Subject(typeof(QuadMesh))]
     public class when_a_mesh_is_below_the_horizon : QuadMeshContext
     {
         Establish context = () =>
-            _mesh.Initialize(10, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 5);
+            InitializeTopFacingMesh();
 
         Because of = () =>
             _mesh.Update(new TimeSpan(), DoubleVector3.Down * 100, DoubleVector3.Zero, _clippingPlanes);
@@ -72,7 +63,7 @@ namespace GenesisEngine.Specs.DomainSpecs
     public class when_a_mesh_is_not_below_the_horizon : QuadMeshContext
     {
         Establish context = () =>
-            _mesh.Initialize(10, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 5);
+            InitializeTopFacingMesh();
 
         Because of = () =>
             _mesh.Update(new TimeSpan(), DoubleVector3.Up * 100, DoubleVector3.Zero, _clippingPlanes);
@@ -81,17 +72,59 @@ namespace GenesisEngine.Specs.DomainSpecs
             _mesh.IsVisibleToCamera.ShouldBeTrue();
     }
 
-    //[Subject(typeof(QuadMesh))]
-    //public class when_a_mesh_is_updated : QuadMeshContext
-    //{
-    //    Establish context = () =>
-    //    {
-    //        _mesh.Initialize(10, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 0);
-    //    };
+    [Subject(typeof(QuadMesh))]
+    public class when_a_visible_mesh_is_updated : QuadMeshContext
+    {
+        public static DoubleVector3 _topLeftPosition;
+        public static DoubleVector3 _cameraPosition;
 
-    //    Because of = () =>
-    //        _mesh.Update();
-    //}
+        Establish context = () =>
+        {
+            InitializeTopFacingMesh();
+
+            _topLeftPosition = _renderer.Vertices[0].Position;
+            _cameraPosition = DoubleVector3.Up * 100;
+        };
+
+        Because of = () =>
+            _mesh.Update(new TimeSpan(), _cameraPosition, DoubleVector3.Zero, _clippingPlanes);
+
+        It should_adjust_the_near_clipping_plane = () =>
+            _clippingPlanes.Near.ShouldBeCloseTo(90);
+
+        It should_adjust_the_far_clipping_plane = () =>
+            _clippingPlanes.Far.ShouldBeCloseTo(DoubleVector3.Distance(_cameraPosition, _topLeftPosition + DoubleVector3.Up * _radius));
+    }
+
+    [Subject(typeof(QuadMesh))]
+    public class when_a_nonvisible_mesh_is_updated : QuadMeshContext
+    {
+        public static DoubleVector3 _topLeftPosition;
+        public static DoubleVector3 _cameraPosition;
+
+        Establish context = () =>
+        {
+            InitializeTopFacingMesh();
+
+            _topLeftPosition = _renderer.Vertices[0].Position;
+            _cameraPosition = DoubleVector3.Down * 100;
+        };
+
+        Because of = () =>
+            _mesh.Update(new TimeSpan(), _cameraPosition, DoubleVector3.Zero, _clippingPlanes);
+
+        It should_not_adjust_the_near_clipping_plane = () =>
+            _clippingPlanes.Near.ShouldBeCloseTo(double.MaxValue);
+
+        It should_not_adjust_the_far_clipping_plane = () =>
+            _clippingPlanes.Far.ShouldBeCloseTo(double.MinValue);
+    }
+
+    // TODO: specs for WidthToCameraDistanceRatio
+
+    // TODO: specs for color of edges
+
+    // TODO: specs for water level
 
     [Subject(typeof(QuadMesh))]
     public class when_a_mesh_is_drawn : QuadMeshContext
@@ -106,7 +139,7 @@ namespace GenesisEngine.Specs.DomainSpecs
             _viewMatrix = Matrix.Identity;
             _projectionMatrix = Matrix.Identity;
 
-            _mesh.Initialize(10, Vector3.Up, Vector3.Backward, Vector3.Right, new QuadNodeExtents(-1.0, 1.0, -1.0, 1.0), 0);
+            InitializeTopFacingMesh();
         };
 
         Because of = () =>
@@ -116,14 +149,14 @@ namespace GenesisEngine.Specs.DomainSpecs
             _renderer.DrawWasCalled.ShouldBeTrue();
 
         It should_draw_the_mesh_in_the_correct_location = () =>
-            _renderer.Location.ShouldEqual(Vector3.Up * 10);
+            _renderer.Location.ShouldEqual(Vector3.Up * _radius);
     }
 
     [Subject(typeof(QuadMesh))]
     public class when_a_mesh_is_disposed : QuadMeshContext
     {
         Establish context = () =>
-            _mesh.Initialize(_radius, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 0);
+            InitializeTopFacingMesh();
 
         Because of = () =>
             _mesh.Dispose();
@@ -134,7 +167,7 @@ namespace GenesisEngine.Specs.DomainSpecs
 
     public class QuadMeshContext
     {
-        public static readonly float _radius = 1;
+        public static readonly float _radius = 10;
         public static DoubleVector3 _location;
         public static QuadNodeExtents _extents = new QuadNodeExtents(-1.0, 1.0, -1.0, 1.0);
 
@@ -164,14 +197,25 @@ namespace GenesisEngine.Specs.DomainSpecs
             _mesh = new QuadMesh(_generator, _renderer, _settings);
         };
 
+        public static void InitializeTopFacingMesh()
+        {
+            _mesh.Initialize(_radius, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 5);
+        }
+
         public static void AssertCornerIsProjected(Vector3 projectedVector, Vector3 normalVector, Vector3 uVector, Vector3 vVector)
+        {
+            Vector3 expectedVector = ProjectCornerToSphere(normalVector, uVector, vVector);
+
+            projectedVector.ShouldBeCloseTo(expectedVector);
+        }
+
+        public static Vector3 ProjectCornerToSphere(Vector3 normalVector, Vector3 uVector, Vector3 vVector)
         {
             var expectedVector = (normalVector * _radius) + (uVector * _radius) + (vVector * _radius);
             expectedVector.Normalize();
             expectedVector *= _radius;
             expectedVector -= normalVector * _radius;
-
-            projectedVector.ShouldBeCloseTo(expectedVector);
+            return expectedVector;
         }
     }
 

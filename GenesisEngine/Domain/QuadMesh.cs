@@ -16,7 +16,7 @@ namespace GenesisEngine
         // TODO: make sure we're accessing 2D arrays in row-major order as per http://msdn.microsoft.com/en-us/magazine/cc872851.aspx
 
         // This should be 2^n+1
-        readonly int _gridSize = 65;
+        static readonly int _gridSize = 65;
 
         DoubleVector3 _locationRelativeToPlanet;
         double _planetRadius;
@@ -24,15 +24,21 @@ namespace GenesisEngine
         DoubleVector3 _vVector;
         DoubleVector3 _planeNormalVector;
         protected QuadNodeExtents _extents;
+        double _meshStride;
 
         IHeightfieldGenerator _generator;
 
         VertexPositionNormalColored[] _vertices;
-        int[] _indices;
+        static int[] _indices;
         DoubleVector3[] _vertexSamples;
 
         IQuadMeshRenderer _renderer;
         readonly ISettings _settings;
+
+        static QuadMesh()
+        {
+            GenerateIndices();    
+        }
 
         public QuadMesh(IHeightfieldGenerator generator, IQuadMeshRenderer renderer, ISettings settings)
         {
@@ -62,6 +68,8 @@ namespace GenesisEngine
             _locationRelativeToPlanet = (_planeNormalVector) + (_uVector * ((_extents.West + (_extents.Width / 2.0)))) + (_vVector * ((_extents.North + (_extents.Width / 2.0))));
             _locationRelativeToPlanet = _locationRelativeToPlanet.ProjectUnitPlaneToUnitSphere() * _planetRadius;
 
+            _meshStride = _extents.Width / (_gridSize - 1);
+
             GenerateMeshVertices();
             CollectMeshSamples();
 
@@ -80,155 +88,138 @@ namespace GenesisEngine
                 _vertices[_gridSize * _gridSize - 1].Position
             };
 
-            // Move them back into real space
+            // Move them back into planet-relative space
             for (int x = 0; x < _vertexSamples.Length; x++)
             {
                 _vertexSamples[x] += _locationRelativeToPlanet;
             }
         }
 
-        private void GenerateMeshVertices()
+        void GenerateMeshVertices()
         {
             _vertices = new VertexPositionNormalColored[_gridSize * _gridSize];
 
-            for (int u = 0; u < _gridSize; u++)
+            for (int row = 0; row < _gridSize; row++)
             {
-                for (int v = 0; v < _gridSize; v++)
+                for (int column = 0; column < _gridSize; column++)
                 {
-                    // TODO: pass in the vertex to be modified
-                    _vertices[u * _gridSize + v] = GetVertexInMeshSpace(u, v);
+                    _vertices[row * _gridSize + column] = GetVertexInMeshSpace(column, row);
                 }
             }
 
-            GenerateIndices();
             GenerateNormals();
-
-            if (_settings.ShowQuadBoundaries)
-            {
-                MarkQuadBoundaries();
-            }
         }
 
-        void MarkQuadBoundaries()
-        {
-            MarkNorthBoundary(_extents.North == -1 ? Color.Green : Color.Red);
-            MarkSouthBoundary(_extents.South == 1 ? Color.Green : Color.Red);
-            MarkWestBoundary(_extents.West == -1 ? Color.Green : Color.Red);
-            MarkEastBoundary(_extents.East == 1 ? Color.Green : Color.Red);
-        }
-
-        void MarkNorthBoundary(Color color)
-        {
-            for (int x = 0; x < _gridSize; x++)
-            {
-                _vertices[x].Color = color;
-            }
-        }
-
-        void MarkSouthBoundary(Color color)
-        {
-            for (int x = 0; x < _gridSize; x++)
-            {
-                _vertices[_vertices.Length - x - 1].Color = color;
-            }
-        }
-
-        void MarkWestBoundary(Color color)
-        {
-            for (int x = 0; x < _gridSize; x++)
-            {
-                _vertices[_gridSize * x].Color = color;
-            }
-        }
-
-        void MarkEastBoundary(Color color)
-        {
-            for (int x = 0; x < _gridSize; x++)
-            {
-                _vertices[_gridSize * x + _gridSize - 1].Color = color;
-            }
-        }
-
-        private VertexPositionNormalColored GetVertexInMeshSpace(int u, int v)
+        VertexPositionNormalColored GetVertexInMeshSpace(int column, int row)
         {
             // Check out "Textures and Modelling - A Procedural Approach" by Ken Musgaves 
 
-            // Managing data in different reference frames (zero-based mesh, real-world-based mesh) is going
-            // to be tricky.  We want to build a mesh where
+            // We want to build a mesh where
             // the center of the mesh is at 0,0 but the vertices are sphere-projected as though they were out in their
             // correct place in the sphere.  Then we want to keep track of the mesh's real-world location so we can do a
             // camera-relative translation for rendering.
 
-            // We start with a sea-level-based height and quad-relative coordinates.  We first convert the quad
-            // coordinates into a planet-space vector that points to the equivalent point on the mesh plane.  Then we project
-            // to a sphere by normalizing the vector and extending it by the planet radius plus heightfield height, which gives
-            // us the correct spherical distance from the center.  Finally we translate the vector "downward" by the radius so
-            // that a zero-height point in the exact middle of the mesh surface would be at the origin.
+            // We have several different reference frames to deal with here:
+            //   "heightfield" coordinates which is the column and row index of the vertex in the mesh grid
+            //   "Unit plane" coordinates which is the coordinates of the vertex on the unit plane of this quadtree
+            //   "Unit sphere" coordinates which is the coordinates of the vertex on the unit sphere arc of this quadtree
+            //   "Planet space" coordinates which is the coordinates of the vertex in real units relative to the planet center
+            //   "Mesh space" coordinates which is the coordinates of the vertex in real units after the center point of the mesh
+            //   has been translated to the center of the planet
 
-            var sphereUnitVector = ProjectOntoSphere(u, v);
-            var terrainHeight = _generator.GetHeight(sphereUnitVector, Level, 8000);
+            // We start with quad-relative coordinates.  We first convert the quad coordinates into a unit plane vector that
+            // points to the equivalent point on the quadtree's plane.  Then we project the unit plane to its equivalent unit
+            // sphere vector.  We then calculate the terrain height for the vertex and use that information to extend the unit
+            // sphere vector to the proper length for the real-space size of our planet.  Finally we translate the vector
+            // "downward" by the radius so that a zero-height point in the exact middle of the mesh surface would be at the origin.
 
-            // TODO: Temporary water adjustment, needs to live somewhere else
-            if (terrainHeight < 0)
-            {
-                terrainHeight = 0;
-            }
+            var unitPlaneVector = ConvertToUnitPlaneVector(column, row);
+            var unitSphereVector = unitPlaneVector.ProjectUnitPlaneToUnitSphere();
 
-            var realVector = ConvertToRealSpace(sphereUnitVector, terrainHeight);
-            var meshVector = ConvertToMeshSpace(realVector);
+            var terrainHeight = _generator.GetHeight(unitSphereVector, Level, 8000);
+            var adjustedTerrainHeight = AdjustForSeaLevel(terrainHeight);
 
-            return CreateVertex(meshVector, terrainHeight); ;
+            var planetSpaceVector = ConvertToPlanetSpace(unitSphereVector, adjustedTerrainHeight);
+            var meshSpaceVector = ConvertToMeshSpace(planetSpaceVector);
+
+            var vertexColor = GetVertexColor(column, row, adjustedTerrainHeight);
+
+            return CreateVertex(meshSpaceVector, vertexColor);
         }
 
-        VertexPositionNormalColored CreateVertex(DoubleVector3 meshVector, double terrainHeight)
+        DoubleVector3 ConvertToUnitPlaneVector(int column, int row)
         {
-            var vertex = new VertexPositionNormalColored { Position = meshVector };
-
-            if (terrainHeight <= 0)
-            {
-                vertex.Color = Color.Blue;
-            }
-            else
-            {
-                vertex.Color = Color.White;
-            }
-
-            return vertex;
-        }
-
-        private DoubleVector3 ProjectOntoSphere(int u, int v)
-        {
-            var planeUnitVector = ConvertToUnitPlaneVector(u, v);
-            var sphereUnitVector = planeUnitVector.ProjectUnitPlaneToUnitSphere();
-
-            return sphereUnitVector;
-        }
-
-        private DoubleVector3 ConvertToUnitPlaneVector(int u, int v)
-        {
-            // TODO: promote to class member
-            var stride = _extents.Width / (_gridSize - 1);
-
-            var uDelta = _uVector * (_extents.North + (u * stride));
-            var vDelta = _vVector * (_extents.West + (v * stride));
+            var uDelta = _uVector * (_extents.North + (row * _meshStride));
+            var vDelta = _vVector * (_extents.West + (column * _meshStride));
             var convertedVector = _planeNormalVector + uDelta + vDelta;
 
             return convertedVector;
         }
 
-        private DoubleVector3 ConvertToRealSpace(DoubleVector3 sphereUnitVector, double terrainHeight)
+        double AdjustForSeaLevel(double terrainHeight)
+        {
+            return terrainHeight < 0 ? 0 : terrainHeight;
+        }
+
+        Color GetVertexColor(int column, int row, double terrainHeight)
+        {
+            var color = GetTerrainColor(terrainHeight);
+
+            color = AddBoundaryColor(row, column, color);
+
+            return color;
+        }
+
+        Color GetTerrainColor(double terrainHeight)
+        {
+            return terrainHeight <= 0 ? Color.Blue : Color.White;
+        }
+
+        Color AddBoundaryColor(int row, int column, Color terrainColor)
+        {
+            var color = terrainColor;
+
+            if (_settings.ShowQuadBoundaries)
+            {
+                if (row == 0)
+                {
+                    color = _extents.North == -1 ? Color.Green : Color.Red;
+                }
+                else if (row == _gridSize - 1)
+                {
+                    color = _extents.South == 1 ? Color.Green : Color.Red;
+                }
+                else if (column == 0)
+                {
+                    color = _extents.West == -1 ? Color.Green : Color.Red;
+                }
+                else if (column == _gridSize - 1)
+                {
+                    color = _extents.East == 1 ? Color.Green : Color.Red;
+                }
+            }
+
+            return color;
+        }
+
+        DoubleVector3 ConvertToPlanetSpace(DoubleVector3 sphereUnitVector, double terrainHeight)
         {
             return sphereUnitVector * (_planetRadius + terrainHeight);
         }
 
-        private DoubleVector3 ConvertToMeshSpace(DoubleVector3 planetSpaceVector)
+        DoubleVector3 ConvertToMeshSpace(DoubleVector3 planetSpaceVector)
         {
             return planetSpaceVector - _locationRelativeToPlanet;
         }
 
-        private void GenerateIndices()
+        VertexPositionNormalColored CreateVertex(DoubleVector3 meshVector, Color terrainColor)
         {
-            // TODO: I think we can generate the indices once and share it for all
+            return new VertexPositionNormalColored { Position = meshVector, Color = terrainColor };
+        }
+
+        static void GenerateIndices()
+        {
+            // We can generate the indices once and share it for all
             // instances since it never changes.  In the future we'll want to deal
             // with adjacent nodes at different levels by constructing special
             // index sets that blend them at the edge.
@@ -255,14 +246,14 @@ namespace GenesisEngine
             }
         }
 
-        private void GenerateNormals()
+        void GenerateNormals()
         {
             InitializeNormals();
             CalculateNormals();
             NormalizeNormals();
         }
 
-        private void InitializeNormals()
+        void InitializeNormals()
         {
             for (int x = 0; x < _vertices.Length; x++)
             {
@@ -270,7 +261,7 @@ namespace GenesisEngine
             }
         }
 
-        private void CalculateNormals()
+        void CalculateNormals()
         {
             // Iterate through each indexed vertex and gradually
             // accumulate the normals in the vertices as we go.
@@ -291,7 +282,7 @@ namespace GenesisEngine
             }
         }
 
-        private void NormalizeNormals()
+        void NormalizeNormals()
         {
             for (int i = 0; i < _vertices.Length; i++)
                 _vertices[i].Normal.Normalize();
@@ -299,13 +290,18 @@ namespace GenesisEngine
 
         public void Update(TimeSpan elapsedTime, DoubleVector3 cameraLocation, DoubleVector3 planetLocation, ClippingPlanes clippingPlanes)
         {
-            var cameraRelationship = GetDistanceFrom(cameraLocation);
-            var distanceFromCamera = cameraRelationship.ClosestDistance;
+            // TODO: I don't like this class's public member design.  In order to get properties like IsVisibleToCamera,
+            // you must first call Update with appropriate information.  Internally, a lot of stuff is also
+            // order-dependent.  However, this seems to be the most performant design at the moment.
+
+            var meshDistance = GetDistanceFrom(cameraLocation);
+            var distanceFromCamera = meshDistance.ClosestDistance;
+            
             WidthToCameraDistanceRatio = distanceFromCamera / WidthInRealSpaceUnits();
 
-            DetermineVisibility(cameraLocation, planetLocation, cameraRelationship.ClosestVertex);
+            IsVisibleToCamera = CalculateVisibility(cameraLocation, planetLocation, meshDistance.ClosestVertex);
 
-            SetClippingPlanes(cameraRelationship, clippingPlanes);
+            SetClippingPlanes(meshDistance, clippingPlanes);
         }
 
         MeshDistance GetDistanceFrom(DoubleVector3 location)
@@ -323,18 +319,19 @@ namespace GenesisEngine
                     closestDistanceSquared = distanceSquared;
                     closestVertex = vertex;
                 }
-                else if (distanceSquared > furthestDistanceSquared)
+                if (distanceSquared > furthestDistanceSquared)
                 {
                     furthestDistanceSquared = distanceSquared;
                     furthestVertex = vertex;
                 }
             }
 
+            // TODO: We're spamming the garbage collector with this.  Allocate one instance per mesh and reuse.
             return new MeshDistance()
             {
                 ClosestDistance = Math.Sqrt(closestDistanceSquared),
                 ClosestVertex = closestVertex,
-                FurthestDistance = Math.Sqrt(closestDistanceSquared),
+                FurthestDistance = Math.Sqrt(furthestDistanceSquared),
                 FurthestVertex = furthestVertex
             };
         }
@@ -344,28 +341,31 @@ namespace GenesisEngine
             return _extents.Width * _planetRadius;
         }
 
-        void DetermineVisibility(DoubleVector3 cameraLocation, DoubleVector3 planetLocation, DoubleVector3 closestVertex)
+        bool CalculateVisibility(DoubleVector3 cameraLocation, DoubleVector3 planetLocation, DoubleVector3 closestVertex)
         {
-            var cameraDirection = DoubleVector3.Normalize(cameraLocation - planetLocation);
-            var nodeDirection = DoubleVector3.Normalize(closestVertex - planetLocation);
+            // TODO: this isn't quite right yet.  At high altitude you can see some popping of distant meshes on
+            // the horizon
 
-            var horizonAngle = Math.Acos(_planetRadius * 0.997 / DoubleVector3.Distance(planetLocation, cameraLocation));
-            var angleToNode = Math.Acos(DoubleVector3.Dot(cameraDirection, nodeDirection));
+            var planetToCamera = DoubleVector3.Normalize(cameraLocation - planetLocation);
+            var planetToMesh = DoubleVector3.Normalize(closestVertex - planetLocation);
 
-            IsVisibleToCamera = (horizonAngle > angleToNode);
+            var horizonAngle = Math.Acos(_planetRadius * 0.99 / DoubleVector3.Distance(planetLocation, cameraLocation));
+            var angleToMesh = Math.Acos(DoubleVector3.Dot(planetToCamera, planetToMesh));
+
+            return horizonAngle > angleToMesh;
         }
 
-        void SetClippingPlanes(MeshDistance cameraRelationship, ClippingPlanes clippingPlanes)
+        void SetClippingPlanes(MeshDistance meshDistance, ClippingPlanes clippingPlanes)
         {
             if (IsVisibleToCamera)
             {
-                if (clippingPlanes.Near > cameraRelationship.ClosestDistance)
+                if (clippingPlanes.Near > meshDistance.ClosestDistance)
                 {
-                    clippingPlanes.Near = cameraRelationship.ClosestDistance;
+                    clippingPlanes.Near = meshDistance.ClosestDistance;
                 }
-                if (clippingPlanes.Far < cameraRelationship.FurthestDistance)
+                if (clippingPlanes.Far < meshDistance.FurthestDistance)
                 {
-                    clippingPlanes.Far = cameraRelationship.FurthestDistance;
+                    clippingPlanes.Far = meshDistance.FurthestDistance;
                 }
             }
         }
