@@ -137,12 +137,11 @@ namespace GenesisEngine
             var unitSphereVector = unitPlaneVector.ProjectUnitPlaneToUnitSphere();
 
             var terrainHeight = _generator.GetHeight(unitSphereVector, Level, 8000);
-            var adjustedTerrainHeight = AdjustForSeaLevel(terrainHeight);
 
-            var planetSpaceVector = ConvertToPlanetSpace(unitSphereVector, adjustedTerrainHeight);
+            var planetSpaceVector = ConvertToPlanetSpace(unitSphereVector, terrainHeight);
             var meshSpaceVector = ConvertToMeshSpace(planetSpaceVector);
 
-            var vertexColor = GetVertexColor(column, row, adjustedTerrainHeight);
+            var vertexColor = GetVertexColor(column, row, terrainHeight);
 
             return CreateVertex(meshSpaceVector, vertexColor);
         }
@@ -154,11 +153,6 @@ namespace GenesisEngine
             var convertedVector = _planeNormalVector + uDelta + vDelta;
 
             return convertedVector;
-        }
-
-        double AdjustForSeaLevel(double terrainHeight)
-        {
-            return terrainHeight < 0 ? 0 : terrainHeight;
         }
 
         Color GetVertexColor(int column, int row, double terrainHeight)

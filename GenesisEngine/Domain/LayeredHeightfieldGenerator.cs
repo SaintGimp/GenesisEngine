@@ -19,7 +19,7 @@ namespace GenesisEngine
 
             if (continentalHeight < 0)
             {
-                return continentalHeight;
+                return 0;
             }
         
             return continentalHeight + GetTerrainHeight(location, level, scale, continentalHeight);
