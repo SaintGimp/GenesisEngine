@@ -141,7 +141,7 @@ namespace GenesisEngine
             var planetSpaceVector = ConvertToPlanetSpace(unitSphereVector, terrainHeight);
             var meshSpaceVector = ConvertToMeshSpace(planetSpaceVector);
 
-            var vertexColor = GetVertexColor(column, row, terrainHeight);
+            var vertexColor = GetVertexColor(terrainHeight, column, row, _gridSize, _extents);
 
             return CreateVertex(meshSpaceVector, vertexColor);
         }
@@ -155,11 +155,14 @@ namespace GenesisEngine
             return convertedVector;
         }
 
-        Color GetVertexColor(int column, int row, double terrainHeight)
+        Color GetVertexColor(double terrainHeight, int column, int row, int gridSize, QuadNodeExtents extents)
         {
             var color = GetTerrainColor(terrainHeight);
 
-            color = AddBoundaryColor(row, column, color);
+            if (_settings.ShowQuadBoundaries)
+            {
+                color = AddBoundaryColor(color, column, row, gridSize, extents);
+            }
 
             return color;
         }
@@ -169,28 +172,25 @@ namespace GenesisEngine
             return terrainHeight <= 0 ? Color.Blue : Color.White;
         }
 
-        Color AddBoundaryColor(int row, int column, Color terrainColor)
+        Color AddBoundaryColor(Color terrainColor, int column, int row, int gridSize, QuadNodeExtents extents)
         {
             var color = terrainColor;
 
-            if (_settings.ShowQuadBoundaries)
+            if (row == 0)
             {
-                if (row == 0)
-                {
-                    color = _extents.North == -1 ? Color.Green : Color.Red;
-                }
-                else if (row == _gridSize - 1)
-                {
-                    color = _extents.South == 1 ? Color.Green : Color.Red;
-                }
-                else if (column == 0)
-                {
-                    color = _extents.West == -1 ? Color.Green : Color.Red;
-                }
-                else if (column == _gridSize - 1)
-                {
-                    color = _extents.East == 1 ? Color.Green : Color.Red;
-                }
+                color = extents.North == -1 ? Color.Green : Color.Red;
+            }
+            else if (row == gridSize - 1)
+            {
+                color = extents.South == 1 ? Color.Green : Color.Red;
+            }
+            else if (column == 0)
+            {
+                color = extents.West == -1 ? Color.Green : Color.Red;
+            }
+            else if (column == gridSize - 1)
+            {
+                color = extents.East == 1 ? Color.Green : Color.Red;
             }
 
             return color;
