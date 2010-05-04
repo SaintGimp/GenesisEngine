@@ -225,9 +225,9 @@ namespace GenesisEngine.Specs.DomainSpecs
         public bool DrawWasCalled { get; private set; }
         public bool DisposeWasCalled { get; private set; }
         public Vector3 Location { get; private set; }
-        public VertexPositionNormalColored[] Vertices { get; private set; }
+        public VertexPositionNormalColor[] Vertices { get; private set; }
 
-        public virtual void Initialize(VertexPositionNormalColored[] vertices, int[] indices)
+        public virtual void Initialize(VertexPositionNormalColor[] vertices, short[] indices)
         {
             this.InitializeWasCalled = true;
             this.Vertices = vertices;

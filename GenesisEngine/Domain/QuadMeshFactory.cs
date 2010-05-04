@@ -11,7 +11,6 @@ namespace GenesisEngine
         readonly IQuadMeshRendererFactory _rendererFactory;
         readonly IHeightfieldGenerator _generator;
         readonly Settings _settings;
-        readonly Statistics _statistics;
 
         public QuadMeshFactory(IQuadMeshRendererFactory rendererFactory, IHeightfieldGenerator generator, Settings settings)
         {

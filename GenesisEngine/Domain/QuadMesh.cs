@@ -16,7 +16,7 @@ namespace GenesisEngine
         // TODO: make sure we're accessing 2D arrays in row-major order as per http://msdn.microsoft.com/en-us/magazine/cc872851.aspx
 
         // This should be 2^n+1
-        static readonly int _gridSize = 65;
+        static readonly short _gridSize = 65;
 
         DoubleVector3 _locationRelativeToPlanet;
         double _planetRadius;
@@ -28,8 +28,8 @@ namespace GenesisEngine
 
         IHeightfieldGenerator _generator;
 
-        VertexPositionNormalColored[] _vertices;
-        static int[] _indices;
+        VertexPositionNormalColor[] _vertices;
+        static short[] _indices;
         DoubleVector3[] _vertexSamples;
 
         IQuadMeshRenderer _renderer;
@@ -97,7 +97,7 @@ namespace GenesisEngine
 
         void GenerateMeshVertices()
         {
-            _vertices = new VertexPositionNormalColored[_gridSize * _gridSize];
+            _vertices = new VertexPositionNormalColor[_gridSize * _gridSize];
 
             for (int row = 0; row < _gridSize; row++)
             {
@@ -110,7 +110,7 @@ namespace GenesisEngine
             GenerateNormals();
         }
 
-        VertexPositionNormalColored GetVertexInMeshSpace(int column, int row)
+        VertexPositionNormalColor GetVertexInMeshSpace(int column, int row)
         {
             // Check out "Textures and Modelling - A Procedural Approach" by Ken Musgaves 
 
@@ -206,9 +206,9 @@ namespace GenesisEngine
             return planetSpaceVector - _locationRelativeToPlanet;
         }
 
-        VertexPositionNormalColored CreateVertex(DoubleVector3 meshVector, Color terrainColor)
+        VertexPositionNormalColor CreateVertex(DoubleVector3 meshVector, Color terrainColor)
         {
-            return new VertexPositionNormalColored { Position = meshVector, Color = terrainColor };
+            return new VertexPositionNormalColor { Position = meshVector, Color = terrainColor };
         }
 
         static void GenerateIndices()
@@ -218,16 +218,20 @@ namespace GenesisEngine
             // with adjacent nodes at different levels by constructing special
             // index sets that blend them at the edge.
 
-            _indices = new int[(_gridSize - 1) * (_gridSize - 1) * 6];
+            // TODO: Right now our indices must be 16 bits because we have to target
+            // the XNA 4.0 Reach profile until RTM is released.  After RTM we should
+            // be able to push this up to 32 bits if we want to.
+
+            _indices = new short[(_gridSize - 1) * (_gridSize - 1) * 6];
             int counter = 0;
-            for (int x = 0; x < _gridSize - 1; x++)
+            for (var x = 0; x < _gridSize - 1; x++)
             {
-                for (int y = 0; y < _gridSize - 1; y++)
+                for (var y = 0; y < _gridSize - 1; y++)
                 {
-                    int topLeft = x * _gridSize + y;
-                    int lowerLeft = (x + 1) * _gridSize + y;
-                    int topRight = x * _gridSize + (y + 1);
-                    int lowerRight = (x + 1) * _gridSize + (y + 1);
+                    var topLeft = (short)(x * _gridSize + y);
+                    var lowerLeft = (short)((x + 1) * _gridSize + y);
+                    var topRight = (short)(x * _gridSize + (y + 1));
+                    var lowerRight = (short)((x + 1) * _gridSize + (y + 1));
 
                     _indices[counter++] = topLeft;
                     _indices[counter++] = lowerRight;

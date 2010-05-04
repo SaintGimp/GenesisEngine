@@ -22,16 +22,13 @@ namespace GenesisEngine
             this.GraphicsDeviceManager = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
 
-            this.GraphicsDeviceManager.MinimumVertexShaderProfile = ShaderProfile.VS_3_0;
-            this.GraphicsDeviceManager.MinimumPixelShaderProfile = ShaderProfile.PS_3_0;
-            
             this.GraphicsDeviceManager.SynchronizeWithVerticalRetrace = false;
             this.IsFixedTimeStep = false;
 
-            GraphicsDeviceManager.PreferredDepthStencilFormat = DepthFormat.Depth32;
+            GraphicsDeviceManager.PreferredDepthStencilFormat = DepthFormat.Depth24;
 
             Window.AllowUserResizing = true;
-            Window.ClientSizeChanged += new EventHandler(Window_ClientSizeChanged);
+            Window.ClientSizeChanged += Window_ClientSizeChanged;
         }
 
         public GraphicsDeviceManager GraphicsDeviceManager { get; private set; }

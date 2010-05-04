@@ -2,6 +2,6 @@
 {
     public interface IQuadMeshRenderer : IRenderer
     {
-        void Initialize(VertexPositionNormalColored[] vertices, int[] indices);
+        void Initialize(VertexPositionNormalColor[] vertices, short[] indices);
     }
 }
