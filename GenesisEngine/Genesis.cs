@@ -121,7 +121,7 @@ namespace GenesisEngine
             _inputState.Update(gameTime.ElapsedGameTime, Keyboard.GetState(), Mouse.GetState());
             _inputMapper.HandleInput(_inputState);
 
-            //Debug.WriteLine(Stopwatch.StartNew().Measure(() => _mainPresenter.Update(gameTime.ElapsedGameTime)));
+            Debug.WriteLine(Stopwatch.StartNew().Measure(() => _mainPresenter.Update(gameTime.ElapsedGameTime)));
             _mainPresenter.Update(gameTime.ElapsedGameTime);
             
             base.Update(gameTime);

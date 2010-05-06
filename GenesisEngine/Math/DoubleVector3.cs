@@ -430,9 +430,13 @@ namespace GenesisEngine
             // http://mathproofs.blogspot.com/2005/07/mapping-cube-to-sphere.html
             DoubleVector3 sphereUnitVector;
 
-            sphereUnitVector.X = X * Math.Sqrt(1.0 - (Math.Pow(Y, 2) / 2) - (Math.Pow(Z, 2) / 2) + (Math.Pow(Y, 2) * Math.Pow(Z, 2) / 3));
-            sphereUnitVector.Y = Y * Math.Sqrt(1.0 - (Math.Pow(Z, 2) / 2) - (Math.Pow(X, 2) / 2) + (Math.Pow(Z, 2) * Math.Pow(X, 2) / 3));
-            sphereUnitVector.Z = Z * Math.Sqrt(1.0 - (Math.Pow(X, 2) / 2) - (Math.Pow(Y, 2) / 2) + (Math.Pow(X, 2) * Math.Pow(Y, 2) / 3));
+            var xSquared = X * X;
+            var ySquared = Y * Y;
+            var zSquared = Z * Z;
+
+            sphereUnitVector.X = X * Math.Sqrt(1.0 - (ySquared / 2) - (zSquared / 2) + (ySquared * zSquared / 3));
+            sphereUnitVector.Y = Y * Math.Sqrt(1.0 - (zSquared / 2) - (xSquared / 2) + (zSquared * xSquared / 3));
+            sphereUnitVector.Z = Z * Math.Sqrt(1.0 - (xSquared / 2) - (ySquared / 2) + (xSquared * ySquared / 3));
 
             return sphereUnitVector;
         }

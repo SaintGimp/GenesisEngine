@@ -12,5 +12,6 @@ _ReSharper.*
 *.vsp
 *.coverage
 *.cachefile
+*.psess
 
 /Specs/*.xml
