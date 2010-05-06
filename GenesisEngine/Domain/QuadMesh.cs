@@ -246,17 +246,8 @@ namespace GenesisEngine
 
         void GenerateNormals()
         {
-            InitializeNormals();
             CalculateNormals();
             NormalizeNormals();
-        }
-
-        void InitializeNormals()
-        {
-            for (int x = 0; x < _vertices.Length; x++)
-            {
-                _vertices[x].Normal = new Vector3(0, 0, 0);
-            }
         }
 
         void CalculateNormals()
