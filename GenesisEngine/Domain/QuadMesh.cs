@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Diagnostics;
@@ -99,13 +100,13 @@ namespace GenesisEngine
         {
             _vertices = new VertexPositionNormalColor[_gridSize * _gridSize];
 
-            for (int row = 0; row < _gridSize; row++)
+            Parallel.For(0, _gridSize, row =>
             {
                 for (int column = 0; column < _gridSize; column++)
                 {
                     _vertices[row * _gridSize + column] = GetVertexInMeshSpace(column, row);
                 }
-            }
+            });
 
             GenerateNormals();
         }
