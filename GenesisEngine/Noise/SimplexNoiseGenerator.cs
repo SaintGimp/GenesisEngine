@@ -15,9 +15,9 @@ namespace GenesisEngine
                                 new int[] {0, 1, 1}, new int[] {0, -1, 1}, new int[] {0, 1, -1}, new int[] {0, -1, -1}};
 
         // TODO: generate from seed, and also maybe increase the length and range
-        private static int[] p = new int [256];
+        private static byte[] p = new byte[256];
 
-        private static int[] perm = new int[512];
+        private static byte[] perm = new byte[512];
 
         static SimplexNoiseGenerator()
         {
@@ -34,7 +34,7 @@ namespace GenesisEngine
         {
             for (int x = 0; x < p.Length; x++)
             {
-                p[x] = x;
+                p[x] = (byte)x;
             }
 
             // TODO: configurable seed
