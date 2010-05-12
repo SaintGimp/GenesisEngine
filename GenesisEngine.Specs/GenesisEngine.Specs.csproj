@@ -113,7 +113,9 @@
   <ItemGroup>
     <Compile Include="CameraSpecs\CameraControllerSpecs.cs" />
     <Compile Include="CameraSpecs\CameraSpecs.cs" />
+    <Compile Include="DomainSpecs\EdgeColorizerSpecs.cs" />
     <Compile Include="DomainSpecs\QuadMeshSpecs.cs" />
+    <Compile Include="DomainSpecs\TerrainColorizerSpecs.cs" />
     <Compile Include="InputSpecs\XnaInputStateSpecs.cs" />
     <Compile Include="DomainSpecs\PlanetSpecs.cs" />
     <Compile Include="DomainSpecs\QuadNodeExtentsSpecs.cs" />

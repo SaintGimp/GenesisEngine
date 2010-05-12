@@ -115,8 +115,11 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Domain\EdgeColorizer.cs" />
+    <Compile Include="Domain\ITerrainColorizer.cs" />
     <Compile Include="Domain\IQuadMesh.cs" />
     <Compile Include="Domain\IQuadMeshFactory.cs" />
+    <Compile Include="Domain\TerrainColorizer.cs" />
     <Compile Include="Infrastructure\StopwatchExtensions.cs" />
     <Compile Include="Renderers\IQuadMeshRendererFactory.cs" />
     <Compile Include="Domain\QuadMeshFactory.cs" />

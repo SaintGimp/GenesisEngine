@@ -13,7 +13,11 @@ namespace GenesisEngine.Specs.DomainSpecs
     public class when_the_mesh_is_initialized : QuadMeshContext
     {
         Because of = () =>
+        {
+            _terrainColorizer.Stub(x => x.GetColor(Arg<double>.Is.Anything, Arg<int>.Is.Anything, Arg<int>.Is.Anything, Arg<int>.Is.Anything, Arg<QuadNodeExtents>.Is.Anything))
+                .Return(Color.PapayaWhip);
             InitializeTopFacingMesh();
+        };
 
         It should_initialize_the_renderer = () =>
             _renderer.InitializeWasCalled.ShouldBeTrue();
@@ -44,6 +48,9 @@ namespace GenesisEngine.Specs.DomainSpecs
             var bottomRightPosition = _renderer.Vertices[_renderer.Vertices.Length - 1].Position;
             AssertCornerIsProjected(bottomRightPosition, Vector3.Up, Vector3.Backward, Vector3.Right);
         };
+
+        It should_assign_vertex_colors_from_the_colorizer = () =>
+            _renderer.Vertices[0].Color.ShouldEqual(Color.PapayaWhip);
     }
 
     [Subject(typeof(QuadMesh))]
@@ -172,6 +179,7 @@ namespace GenesisEngine.Specs.DomainSpecs
         public static QuadNodeExtents _extents = new QuadNodeExtents(-1.0, 1.0, -1.0, 1.0);
 
         public static IHeightfieldGenerator _generator;
+        public static ITerrainColorizer _terrainColorizer;
         public static MockQuadMeshRenderer _renderer;
         public static ISettings _settings;
         public static Statistics _statistics;
@@ -182,6 +190,8 @@ namespace GenesisEngine.Specs.DomainSpecs
         Establish context = () =>
         {
             _generator = MockRepository.GenerateStub<IHeightfieldGenerator>();
+
+            _terrainColorizer = MockRepository.GenerateStub<ITerrainColorizer>();
 
             // We're using a hand-rolled fake here because of a bug
             // in .Net that prevents mocking of multi-dimentional arrays:
@@ -194,7 +204,7 @@ namespace GenesisEngine.Specs.DomainSpecs
 
             _clippingPlanes = new ClippingPlanes();
 
-            _mesh = new QuadMesh(_generator, _renderer, _settings);
+            _mesh = new QuadMesh(_generator, _terrainColorizer, _renderer, _settings);
         };
 
         public static void InitializeTopFacingMesh()

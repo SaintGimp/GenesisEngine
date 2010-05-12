@@ -36,6 +36,7 @@ namespace GenesisEngine
             For<ContentManager>().Use(x => ObjectFactory.GetInstance<Genesis>().Content);
             For<GraphicsDevice>().Use(x => ObjectFactory.GetInstance<Genesis>().GraphicsDeviceManager.GraphicsDevice);
             For<IInputState>().Use<XnaInputState>();
+            For<ITerrainColorizer>().Use(x => new EdgeColorizer(ObjectFactory.GetInstance<TerrainColorizer>(), ObjectFactory.GetInstance<ISettings>()));
 
             For<IHeightfieldGenerator>().Use<LayeredHeightfieldGenerator>();
             RegisterInterceptor(new EventAggregatorTypeInterceptor());
