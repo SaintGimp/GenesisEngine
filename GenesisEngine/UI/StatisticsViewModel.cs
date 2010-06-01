@@ -12,7 +12,7 @@ namespace GenesisEngine
     {
         readonly Statistics _statistics;
         Dispatcher _dispatcher;
-        System.Threading.Timer _timer;
+        Timer _timer;
 
         public StatisticsViewModel(Statistics statistics)
         {
@@ -20,7 +20,7 @@ namespace GenesisEngine
             StatisticsList = new ObservableCollection<string>();
 
             _dispatcher = Dispatcher.CurrentDispatcher;
-            _timer = new Timer(s => _dispatcher.Invoke((Action)(() => Update())), null, TimeSpan.Zero, TimeSpan.FromMilliseconds(250));
+            _timer = new Timer(s => _dispatcher.Invoke((Action)(Update)), null, TimeSpan.Zero, TimeSpan.FromMilliseconds(250));
         }
 
         public ObservableCollection<string> StatisticsList { get; private set; }

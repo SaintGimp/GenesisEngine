@@ -129,10 +129,6 @@ namespace GenesisEngine.Specs.DomainSpecs
 
     // TODO: specs for WidthToCameraDistanceRatio
 
-    // TODO: specs for color of edges
-
-    // TODO: specs for water level
-
     [Subject(typeof(QuadMesh))]
     public class when_a_mesh_is_drawn : QuadMeshContext
     {
@@ -239,14 +235,14 @@ namespace GenesisEngine.Specs.DomainSpecs
 
         public virtual void Initialize(VertexPositionNormalColor[] vertices, short[] indices)
         {
-            this.InitializeWasCalled = true;
-            this.Vertices = vertices;
+            InitializeWasCalled = true;
+            Vertices = vertices;
         }
 
         public virtual void Draw(DoubleVector3 location, DoubleVector3 cameraLocation, Matrix originBasedViewMatrix, Matrix projectionMatrix)
         {
-            this.DrawWasCalled = true;
-            this.Location = location;
+            DrawWasCalled = true;
+            Location = location;
         }
 
         public void Dispose()

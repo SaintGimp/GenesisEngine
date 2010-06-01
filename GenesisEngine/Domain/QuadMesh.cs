@@ -25,6 +25,7 @@ namespace GenesisEngine
         DoubleVector3 _vVector;
         DoubleVector3 _planeNormalVector;
         protected QuadNodeExtents _extents;
+        int _level;
         double _meshStride;
 
 
@@ -50,15 +51,12 @@ namespace GenesisEngine
             _settings = settings;
         }
 
-        public int Level { get; private set; }
-
         public bool IsVisibleToCamera { get; private set; }
 
         public double WidthToCameraDistanceRatio { get; private set; }
 
         // TODO: push this data in through the constructor, probably in a QuadMeshDefintion class, and make
-        // this method private.  Except that would do real work in construction.  Hmmm.  When we explode this class
-        // into separate responsibilites, this problem may go away.
+        // this method private.  Except that would do real work in construction.  Hmmm.
         public void Initialize(double planetRadius, DoubleVector3 planeNormalVector, DoubleVector3 uVector, DoubleVector3 vVector, QuadNodeExtents extents, int level)
         {
             _planetRadius = planetRadius;
@@ -66,7 +64,7 @@ namespace GenesisEngine
             _uVector = uVector;
             _vVector = vVector;
             _extents = extents;
-            Level = level;
+            _level = level;
 
             _locationRelativeToPlanet = (_planeNormalVector) + (_uVector * ((_extents.West + (_extents.Width / 2.0)))) + (_vVector * ((_extents.North + (_extents.Width / 2.0))));
             _locationRelativeToPlanet = _locationRelativeToPlanet.ProjectUnitPlaneToUnitSphere() * _planetRadius;
@@ -139,7 +137,7 @@ namespace GenesisEngine
             var unitPlaneVector = ConvertToUnitPlaneVector(column, row);
             var unitSphereVector = unitPlaneVector.ProjectUnitPlaneToUnitSphere();
 
-            var terrainHeight = _generator.GetHeight(unitSphereVector, Level, 8000);
+            var terrainHeight = _generator.GetHeight(unitSphereVector, _level, 8000);
 
             var planetSpaceVector = ConvertToPlanetSpace(unitSphereVector, terrainHeight);
             var meshSpaceVector = ConvertToMeshSpace(planetSpaceVector);
@@ -331,7 +329,7 @@ namespace GenesisEngine
             ((IDisposable)_renderer).Dispose();
         }
 
-        private class MeshDistance
+        private struct MeshDistance
         {
             public DoubleVector3 ClosestVertex { get; set; }
             public DoubleVector3 FurthestVertex { get; set; }
