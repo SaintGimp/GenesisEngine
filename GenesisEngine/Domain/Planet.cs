@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -30,9 +30,9 @@ namespace GenesisEngine
             _clippingPlanes = new ClippingPlanes();
         }
 
-        public void Update(TimeSpan elapsedTime, DoubleVector3 cameraLocation)
+        public void Update(DoubleVector3 cameraLocation)
         {
-            _terrain.Update(elapsedTime, cameraLocation, _location, _clippingPlanes);
+            _terrain.Update(cameraLocation, _location, _clippingPlanes);
 
             UpdateStatistics(cameraLocation);
         }

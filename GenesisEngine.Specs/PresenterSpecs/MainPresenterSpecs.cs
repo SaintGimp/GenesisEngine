@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -38,7 +38,7 @@ namespace GenesisEngine.Specs.PresenterSpecs
             _mainPresenter.Update(TimeSpan.FromMilliseconds(250));
 
         It should_update_the_planet = () =>
-            _planet.AssertWasCalled(x => x.Update(TimeSpan.FromMilliseconds(250), _camera.Location));
+            _planet.AssertWasCalled(x => x.Update(_camera.Location));
 
         It update_the_framerate_statistic = () =>
             _statistics.FrameRate.ShouldEqual(4);
@@ -57,7 +57,7 @@ namespace GenesisEngine.Specs.PresenterSpecs
             _mainPresenter.Update(TimeSpan.FromMilliseconds(250));
 
         It should_not_update_the_planet = () =>
-            _planet.AssertWasNotCalled(x => x.Update(Arg<TimeSpan>.Is.Anything, Arg<DoubleVector3>.Is.Anything));
+            _planet.AssertWasNotCalled(x => x.Update(Arg<DoubleVector3>.Is.Anything));
 
         It update_the_framerate_statistic = () =>
             _statistics.FrameRate.ShouldEqual(4);
@@ -77,7 +77,7 @@ namespace GenesisEngine.Specs.PresenterSpecs
             _mainPresenter.Update(TimeSpan.FromMilliseconds(250));
 
         It should_update_the_planet = () =>
-            _planet.AssertWasCalled(x => x.Update(TimeSpan.FromMilliseconds(250), _camera.Location));
+            _planet.AssertWasCalled(x => x.Update(_camera.Location));
 
         It should_turn_off_single_stepping = () =>
             _settings.ShouldSingleStep.ShouldBeFalse();

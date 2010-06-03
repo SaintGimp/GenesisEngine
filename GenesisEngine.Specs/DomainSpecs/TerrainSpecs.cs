@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -36,10 +36,10 @@ namespace GenesisEngine.Specs.DomainSpecs
         public static ClippingPlanes _clippingPlanes;
 
         Because of = () =>
-            _terrain.Update(new TimeSpan(), DoubleVector3.Zero, DoubleVector3.Zero, _clippingPlanes);
+            _terrain.Update(DoubleVector3.Zero, DoubleVector3.Zero, _clippingPlanes);
 
         It should_update_the_faces = () =>
-            _face.AssertWasCalled(x => x.Update(new TimeSpan(), DoubleVector3.Zero, DoubleVector3.Zero, _clippingPlanes));
+            _face.AssertWasCalled(x => x.Update(DoubleVector3.Zero, DoubleVector3.Zero, _clippingPlanes));
     }
     
     public class TerrainContext

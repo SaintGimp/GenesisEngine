@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Diagnostics;
@@ -10,8 +11,6 @@ namespace GenesisEngine
 {
     public class QuadNode : IQuadNode, IDisposable
     {
-        // TODO: this class is a serious SRP violation and needs to be refactored ASAP!
-
         DoubleVector3 _locationRelativeToPlanet;
         double _planetRadius;
         DoubleVector3 _uVector;
@@ -19,12 +18,15 @@ namespace GenesisEngine
         DoubleVector3 _planeNormalVector;
         protected QuadNodeExtents _extents;
 
-        bool _hasSubnodes = false;
+        bool _hasSubnodes;
+        bool _splitInProgress;
+        bool _mergeInProgress;
+        protected Task _backgroundSplitTask;
         protected List<IQuadNode> _subnodes = new List<IQuadNode>();
 
-        IQuadMesh _mesh;
-        IQuadNodeFactory _quadNodeFactory;
-        IQuadNodeRenderer _renderer;
+        readonly IQuadMesh _mesh;
+        readonly IQuadNodeFactory _quadNodeFactory;
+        readonly IQuadNodeRenderer _renderer;
         readonly ISettings _settings;
         readonly Statistics _statistics;
 
@@ -40,8 +42,7 @@ namespace GenesisEngine
         public int Level { get; private set; }
 
         // TODO: push this data in through the constructor, probably in a QuadNodeDefintion class, and make
-        // this method private.  Except that would do real work in construction.  Hmmm.  When we explode this class
-        // into separate responsibilites, this problem may go away.
+        // this method private.  Except that would do real work in construction.  Hmmm.
         public void Initialize(double planetRadius, DoubleVector3 planeNormalVector, DoubleVector3 uVector, DoubleVector3 vVector, QuadNodeExtents extents, int level)
         {
             _planetRadius = planetRadius;
@@ -60,17 +61,17 @@ namespace GenesisEngine
             _statistics.NumberOfQuadNodesAtLevel[Level]++;
         }
 
-        public void Update(TimeSpan elapsedTime, DoubleVector3 cameraLocation, DoubleVector3 planetLocation, ClippingPlanes clippingPlanes)
+        public void Update(DoubleVector3 cameraLocation, DoubleVector3 planetLocation, ClippingPlanes clippingPlanes)
         {
-            _mesh.Update(elapsedTime, cameraLocation, planetLocation, clippingPlanes);
+            _mesh.Update(cameraLocation, planetLocation, clippingPlanes);
 
             // TODO: This algorithm could be improved to optimize the number of triangles that are drawn
 
-            if (_mesh.IsVisibleToCamera && _mesh.CameraDistanceToWidthRatio < 1 && !_hasSubnodes && Level < _settings.MaximumQuadNodeLevel)
+            if (_mesh.IsVisibleToCamera && _mesh.CameraDistanceToWidthRatio < 1 && !_hasSubnodes && !_splitInProgress && !_mergeInProgress && Level < _settings.MaximumQuadNodeLevel)
             {
                 Split();
             }
-            else if (_mesh.CameraDistanceToWidthRatio > 1.2 && _hasSubnodes)
+            else if (_mesh.CameraDistanceToWidthRatio > 1.2 && _hasSubnodes && !_mergeInProgress && !_splitInProgress)
             {
                 Merge();
             }
@@ -79,30 +80,64 @@ namespace GenesisEngine
             {
                 foreach (var subnode in _subnodes)
                 {
-                    subnode.Update(elapsedTime, cameraLocation, planetLocation, clippingPlanes);
+                    subnode.Update(cameraLocation, planetLocation, clippingPlanes);
                 }
             }
         }
 
         private void Split()
         {
+            _splitInProgress = true;
             var subextents = _extents.Split();
 
+            // TODO: refactor
+            // TODO: should we bother to write specs for the threading behavior?
+
+            var tasks = new List<Task<IQuadNode>>();
             foreach (var subextent in subextents)
             {
-                var node = _quadNodeFactory.Create();
-                node.Initialize(_planetRadius, _planeNormalVector, _uVector, _vVector, subextent, Level + 1);
-                _subnodes.Add(node);
+                var capturedExtent = subextent;
+                var task = Task<IQuadNode>.Factory.StartNew(() =>
+                {
+                    var node = _quadNodeFactory.Create();
+                    node.Initialize(_planetRadius, _planeNormalVector, _uVector, _vVector, capturedExtent, Level + 1);
+                    return node;
+                });
+
+                tasks.Add(task);
             }
 
-            _hasSubnodes = true;
+            _backgroundSplitTask = Task.Factory.ContinueWhenAll(tasks.ToArray(), finishedTasks =>
+            {
+                foreach (var task in finishedTasks)
+                {
+                    _subnodes.Add(task.Result);
+                }
+
+                _hasSubnodes = true;
+                _splitInProgress = false;
+            });
+
+            // TODO: we get flashes of black on some nodes when they split because the subnodes are initialized
+            // but not necessarily updated before the first Draw call after the continuation completes.  We need
+            // to ensure that subnodes are initialized thoroughly enough to be drawn immediately without another
+            // Update call.
         }
 
         private void Merge()
         {
-            DisposeSubNodes();
-            _subnodes.Clear();
+            // TODO: Do async disposal
+            // TODO: if a split is pending, cancel it
+            _mergeInProgress = true;
             _hasSubnodes = false;
+
+            Task.Factory.StartNew(() =>
+            {
+                DisposeSubNodes();
+                _subnodes.Clear();
+
+                _mergeInProgress = false;
+            });
         }
 
         void DisposeSubNodes()

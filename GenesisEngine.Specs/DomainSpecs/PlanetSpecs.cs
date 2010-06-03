@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -43,10 +43,10 @@ namespace GenesisEngine.Specs.DomainSpecs
     public class when_the_planet_is_updated : PlanetContext
     {
         Because of = () =>
-            _planet.Update(new TimeSpan(), DoubleVector3.Up);
+            _planet.Update(DoubleVector3.Up);
 
         It should_update_the_terrain = () =>
-            _terrain.AssertWasCalled(x => x.Update(Arg<TimeSpan>.Is.Anything, Arg.Is(DoubleVector3.Up), Arg.Is(_location), Arg<ClippingPlanes>.Is.Anything));
+            _terrain.AssertWasCalled(x => x.Update(Arg.Is(DoubleVector3.Up), Arg.Is(_location), Arg<ClippingPlanes>.Is.Anything));
     }
 
     [Subject(typeof(Planet))]

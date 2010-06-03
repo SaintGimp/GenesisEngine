@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,11 +23,11 @@ namespace GenesisEngine
             }
         }
 
-        public void Update(TimeSpan elapsedTime, DoubleVector3 cameraLocation, DoubleVector3 planetLocation, ClippingPlanes clippingPlanes)
+        public void Update(DoubleVector3 cameraLocation, DoubleVector3 planetLocation, ClippingPlanes clippingPlanes)
         {
             foreach (var face in _faces)
             {
-                face.Update(elapsedTime, cameraLocation, planetLocation, clippingPlanes);
+                face.Update(cameraLocation, planetLocation, clippingPlanes);
             }
         }
     }

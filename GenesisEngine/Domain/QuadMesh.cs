@@ -100,13 +100,13 @@ namespace GenesisEngine
         {
             _vertices = new VertexPositionNormalColor[_gridSize * _gridSize];
 
-            Parallel.For(0, _gridSize, row =>
+            for (int row = 0; row < _gridSize; row++)
             {
                 for (int column = 0; column < _gridSize; column++)
                 {
                     _vertices[row * _gridSize + column] = GetVertexInMeshSpace(column, row);
                 }
-            });
+            }
 
             GenerateNormals();
         }
@@ -237,7 +237,7 @@ namespace GenesisEngine
                 _vertices[i].Normal.Normalize();
         }
 
-        public void Update(TimeSpan elapsedTime, DoubleVector3 cameraLocation, DoubleVector3 planetLocation, ClippingPlanes clippingPlanes)
+        public void Update(DoubleVector3 cameraLocation, DoubleVector3 planetLocation, ClippingPlanes clippingPlanes)
         {
             // TODO: I don't like this class's public member design.  In order to get properties like IsVisibleToCamera,
             // you must first call Update with appropriate information.  Internally, a lot of stuff is also

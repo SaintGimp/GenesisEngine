@@ -39,10 +39,10 @@ namespace GenesisEngine.Specs.DomainSpecs
             _node.Initialize(10, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 5);
 
         Because of = () =>
-            _node.Update(TimeSpan.Zero, DoubleVector3.Up * 11, DoubleVector3.Zero, _clippingPlanes);
+            _node.Update(DoubleVector3.Up * 11, DoubleVector3.Zero, _clippingPlanes);
 
         It should_update_the_mesh = () =>
-            _mesh.AssertWasCalled(x => x.Update(TimeSpan.Zero, DoubleVector3.Up * 11, DoubleVector3.Zero, _clippingPlanes));
+            _mesh.AssertWasCalled(x => x.Update(DoubleVector3.Up * 11, DoubleVector3.Zero, _clippingPlanes));
     }
 
     [Subject(typeof(QuadNode))]
@@ -56,7 +56,10 @@ namespace GenesisEngine.Specs.DomainSpecs
         };
 
         Because of = () =>
-            _node.Update(new TimeSpan(), DoubleVector3.Up * 11, DoubleVector3.Zero, _clippingPlanes);
+        {
+            _node.Update(DoubleVector3.Up * 11, DoubleVector3.Zero, _clippingPlanes);
+            _node.WaitForSplitToComplete();
+        };
 
         It should_split_into_subquads = () =>
             _node.Subnodes.Count.ShouldEqual(4);
@@ -86,11 +89,14 @@ namespace GenesisEngine.Specs.DomainSpecs
             _mesh.Stub(x => x.IsVisibleToCamera).Return(true);
 
             _node.Initialize(10, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 0);
-            _node.Update(new TimeSpan(), DoubleVector3.Up * 11, DoubleVector3.Zero, _clippingPlanes);
+            _node.Update(DoubleVector3.Up * 11, DoubleVector3.Zero, _clippingPlanes);
         };
 
         Because of = () =>
-            _node.Update(new TimeSpan(), DoubleVector3.Up * 11, DoubleVector3.Zero, _clippingPlanes);
+        {
+            _node.Update(DoubleVector3.Up * 11, DoubleVector3.Zero, _clippingPlanes);
+            _node.WaitForSplitToComplete();
+        };
 
         It should_split_only_once = () =>
             _node.Subnodes.Count.ShouldEqual(4);
@@ -104,11 +110,11 @@ namespace GenesisEngine.Specs.DomainSpecs
             _mesh.Stub(x => x.IsVisibleToCamera).Return(true);
 
             _node.Initialize(10, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 19);
-            _node.Update(new TimeSpan(), DoubleVector3.Up * 11, DoubleVector3.Zero, _clippingPlanes);
+            _node.Update(DoubleVector3.Up * 11, DoubleVector3.Zero, _clippingPlanes);
         };
 
         Because of = () =>
-            _node.Update(new TimeSpan(), DoubleVector3.Up * 11, DoubleVector3.Zero, _clippingPlanes);
+            _node.Update(DoubleVector3.Up * 11, DoubleVector3.Zero, _clippingPlanes);
 
         It should_not_split = () =>
             _node.Subnodes.Count.ShouldEqual(0);
@@ -128,13 +134,16 @@ namespace GenesisEngine.Specs.DomainSpecs
             _farCameraLocation = DoubleVector3.Up * 15 * 10 * 2;
 
             _node.Initialize(10, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 0);
-            _node.Update(new TimeSpan(), _nearCameraLocation, DoubleVector3.Zero, _clippingPlanes);
+            _node.Update(_nearCameraLocation, DoubleVector3.Zero, _clippingPlanes);
 
             _mesh.Stub(x => x.CameraDistanceToWidthRatio).Return(2);
         };
 
         Because of = () =>
-            _node.Update(new TimeSpan(), _farCameraLocation, DoubleVector3.Zero, _clippingPlanes);
+        {
+            _node.Update(_farCameraLocation, DoubleVector3.Zero, _clippingPlanes);
+            _node.WaitForSplitToComplete();
+        };
 
         It should_remove_subnodes = () =>
             _node.Subnodes.Count.ShouldEqual(0);
@@ -158,17 +167,17 @@ namespace GenesisEngine.Specs.DomainSpecs
             _cameraLocation = DoubleVector3.Up;
 
             _node.Initialize(10, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 0);
-            _node.Update(new TimeSpan(), _cameraLocation, DoubleVector3.Zero, _clippingPlanes);
+            _node.Update(_cameraLocation, DoubleVector3.Zero, _clippingPlanes);
         };
 
         Because of = () =>
-            _node.Update(new TimeSpan(), _cameraLocation, DoubleVector3.Zero, _clippingPlanes);
+            _node.Update(_cameraLocation, DoubleVector3.Zero, _clippingPlanes);
 
         It should_update_subquads = () =>
         {
             foreach (var subnode in _node.Subnodes)
             {
-                subnode.AssertWasCalled(x => x.Update(new TimeSpan(), _cameraLocation, DoubleVector3.Zero, _clippingPlanes));
+                subnode.AssertWasCalled(x => x.Update(_cameraLocation, DoubleVector3.Zero, _clippingPlanes));
             }
         };
     }
@@ -191,7 +200,8 @@ namespace GenesisEngine.Specs.DomainSpecs
             _projectionMatrix = Matrix.Identity;
 
             _node.Initialize(10, Vector3.Up, Vector3.Backward, Vector3.Right, new QuadNodeExtents(-1.0, 1.0, -1.0, 1.0), 0);
-            _node.Update(TimeSpan.Zero, DoubleVector3.Up, DoubleVector3.Zero, _clippingPlanes);
+            _node.Update(DoubleVector3.Up, DoubleVector3.Zero, _clippingPlanes);
+            _node.WaitForSplitToComplete();
         };
 
         Because of = () =>
@@ -265,7 +275,7 @@ namespace GenesisEngine.Specs.DomainSpecs
         Establish context = () =>
         {
             _node.Initialize(_radius, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 0);
-            _node.Update(new TimeSpan(), DoubleVector3.Up, DoubleVector3.Zero, _clippingPlanes);
+            _node.Update(DoubleVector3.Up, DoubleVector3.Zero, _clippingPlanes);
         };
 
         Because of = () =>
@@ -349,6 +359,11 @@ namespace GenesisEngine.Specs.DomainSpecs
         public double Width
         {
             get { return _extents.Width; }
+        }
+
+        public void WaitForSplitToComplete()
+        {
+            _backgroundSplitTask.Wait();
         }
     }
 

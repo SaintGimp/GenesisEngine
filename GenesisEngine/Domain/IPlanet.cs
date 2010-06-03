@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,7 +8,7 @@ namespace GenesisEngine
 {
     public interface IPlanet
     {
-        void Update(TimeSpan elapsedTime, DoubleVector3 cameraLocation);
+        void Update(DoubleVector3 cameraLocation);
         
         void Draw(ICamera camera);
 

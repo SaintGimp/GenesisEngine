@@ -40,7 +40,7 @@ namespace GenesisEngine
 		{
 			if (_settings.ShouldUpdate || _settings.ShouldSingleStep)
 			{
-                _planet.Update(elapsedTime, _camera.Location);
+                _planet.Update(_camera.Location);
 				
 				_settings.ShouldSingleStep = false;
 			}

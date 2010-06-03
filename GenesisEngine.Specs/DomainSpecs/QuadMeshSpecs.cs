@@ -62,7 +62,7 @@ namespace GenesisEngine.Specs.DomainSpecs
             InitializeTopFacingMesh();
 
         Because of = () =>
-            _mesh.Update(new TimeSpan(), DoubleVector3.Down * 100, DoubleVector3.Zero, _clippingPlanes);
+            _mesh.Update(DoubleVector3.Down * 100, DoubleVector3.Zero, _clippingPlanes);
 
         It should_not_be_visible = () =>
             _mesh.IsVisibleToCamera.ShouldBeFalse();
@@ -75,7 +75,7 @@ namespace GenesisEngine.Specs.DomainSpecs
             InitializeTopFacingMesh();
 
         Because of = () =>
-            _mesh.Update(new TimeSpan(), DoubleVector3.Up * 100, DoubleVector3.Zero, _clippingPlanes);
+            _mesh.Update(DoubleVector3.Up * 100, DoubleVector3.Zero, _clippingPlanes);
 
         It should_be_visible = () =>
             _mesh.IsVisibleToCamera.ShouldBeTrue();
@@ -96,7 +96,7 @@ namespace GenesisEngine.Specs.DomainSpecs
         };
 
         Because of = () =>
-            _mesh.Update(new TimeSpan(), _cameraPosition, DoubleVector3.Zero, _clippingPlanes);
+            _mesh.Update(_cameraPosition, DoubleVector3.Zero, _clippingPlanes);
 
         It should_adjust_the_near_clipping_plane = () =>
             _clippingPlanes.Near.ShouldBeCloseTo(90);
@@ -123,7 +123,7 @@ namespace GenesisEngine.Specs.DomainSpecs
         };
 
         Because of = () =>
-            _mesh.Update(new TimeSpan(), _cameraPosition, DoubleVector3.Zero, _clippingPlanes);
+            _mesh.Update(_cameraPosition, DoubleVector3.Zero, _clippingPlanes);
 
         It should_not_adjust_the_near_clipping_plane = () =>
             _clippingPlanes.Near.ShouldBeCloseTo(double.MaxValue);
