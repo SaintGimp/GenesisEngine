@@ -130,7 +130,7 @@ namespace GenesisEngine.Specs.DomainSpecs
             _node.Initialize(10, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 0);
             _node.Update(new TimeSpan(), _nearCameraLocation, DoubleVector3.Zero, _clippingPlanes);
 
-            _mesh.Stub(x => x.WidthToCameraDistanceRatio).Return(2);
+            _mesh.Stub(x => x.CameraDistanceToWidthRatio).Return(2);
         };
 
         Because of = () =>

@@ -1,4 +1,6 @@
-﻿using System;
+﻿// ReSharper disable ConvertClosureToMethodGroup
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -101,6 +103,9 @@ namespace GenesisEngine.Specs.DomainSpecs
 
         It should_adjust_the_far_clipping_plane = () =>
             _clippingPlanes.Far.ShouldBeCloseTo(DoubleVector3.Distance(_cameraPosition, _topLeftPosition + DoubleVector3.Up * _radius));
+
+        It should_calculate_the_ratio_of_distance_to_width = () =>
+            _mesh.CameraDistanceToWidthRatio.ShouldEqual((_cameraPosition.Length() - _radius) / (_extents.Width * _radius));
     }
 
     [Subject(typeof(QuadMesh))]
@@ -125,9 +130,10 @@ namespace GenesisEngine.Specs.DomainSpecs
 
         It should_not_adjust_the_far_clipping_plane = () =>
             _clippingPlanes.Far.ShouldBeCloseTo(double.MinValue);
-    }
 
-    // TODO: specs for WidthToCameraDistanceRatio
+        It should_calculate_the_ratio_of_distance_to_width = () =>
+            _mesh.CameraDistanceToWidthRatio.ShouldBeCloseTo(5.3, 0.1);
+    }
 
     [Subject(typeof(QuadMesh))]
     public class when_a_mesh_is_drawn : QuadMeshContext

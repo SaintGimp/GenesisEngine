@@ -53,7 +53,7 @@ namespace GenesisEngine
 
         public bool IsVisibleToCamera { get; private set; }
 
-        public double WidthToCameraDistanceRatio { get; private set; }
+        public double CameraDistanceToWidthRatio { get; private set; }
 
         // TODO: push this data in through the constructor, probably in a QuadMeshDefintion class, and make
         // this method private.  Except that would do real work in construction.  Hmmm.
@@ -246,7 +246,7 @@ namespace GenesisEngine
             var meshDistance = GetDistanceFrom(cameraLocation);
             var distanceFromCamera = meshDistance.ClosestDistance;
             
-            WidthToCameraDistanceRatio = distanceFromCamera / WidthInRealSpaceUnits();
+            CameraDistanceToWidthRatio = distanceFromCamera / WidthInRealSpaceUnits();
 
             IsVisibleToCamera = CalculateVisibility(cameraLocation, planetLocation, meshDistance.ClosestVertex);
 

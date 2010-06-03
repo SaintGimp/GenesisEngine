@@ -66,11 +66,11 @@ namespace GenesisEngine
 
             // TODO: This algorithm could be improved to optimize the number of triangles that are drawn
 
-            if (_mesh.IsVisibleToCamera && _mesh.WidthToCameraDistanceRatio < 1 && !_hasSubnodes && Level < _settings.MaximumQuadNodeLevel)
+            if (_mesh.IsVisibleToCamera && _mesh.CameraDistanceToWidthRatio < 1 && !_hasSubnodes && Level < _settings.MaximumQuadNodeLevel)
             {
                 Split();
             }
-            else if (_mesh.WidthToCameraDistanceRatio > 1.2 && _hasSubnodes)
+            else if (_mesh.CameraDistanceToWidthRatio > 1.2 && _hasSubnodes)
             {
                 Merge();
             }

@@ -10,7 +10,7 @@ namespace GenesisEngine
 
         bool IsVisibleToCamera { get; }
 
-        double WidthToCameraDistanceRatio { get; }
+        double CameraDistanceToWidthRatio { get; }
 
         void Update(TimeSpan elapsedTime, DoubleVector3 cameraLocation, DoubleVector3 planetLocation, ClippingPlanes clippingPlanes);
 
