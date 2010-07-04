@@ -12,5 +12,7 @@ _ReSharper.*
 *.coverage
 *.cachefile
 *.psess
+*.app.ctl
+*.krn.ctl
 
 /Specs/*.xml

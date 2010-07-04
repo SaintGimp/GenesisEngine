@@ -10,24 +10,24 @@ namespace GenesisEngine
 {
     public class QuadMeshRenderer : IQuadMeshRenderer, IDisposable
     {
-        private GraphicsDevice _graphicsDevice;
-        private VertexBuffer _vertexBuffer;
-        private IndexBuffer _indexBuffer;
-        private int _numberOfVertices;
-        private int _numberOfIndices;
-        private BasicEffect _effect;
-        private ISettings _settings;
+        readonly GraphicsDevice _graphicsDevice;
+        readonly BasicEffect _effect;
+        readonly ISettings _settings;
+        
+        VertexBuffer _vertexBuffer;
+        IndexBuffer _indexBuffer;
+        int _numberOfVertices;
+        int _numberOfIndices;
 
-        public QuadMeshRenderer(GraphicsDevice graphicsDevice, ISettings settings)
+        public QuadMeshRenderer(GraphicsDevice graphicsDevice, BasicEffect effect, ISettings settings)
         {
             _graphicsDevice = graphicsDevice;
+            _effect = effect;
             _settings = settings;
         }
 
         public void Initialize(VertexPositionNormalColor[] vertices, short[] indices)
         {
-            _effect = new BasicEffect(_graphicsDevice);
-
             CreateVertexBuffer(vertices);
             CreateIndexBuffer(indices);
         }
@@ -135,6 +135,7 @@ namespace GenesisEngine
         void DrawMesh()
         {
             _effect.CurrentTechnique.Passes[0].Apply();
+
             foreach (EffectPass pass in _effect.CurrentTechnique.Passes)
             {
                 pass.Apply();
@@ -149,8 +150,6 @@ namespace GenesisEngine
         {
             _vertexBuffer.Dispose();
             _indexBuffer.Dispose();
-
-            // Don't dispose _effect here because the ContentManager gives us a shared instance
         }
     }
 }
