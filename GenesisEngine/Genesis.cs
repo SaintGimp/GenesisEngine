@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using StructureMap;
+using Scenario;
 
 namespace GenesisEngine
 {
@@ -16,6 +17,7 @@ namespace GenesisEngine
         private MainPresenter _mainPresenter;
         private IInputState _inputState;
         IInputMapper _inputMapper;
+        Scenario.Scenario _drawMarker = new Scenario.Scenario(0, "Draw pass");
 
         public Genesis()
         {
@@ -135,7 +137,9 @@ namespace GenesisEngine
         {
             this.GraphicsDeviceManager.GraphicsDevice.Clear(Color.Black);
 
+            _drawMarker.Begin();
             _mainPresenter.Draw();
+            _drawMarker.End();
 
             base.Draw(gameTime);
         }
