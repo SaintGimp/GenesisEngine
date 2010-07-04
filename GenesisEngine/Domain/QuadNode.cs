@@ -69,7 +69,7 @@ namespace GenesisEngine
 
             if (_mesh.IsVisibleToCamera && _mesh.CameraDistanceToWidthRatio < 1 && !_hasSubnodes && !_splitInProgress && !_mergeInProgress && Level < _settings.MaximumQuadNodeLevel)
             {
-                Split();
+                Split(cameraLocation, planetLocation, clippingPlanes);
             }
             else if (_mesh.CameraDistanceToWidthRatio > 1.2 && _hasSubnodes && !_mergeInProgress && !_splitInProgress)
             {
@@ -85,7 +85,7 @@ namespace GenesisEngine
             }
         }
 
-        private void Split()
+        private void Split(DoubleVector3 cameraLocation, DoubleVector3 planetLocation, ClippingPlanes clippingPlanes)
         {
             _splitInProgress = true;
             var subextents = _extents.Split();
@@ -101,6 +101,7 @@ namespace GenesisEngine
                 {
                     var node = _quadNodeFactory.Create();
                     node.Initialize(_planetRadius, _planeNormalVector, _uVector, _vVector, capturedExtent, Level + 1);
+                    node.Update(cameraLocation, planetLocation, clippingPlanes);
                     return node;
                 });
 
@@ -117,11 +118,6 @@ namespace GenesisEngine
                 _hasSubnodes = true;
                 _splitInProgress = false;
             });
-
-            // TODO: we get flashes of black on some nodes when they split because the subnodes are initialized
-            // but not necessarily updated before the first Draw call after the continuation completes.  We need
-            // to ensure that subnodes are initialized thoroughly enough to be drawn immediately without another
-            // Update call.
         }
 
         private void Merge()
