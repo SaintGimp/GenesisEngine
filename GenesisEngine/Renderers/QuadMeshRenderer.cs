@@ -10,7 +10,6 @@ namespace GenesisEngine
 {
     public class QuadMeshRenderer : IQuadMeshRenderer, IDisposable
     {
-        private ContentManager _contentManager;
         private GraphicsDevice _graphicsDevice;
         private VertexBuffer _vertexBuffer;
         private IndexBuffer _indexBuffer;
@@ -19,9 +18,8 @@ namespace GenesisEngine
         private BasicEffect _effect;
         private ISettings _settings;
 
-        public QuadMeshRenderer(ContentManager contentManager, GraphicsDevice graphicsDevice, ISettings settings)
+        public QuadMeshRenderer(GraphicsDevice graphicsDevice, ISettings settings)
         {
-            _contentManager = contentManager;
             _graphicsDevice = graphicsDevice;
             _settings = settings;
         }
@@ -54,45 +52,89 @@ namespace GenesisEngine
 
         public void Draw(DoubleVector3 location, DoubleVector3 cameraLocation, Matrix originBasedViewMatrix, Matrix projectionMatrix)
         {
-            // TODO: Calculate a dynamic scaling factor based on the distance of the object from the camera?  See
-            // the Interactive Visualization paper, page 24.
-
-            Matrix translationMatrix = Matrix.CreateTranslation(location - cameraLocation);
-            Matrix worldMatrix = translationMatrix;
-
             _effect.View = originBasedViewMatrix;
             _effect.Projection = projectionMatrix;
-            _effect.World = worldMatrix;
+            _effect.World = GetWorldMatrix(location, cameraLocation);
 
+            SetLightingEffects();
+            SetFogEffects();
+            SetFillMode();
+
+            DrawMesh();
+        }
+
+        Matrix GetWorldMatrix(DoubleVector3 location, DoubleVector3 cameraLocation)
+        {
+            // The mesh stored in the vertex buffer is centered at the origin in order to take it easy on
+            // the float number system.  The camera view matrix is also generated as though the camera were
+            // at the origin.  In order to correctly render the mesh we translate it away from the origin
+            // by the same vector that the mesh (in double space) is displaced from the camera (in double space).
+
+            // We also translate and scale distant meshes to bring them inside the far clipping plane.  For
+            // every mesh that's further than the start of the scaled space, we calcuate a new distance
+            // using an exponential downscale function to make it fall in the view frustum.  We also scale
+            // it down proportionally so that it appears perspective-wise to be identical to the original
+            // location.  See the Interactive Visualization paper, page 24.
+
+            Matrix scaleMatrix;
+            Matrix translationMatrix;
+
+            var locationRelativeToCamera = location - cameraLocation;
+            var distanceFromCamera = locationRelativeToCamera.Length();
+            var unscaledViewSpace = _settings.FarClippingPlaneDistance * 0.25;
+
+            if (distanceFromCamera > unscaledViewSpace)
+            {
+                var scaledViewSpace = _settings.FarClippingPlaneDistance - unscaledViewSpace;
+                double scaledDistanceFromCamera = unscaledViewSpace + (scaledViewSpace * (1.0 - Math.Exp((scaledViewSpace - distanceFromCamera) / 1000000000)));
+                DoubleVector3 scaledLocationRelativeToCamera = DoubleVector3.Normalize(locationRelativeToCamera) * scaledDistanceFromCamera;
+                
+                scaleMatrix = Matrix.CreateScale((float)(scaledDistanceFromCamera / distanceFromCamera));
+                translationMatrix = Matrix.CreateTranslation(scaledLocationRelativeToCamera);
+            }
+            else
+            {
+                scaleMatrix = Matrix.Identity;
+                translationMatrix = Matrix.CreateTranslation(locationRelativeToCamera);
+            }
+            
+            return scaleMatrix * translationMatrix;
+        }
+
+        void SetLightingEffects()
+        {
             _effect.VertexColorEnabled = true;
             _effect.PreferPerPixelLighting = true;
-
-            _effect.FogEnabled = false;
-            _effect.FogColor = new Vector3(0.5f, 0.5f, 0.6f);
-            _effect.FogStart = 0f;
-            _effect.FogEnd = 300000f;
 
             _effect.DirectionalLight0.DiffuseColor = Vector3.One;
             _effect.DirectionalLight0.Direction = Vector3.Normalize(new Vector3(1.0f, -1.0f, -1.0f));
             _effect.AmbientLightColor = new Vector3(0.1f, 0.1f, 0.1f);
             _effect.LightingEnabled = true;
+        }
 
-            if (_settings.ShouldDrawWireframe)
-            {
-                if (_graphicsDevice.RasterizerState.FillMode != FillMode.WireFrame)
-                {
-                    _graphicsDevice.RasterizerState = new RasterizerState() { FillMode = FillMode.WireFrame };
-                }
-            }
-            else
-            {
-                if (_graphicsDevice.RasterizerState.FillMode != FillMode.Solid)
-                {
-                    _graphicsDevice.RasterizerState = new RasterizerState() { FillMode = FillMode.Solid };
-                }
-            }
+        void SetFogEffects()
+        {
+            _effect.FogEnabled = false;
+            _effect.FogColor = new Vector3(0.5f, 0.5f, 0.6f);
+            _effect.FogStart = 0f;
+            _effect.FogEnd = 300000f;
+        }
 
-            _effect.CurrentTechnique.Passes[0].Apply(); 
+        void SetFillMode()
+        {
+            if (_settings.ShouldDrawWireframe && _graphicsDevice.RasterizerState.FillMode != FillMode.WireFrame)
+            {
+                _graphicsDevice.RasterizerState = new RasterizerState() { FillMode = FillMode.WireFrame };
+            }
+            else if (!_settings.ShouldDrawWireframe && _graphicsDevice.RasterizerState.FillMode != FillMode.Solid)
+            {
+                _graphicsDevice.RasterizerState = new RasterizerState() { FillMode = FillMode.Solid };
+            }
+        }
+
+        void DrawMesh()
+        {
+            _effect.CurrentTechnique.Passes[0].Apply();
             foreach (EffectPass pass in _effect.CurrentTechnique.Passes)
             {
                 pass.Apply();

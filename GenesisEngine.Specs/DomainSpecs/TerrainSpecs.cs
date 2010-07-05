@@ -33,13 +33,11 @@ namespace GenesisEngine.Specs.DomainSpecs
     [Subject(typeof(Terrain))]
     public class when_the_terrain_is_updated : TerrainContext
     {
-        public static ClippingPlanes _clippingPlanes;
-
         Because of = () =>
-            _terrain.Update(DoubleVector3.Zero, DoubleVector3.Zero, _clippingPlanes);
+            _terrain.Update(DoubleVector3.Zero, DoubleVector3.Zero);
 
         It should_update_the_faces = () =>
-            _face.AssertWasCalled(x => x.Update(DoubleVector3.Zero, DoubleVector3.Zero, _clippingPlanes));
+            _face.AssertWasCalled(x => x.Update(DoubleVector3.Zero, DoubleVector3.Zero));
     }
     
     public class TerrainContext

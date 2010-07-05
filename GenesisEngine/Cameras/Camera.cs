@@ -50,7 +50,7 @@ namespace GenesisEngine
                 SetViewParameters(_settings.CameraStartingLocation, 0.0f, 0.0f, 0.0f);
             }
 
-            SetProjectionParameters(MathHelper.Pi / 4, 1.0f, 1.0f, 1.0f, 50000.0f);
+            SetProjectionParameters(MathHelper.Pi / 4, 1.0f, 1.0f, 1.0f, (float)_settings.FarClippingPlaneDistance);
         }
 
         public void SetViewParameters(DoubleVector3 location, DoubleVector3 lookAt)

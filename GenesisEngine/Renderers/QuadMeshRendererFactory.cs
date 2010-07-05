@@ -9,20 +9,18 @@ namespace GenesisEngine
 {
     public class QuadMeshRendererFactory : IQuadMeshRendererFactory
     {
-        ContentManager _contentManager;
         GraphicsDevice _graphicsDevice;
         ISettings _settings;
 
-        public QuadMeshRendererFactory(ContentManager contentManager, GraphicsDevice graphicsDevice, ISettings settings)
+        public QuadMeshRendererFactory(GraphicsDevice graphicsDevice, ISettings settings)
         {
-            _contentManager = contentManager;
             _graphicsDevice = graphicsDevice;
             _settings = settings;
         }
 
         public IQuadMeshRenderer Create()
         {
-            return new QuadMeshRenderer(_contentManager, _graphicsDevice, _settings);
+            return new QuadMeshRenderer(_graphicsDevice, _settings);
         }
     }
 }

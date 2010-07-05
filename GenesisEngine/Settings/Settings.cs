@@ -28,6 +28,7 @@ namespace GenesisEngine
             ShouldOutlineQuads = false;
             MaximumQuadNodeLevel = 19;
             ShowQuadBoundaries = true;
+            FarClippingPlaneDistance = 10000000;
         }
 
         public bool ShouldUpdate { get; set; }
@@ -60,6 +61,8 @@ namespace GenesisEngine
         public int MaximumQuadNodeLevel { get; set; }
 
         public bool ShowQuadBoundaries { get; set; }
+
+        public double FarClippingPlaneDistance { get; set; }
         
         public void Handle(ToggleDrawWireframeSetting message)
         {

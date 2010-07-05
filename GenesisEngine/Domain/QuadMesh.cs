@@ -79,14 +79,18 @@ namespace GenesisEngine
 
         void CollectMeshSamples()
         {
-            // We just sample the corners and the middle for now
+            // We just take a few samples for now
             _vertexSamples = new DoubleVector3[]
             {
-                _vertices[0].Position,
-                _vertices[_gridSize - 1].Position,
-                _vertices[_vertices.Length / 2].Position,
-                _vertices[_gridSize * (_gridSize - 1)].Position,
-                _vertices[_gridSize * _gridSize - 1].Position
+                _vertices[0].Position,  // Upper left
+                _vertices[_gridSize / 2].Position,  // Upper middle
+                _vertices[_gridSize - 1].Position,  // Upper right
+                _vertices[(_gridSize / 2) * _gridSize].Position,  // Middle left
+                _vertices[_vertices.Length / 2].Position, // Middle
+                _vertices[(_gridSize / 2) * _gridSize + _gridSize - 1].Position,  // Middle right
+                _vertices[_gridSize * (_gridSize - 1)].Position, // Lower left
+                _vertices[_gridSize * (_gridSize - 1) + _gridSize / 2].Position, // Lower middle
+                _vertices[_gridSize * _gridSize - 1].Position  // Lower right
             };
 
             // Move them back into planet-relative space
@@ -237,7 +241,7 @@ namespace GenesisEngine
                 _vertices[i].Normal.Normalize();
         }
 
-        public void Update(DoubleVector3 cameraLocation, DoubleVector3 planetLocation, ClippingPlanes clippingPlanes)
+        public void Update(DoubleVector3 cameraLocation, DoubleVector3 planetLocation)
         {
             // TODO: I don't like this class's public member design.  In order to get properties like IsVisibleToCamera,
             // you must first call Update with appropriate information.  Internally, a lot of stuff is also
@@ -249,16 +253,12 @@ namespace GenesisEngine
             CameraDistanceToWidthRatio = distanceFromCamera / WidthInRealSpaceUnits();
 
             IsVisibleToCamera = CalculateVisibility(cameraLocation, planetLocation, meshDistance.ClosestVertex);
-
-            SetClippingPlanes(meshDistance, clippingPlanes);
         }
 
         MeshDistance GetDistanceFrom(DoubleVector3 location)
         {
             double closestDistanceSquared = double.MaxValue;
-            double furthestDistanceSquared = double.MinValue;
             DoubleVector3 closestVertex = _vertexSamples[0];
-            DoubleVector3 furthestVertex = _vertexSamples[0];
 
             foreach (var vertex in _vertexSamples)
             {
@@ -268,11 +268,6 @@ namespace GenesisEngine
                     closestDistanceSquared = distanceSquared;
                     closestVertex = vertex;
                 }
-                if (distanceSquared > furthestDistanceSquared)
-                {
-                    furthestDistanceSquared = distanceSquared;
-                    furthestVertex = vertex;
-                }
             }
 
             // TODO: We're spamming the garbage collector with this.  Allocate one instance per mesh and reuse.
@@ -280,8 +275,6 @@ namespace GenesisEngine
             {
                 ClosestDistance = Math.Sqrt(closestDistanceSquared),
                 ClosestVertex = closestVertex,
-                FurthestDistance = Math.Sqrt(furthestDistanceSquared),
-                FurthestVertex = furthestVertex
             };
         }
 
@@ -292,8 +285,10 @@ namespace GenesisEngine
 
         bool CalculateVisibility(DoubleVector3 cameraLocation, DoubleVector3 planetLocation, DoubleVector3 closestVertex)
         {
-            // TODO: this isn't quite right yet.  At high altitude you can see some popping of distant meshes on
-            // the horizon
+            // Taken from http://www.crappycoding.com/2009/04/
+
+            // TODO: This algorithm is poor.  Implement this algorithm instead:
+            // http://www.gamedev.net/community/forums/mod/journal/journal.asp?jn=263350&reply_id=3173799
 
             var planetToCamera = DoubleVector3.Normalize(cameraLocation - planetLocation);
             var planetToMesh = DoubleVector3.Normalize(closestVertex - planetLocation);
@@ -302,21 +297,6 @@ namespace GenesisEngine
             var angleToMesh = Math.Acos(DoubleVector3.Dot(planetToCamera, planetToMesh));
 
             return horizonAngle > angleToMesh;
-        }
-
-        void SetClippingPlanes(MeshDistance meshDistance, ClippingPlanes clippingPlanes)
-        {
-            if (IsVisibleToCamera)
-            {
-                if (clippingPlanes.Near > meshDistance.ClosestDistance)
-                {
-                    clippingPlanes.Near = meshDistance.ClosestDistance;
-                }
-                if (clippingPlanes.Far < meshDistance.FurthestDistance)
-                {
-                    clippingPlanes.Far = meshDistance.FurthestDistance;
-                }
-            }
         }
 
         public void Draw(DoubleVector3 cameraLocation, Matrix originBasedViewMatrix, Matrix projectionMatrix)

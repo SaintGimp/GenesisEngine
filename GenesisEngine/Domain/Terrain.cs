@@ -23,11 +23,11 @@ namespace GenesisEngine
             }
         }
 
-        public void Update(DoubleVector3 cameraLocation, DoubleVector3 planetLocation, ClippingPlanes clippingPlanes)
+        public void Update(DoubleVector3 cameraLocation, DoubleVector3 planetLocation)
         {
             foreach (var face in _faces)
             {
-                face.Update(cameraLocation, planetLocation, clippingPlanes);
+                face.Update(cameraLocation, planetLocation);
             }
         }
     }

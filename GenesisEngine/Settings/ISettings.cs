@@ -25,5 +25,7 @@ namespace GenesisEngine
         int MaximumQuadNodeLevel { get; set;  }
 
         bool ShowQuadBoundaries { get; set; }
+
+        double FarClippingPlaneDistance { get; set; }
     }
 }

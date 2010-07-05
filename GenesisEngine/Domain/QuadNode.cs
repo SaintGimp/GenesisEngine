@@ -61,15 +61,15 @@ namespace GenesisEngine
             _statistics.NumberOfQuadNodesAtLevel[Level]++;
         }
 
-        public void Update(DoubleVector3 cameraLocation, DoubleVector3 planetLocation, ClippingPlanes clippingPlanes)
+        public void Update(DoubleVector3 cameraLocation, DoubleVector3 planetLocation)
         {
-            _mesh.Update(cameraLocation, planetLocation, clippingPlanes);
+            _mesh.Update(cameraLocation, planetLocation);
 
             // TODO: This algorithm could be improved to optimize the number of triangles that are drawn
 
             if (_mesh.IsVisibleToCamera && _mesh.CameraDistanceToWidthRatio < 1 && !_hasSubnodes && !_splitInProgress && !_mergeInProgress && Level < _settings.MaximumQuadNodeLevel)
             {
-                Split(cameraLocation, planetLocation, clippingPlanes);
+                Split(cameraLocation, planetLocation);
             }
             else if (_mesh.CameraDistanceToWidthRatio > 1.2 && _hasSubnodes && !_mergeInProgress && !_splitInProgress)
             {
@@ -80,12 +80,12 @@ namespace GenesisEngine
             {
                 foreach (var subnode in _subnodes)
                 {
-                    subnode.Update(cameraLocation, planetLocation, clippingPlanes);
+                    subnode.Update(cameraLocation, planetLocation);
                 }
             }
         }
 
-        private void Split(DoubleVector3 cameraLocation, DoubleVector3 planetLocation, ClippingPlanes clippingPlanes)
+        private void Split(DoubleVector3 cameraLocation, DoubleVector3 planetLocation)
         {
             _splitInProgress = true;
             var subextents = _extents.Split();
@@ -101,7 +101,7 @@ namespace GenesisEngine
                 {
                     var node = _quadNodeFactory.Create();
                     node.Initialize(_planetRadius, _planeNormalVector, _uVector, _vVector, capturedExtent, Level + 1);
-                    node.Update(cameraLocation, planetLocation, clippingPlanes);
+                    node.Update(cameraLocation, planetLocation);
                     return node;
                 });
 
@@ -146,13 +146,12 @@ namespace GenesisEngine
 
         public void Draw(DoubleVector3 cameraLocation, Matrix originBasedViewMatrix, Matrix projectionMatrix)
         {
-            if (!_mesh.IsVisibleToCamera)
-            {
-                return;
-            }
-
             if (_hasSubnodes)
             {
+                // TODO: we'd like to stop traversing into subnodes if this node's mesh isn't visibile, but our
+                // horizon culling algorithm isn't that great right now and the primary faces are so large that
+                // sometimes all of their sample points are below the horizon even though we're above that face.
+                // For now, we'll scan all subnodes regardless.
                 foreach (var subnode in _subnodes)
                 {
                     subnode.Draw(cameraLocation, originBasedViewMatrix, projectionMatrix);
@@ -160,8 +159,11 @@ namespace GenesisEngine
             }
             else
             {
-                _renderer.Draw(_locationRelativeToPlanet, cameraLocation, originBasedViewMatrix, projectionMatrix);
-                _mesh.Draw(cameraLocation, originBasedViewMatrix, projectionMatrix);
+                if (_mesh.IsVisibleToCamera)
+                {
+                    _renderer.Draw(_locationRelativeToPlanet, cameraLocation, originBasedViewMatrix, projectionMatrix);
+                    _mesh.Draw(cameraLocation, originBasedViewMatrix, projectionMatrix);
+                }
             }
         }
 

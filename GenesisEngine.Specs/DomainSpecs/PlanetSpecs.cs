@@ -46,7 +46,7 @@ namespace GenesisEngine.Specs.DomainSpecs
             _planet.Update(DoubleVector3.Up);
 
         It should_update_the_terrain = () =>
-            _terrain.AssertWasCalled(x => x.Update(Arg.Is(DoubleVector3.Up), Arg.Is(_location), Arg<ClippingPlanes>.Is.Anything));
+            _terrain.AssertWasCalled(x => x.Update(Arg.Is(DoubleVector3.Up), Arg.Is(_location)));
     }
 
     [Subject(typeof(Planet))]
@@ -77,6 +77,7 @@ namespace GenesisEngine.Specs.DomainSpecs
         public static ITerrainFactory _terrainFactory;
         public static ITerrain _terrain;
         public static IHeightfieldGenerator _generator;
+        public static ISettings _settings;
         public static Statistics _statistics;
         public static IPlanet _planet;
 
@@ -88,9 +89,10 @@ namespace GenesisEngine.Specs.DomainSpecs
             _terrain = MockRepository.GenerateStub<ITerrain>();
             _planetRenderer = MockRepository.GenerateStub<IPlanetRenderer>();
             _generator = MockRepository.GenerateStub<IHeightfieldGenerator>();
+            _settings = MockRepository.GenerateStub<ISettings>();
             _statistics = new Statistics();
 
-            _planet = new Planet(_location, _radius, _terrain, _planetRenderer, _generator, _statistics);
+            _planet = new Planet(_location, _radius, _terrain, _planetRenderer, _generator, _settings, _statistics);
         };
     }
 }

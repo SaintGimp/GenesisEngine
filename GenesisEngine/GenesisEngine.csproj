@@ -135,7 +135,6 @@
     <Compile Include="Cameras\ICameraController.cs" />
     <Compile Include="Input\IInputState.cs" />
     <Compile Include="Input\XnaInputState.cs" />
-    <Compile Include="Domain\ClippingPlanes.cs" />
     <Compile Include="Domain\TestHeightfieldGenerator1.cs" />
     <Compile Include="Domain\TestHeightfieldGenerator2.cs" />
     <Compile Include="Domain\LayeredHeightfieldGenerator.cs" />

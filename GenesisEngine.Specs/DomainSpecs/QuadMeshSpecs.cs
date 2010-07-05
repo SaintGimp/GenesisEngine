@@ -62,7 +62,7 @@ namespace GenesisEngine.Specs.DomainSpecs
             InitializeTopFacingMesh();
 
         Because of = () =>
-            _mesh.Update(DoubleVector3.Down * 100, DoubleVector3.Zero, _clippingPlanes);
+            _mesh.Update(DoubleVector3.Down * 100, DoubleVector3.Zero);
 
         It should_not_be_visible = () =>
             _mesh.IsVisibleToCamera.ShouldBeFalse();
@@ -75,14 +75,14 @@ namespace GenesisEngine.Specs.DomainSpecs
             InitializeTopFacingMesh();
 
         Because of = () =>
-            _mesh.Update(DoubleVector3.Up * 100, DoubleVector3.Zero, _clippingPlanes);
+            _mesh.Update(DoubleVector3.Up * 100, DoubleVector3.Zero);
 
         It should_be_visible = () =>
             _mesh.IsVisibleToCamera.ShouldBeTrue();
     }
 
     [Subject(typeof(QuadMesh))]
-    public class when_a_visible_mesh_is_updated : QuadMeshContext
+    public class when_a_mesh_is_updated : QuadMeshContext
     {
         public static DoubleVector3 _topLeftPosition;
         public static DoubleVector3 _cameraPosition;
@@ -96,43 +96,10 @@ namespace GenesisEngine.Specs.DomainSpecs
         };
 
         Because of = () =>
-            _mesh.Update(_cameraPosition, DoubleVector3.Zero, _clippingPlanes);
-
-        It should_adjust_the_near_clipping_plane = () =>
-            _clippingPlanes.Near.ShouldBeCloseTo(90);
-
-        It should_adjust_the_far_clipping_plane = () =>
-            _clippingPlanes.Far.ShouldBeCloseTo(DoubleVector3.Distance(_cameraPosition, _topLeftPosition + DoubleVector3.Up * _radius));
+            _mesh.Update(_cameraPosition, DoubleVector3.Zero);
 
         It should_calculate_the_ratio_of_distance_to_width = () =>
             _mesh.CameraDistanceToWidthRatio.ShouldEqual((_cameraPosition.Length() - _radius) / (_extents.Width * _radius));
-    }
-
-    [Subject(typeof(QuadMesh))]
-    public class when_a_nonvisible_mesh_is_updated : QuadMeshContext
-    {
-        public static DoubleVector3 _topLeftPosition;
-        public static DoubleVector3 _cameraPosition;
-
-        Establish context = () =>
-        {
-            InitializeTopFacingMesh();
-
-            _topLeftPosition = _renderer.Vertices[0].Position;
-            _cameraPosition = DoubleVector3.Down * 100;
-        };
-
-        Because of = () =>
-            _mesh.Update(_cameraPosition, DoubleVector3.Zero, _clippingPlanes);
-
-        It should_not_adjust_the_near_clipping_plane = () =>
-            _clippingPlanes.Near.ShouldBeCloseTo(double.MaxValue);
-
-        It should_not_adjust_the_far_clipping_plane = () =>
-            _clippingPlanes.Far.ShouldBeCloseTo(double.MinValue);
-
-        It should_calculate_the_ratio_of_distance_to_width = () =>
-            _mesh.CameraDistanceToWidthRatio.ShouldBeCloseTo(5.3, 0.1);
     }
 
     [Subject(typeof(QuadMesh))]
@@ -185,7 +152,6 @@ namespace GenesisEngine.Specs.DomainSpecs
         public static MockQuadMeshRenderer _renderer;
         public static ISettings _settings;
         public static Statistics _statistics;
-        public static ClippingPlanes _clippingPlanes;
 
         public static QuadMesh _mesh;
 
@@ -203,8 +169,6 @@ namespace GenesisEngine.Specs.DomainSpecs
             _settings = MockRepository.GenerateStub<ISettings>();
 
             _statistics = new Statistics();
-
-            _clippingPlanes = new ClippingPlanes();
 
             _mesh = new QuadMesh(_generator, _terrainColorizer, _renderer, _settings);
         };

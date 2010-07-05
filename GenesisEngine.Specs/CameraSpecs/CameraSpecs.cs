@@ -405,6 +405,7 @@ namespace GenesisEngine.Specs.CameraSpecs
         Establish context = () =>
         {
             _settings = MockRepository.GenerateStub<ISettings>();
+            _settings.FarClippingPlaneDistance = 50000.0f;
             _camera = new Camera(_settings);
         };
 

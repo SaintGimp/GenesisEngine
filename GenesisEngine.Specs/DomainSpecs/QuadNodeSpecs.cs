@@ -39,10 +39,10 @@ namespace GenesisEngine.Specs.DomainSpecs
             _node.Initialize(10, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 5);
 
         Because of = () =>
-            _node.Update(DoubleVector3.Up * 11, DoubleVector3.Zero, _clippingPlanes);
+            _node.Update(DoubleVector3.Up * 11, DoubleVector3.Zero);
 
         It should_update_the_mesh = () =>
-            _mesh.AssertWasCalled(x => x.Update(DoubleVector3.Up * 11, DoubleVector3.Zero, _clippingPlanes));
+            _mesh.AssertWasCalled(x => x.Update(DoubleVector3.Up * 11, DoubleVector3.Zero));
     }
 
     [Subject(typeof(QuadNode))]
@@ -57,7 +57,7 @@ namespace GenesisEngine.Specs.DomainSpecs
 
         Because of = () =>
         {
-            _node.Update(DoubleVector3.Up * 11, DoubleVector3.Zero, _clippingPlanes);
+            _node.Update(DoubleVector3.Up * 11, DoubleVector3.Zero);
             _node.WaitForSplitToComplete();
         };
 
@@ -89,12 +89,12 @@ namespace GenesisEngine.Specs.DomainSpecs
             _mesh.Stub(x => x.IsVisibleToCamera).Return(true);
 
             _node.Initialize(10, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 0);
-            _node.Update(DoubleVector3.Up * 11, DoubleVector3.Zero, _clippingPlanes);
+            _node.Update(DoubleVector3.Up * 11, DoubleVector3.Zero);
         };
 
         Because of = () =>
         {
-            _node.Update(DoubleVector3.Up * 11, DoubleVector3.Zero, _clippingPlanes);
+            _node.Update(DoubleVector3.Up * 11, DoubleVector3.Zero);
             _node.WaitForSplitToComplete();
         };
 
@@ -110,11 +110,11 @@ namespace GenesisEngine.Specs.DomainSpecs
             _mesh.Stub(x => x.IsVisibleToCamera).Return(true);
 
             _node.Initialize(10, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 19);
-            _node.Update(DoubleVector3.Up * 11, DoubleVector3.Zero, _clippingPlanes);
+            _node.Update(DoubleVector3.Up * 11, DoubleVector3.Zero);
         };
 
         Because of = () =>
-            _node.Update(DoubleVector3.Up * 11, DoubleVector3.Zero, _clippingPlanes);
+            _node.Update(DoubleVector3.Up * 11, DoubleVector3.Zero);
 
         It should_not_split = () =>
             _node.Subnodes.Count.ShouldEqual(0);
@@ -134,14 +134,14 @@ namespace GenesisEngine.Specs.DomainSpecs
             _farCameraLocation = DoubleVector3.Up * 15 * 10 * 2;
 
             _node.Initialize(10, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 0);
-            _node.Update(_nearCameraLocation, DoubleVector3.Zero, _clippingPlanes);
+            _node.Update(_nearCameraLocation, DoubleVector3.Zero);
 
             _mesh.Stub(x => x.CameraDistanceToWidthRatio).Return(2);
         };
 
         Because of = () =>
         {
-            _node.Update(_farCameraLocation, DoubleVector3.Zero, _clippingPlanes);
+            _node.Update(_farCameraLocation, DoubleVector3.Zero);
             _node.WaitForSplitToComplete();
         };
 
@@ -167,17 +167,17 @@ namespace GenesisEngine.Specs.DomainSpecs
             _cameraLocation = DoubleVector3.Up;
 
             _node.Initialize(10, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 0);
-            _node.Update(_cameraLocation, DoubleVector3.Zero, _clippingPlanes);
+            _node.Update(_cameraLocation, DoubleVector3.Zero);
         };
 
         Because of = () =>
-            _node.Update(_cameraLocation, DoubleVector3.Zero, _clippingPlanes);
+            _node.Update(_cameraLocation, DoubleVector3.Zero);
 
         It should_update_subquads = () =>
         {
             foreach (var subnode in _node.Subnodes)
             {
-                subnode.AssertWasCalled(x => x.Update(_cameraLocation, DoubleVector3.Zero, _clippingPlanes));
+                subnode.AssertWasCalled(x => x.Update(_cameraLocation, DoubleVector3.Zero));
             }
         };
     }
@@ -200,7 +200,7 @@ namespace GenesisEngine.Specs.DomainSpecs
             _projectionMatrix = Matrix.Identity;
 
             _node.Initialize(10, Vector3.Up, Vector3.Backward, Vector3.Right, new QuadNodeExtents(-1.0, 1.0, -1.0, 1.0), 0);
-            _node.Update(DoubleVector3.Up, DoubleVector3.Zero, _clippingPlanes);
+            _node.Update(DoubleVector3.Up, DoubleVector3.Zero);
             _node.WaitForSplitToComplete();
         };
 
@@ -275,7 +275,7 @@ namespace GenesisEngine.Specs.DomainSpecs
         Establish context = () =>
         {
             _node.Initialize(_radius, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 0);
-            _node.Update(DoubleVector3.Up, DoubleVector3.Zero, _clippingPlanes);
+            _node.Update(DoubleVector3.Up, DoubleVector3.Zero);
         };
 
         Because of = () =>
@@ -307,7 +307,6 @@ namespace GenesisEngine.Specs.DomainSpecs
         public static MockQuadNodeRenderer _renderer;
         public static ISettings _settings;
         public static Statistics _statistics;
-        public static ClippingPlanes _clippingPlanes;
 
         public static TestableQuadNode _node;
 
@@ -327,8 +326,6 @@ namespace GenesisEngine.Specs.DomainSpecs
             _settings.MaximumQuadNodeLevel = 19;
 
             _statistics = new Statistics();
-
-            _clippingPlanes = new ClippingPlanes();
 
             _node = new TestableQuadNode(_mesh, _quadNodeFactory, _renderer, _settings, _statistics);
         };
