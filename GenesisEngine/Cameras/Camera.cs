@@ -194,6 +194,10 @@ namespace GenesisEngine
             }
         }
 
+        // This is the view matrix built as though the camera were at the origin rather than at
+        // its world location.  This is useful because it lets us translate meshes to be drawn
+        // only as much as they need to be correct relative to the camera, not as much as they'd
+        // need to be in their actual world locations (which might blow the floats they're based on).
         public Matrix OriginBasedViewTransformation
         {
             get { return _originBasedViewMatrix; }
