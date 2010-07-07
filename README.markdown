@@ -37,7 +37,6 @@ Right now the camera is fixed to a universal reference frame, not a planetary re
 
 I've got a decent start on basic terrain generation.  I can zoom all the way from ground level to high orbit and the terrain is mildly interesting.  There's obviously a ton of features left to implement.  Some things on the list include:
 
-* Generating terrain patches on background threads so the renderer doesn't stutter
 * Generating terrain patches on the GPU which will be much faster
 * Texturing
 * Normal maps
