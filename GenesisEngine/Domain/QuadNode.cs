@@ -22,6 +22,7 @@ namespace GenesisEngine
         bool _splitInProgress;
         bool _mergeInProgress;
         protected Task _backgroundSplitTask;
+        protected Task _backgroundMergeTask;
         protected List<IQuadNode> _subnodes = new List<IQuadNode>();
 
         readonly IQuadMesh _mesh;
@@ -127,7 +128,7 @@ namespace GenesisEngine
             _mergeInProgress = true;
             _hasSubnodes = false;
 
-            Task.Factory.StartNew(() =>
+            _backgroundMergeTask = Task.Factory.StartNew(() =>
             {
                 DisposeSubNodes();
                 _subnodes.Clear();

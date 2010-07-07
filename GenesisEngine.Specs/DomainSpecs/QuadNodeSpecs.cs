@@ -135,6 +135,7 @@ namespace GenesisEngine.Specs.DomainSpecs
 
             _node.Initialize(10, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 0);
             _node.Update(_nearCameraLocation, DoubleVector3.Zero);
+            _node.WaitForSplitToComplete();
 
             _mesh.Stub(x => x.CameraDistanceToWidthRatio).Return(2);
         };
@@ -142,7 +143,7 @@ namespace GenesisEngine.Specs.DomainSpecs
         Because of = () =>
         {
             _node.Update(_farCameraLocation, DoubleVector3.Zero);
-            _node.WaitForSplitToComplete();
+            _node.WaitForMergeToComplete();
         };
 
         It should_remove_subnodes = () =>
@@ -361,6 +362,11 @@ namespace GenesisEngine.Specs.DomainSpecs
         public void WaitForSplitToComplete()
         {
             _backgroundSplitTask.Wait();
+        }
+
+        public void WaitForMergeToComplete()
+        {
+            _backgroundMergeTask.Wait();
         }
     }
 
