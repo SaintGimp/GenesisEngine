@@ -103,4 +103,33 @@
       </UserRule>
     </Naming2>
   </CodeStyleSettings>
+  <SharedSolutionTemplateManager>
+    <LiveTemplates>
+      <Template uid="2dfeec5f-40f3-49a9-a400-e01745ea1419" shortcut="establish" description="MSpec Establish clause" text="Establish context = () =&gt;&#xD;&#xA;    " reformat="True" shortenQualifiedReferences="True">
+        <Categories />
+        <Variables />
+        <CustomProperties />
+      </Template>
+      <Template uid="407f2333-1b58-4e55-82b5-739733f3a26f" shortcut="it" description="MSpec It clause" text="It $SHOULD$ = () =&gt;&#xD;&#xA;	$ASSERT$" reformat="True" shortenQualifiedReferences="True">
+        <Categories />
+        <Variables>
+          <Variable name="SHOULD" expression="" initialRange="0" />
+          <Variable name="ASSERT" expression="" initialRange="0" />
+        </Variables>
+        <CustomProperties />
+      </Template>
+      <Template uid="378facd2-7ef3-48fe-9c81-e48be7e61ed4" shortcut="context" description="MSpec context class" text="    [Subject(typeof($TYPE$))]&#xD;&#xA;    public class $WHEN$&#xD;&#xA;    {&#xD;&#xA;        Establish context = () =&gt;&#xD;&#xA;            $CONTEXT$&#xD;&#xA;&#xD;&#xA;        Because of = () =&gt;&#xD;&#xA;            $BECAUSE$&#xD;&#xA;&#xD;&#xA;        It $SHOULD$ = () =&gt;&#xD;&#xA;            $ASSERT$&#xD;&#xA;    }&#xD;&#xA;" reformat="True" shortenQualifiedReferences="True">
+        <Categories />
+        <Variables>
+          <Variable name="TYPE" expression="" initialRange="0" />
+          <Variable name="WHEN" expression="" initialRange="0" />
+          <Variable name="CONTEXT" expression="" initialRange="0" />
+          <Variable name="BECAUSE" expression="" initialRange="0" />
+          <Variable name="SHOULD" expression="" initialRange="0" />
+          <Variable name="ASSERT" expression="" initialRange="0" />
+        </Variables>
+        <CustomProperties />
+      </Template>
+    </LiveTemplates>
+  </SharedSolutionTemplateManager>
 </Configuration>
