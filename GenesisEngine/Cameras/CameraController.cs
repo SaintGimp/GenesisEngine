@@ -13,7 +13,9 @@ namespace GenesisEngine
                                     IListener<MoveUp>,
                                     IListener<MoveDown>,
                                     IListener<MouseLook>,
-                                    IListener<GoToGround>
+                                    IListener<GoToGround>,
+                                    IListener<ZoomIn>,
+                                    IListener<ZoomOut>
     {
         readonly ICamera _camera;
         readonly ISettings _settings;
@@ -82,6 +84,16 @@ namespace GenesisEngine
             var planetUnitVector = DoubleVector3.Normalize(_camera.Location);
             var height = _planet.GetGroundHeight(_camera.Location);
             _camera.Location = planetUnitVector * (height + 2);
+        }
+
+        public void Handle(ZoomIn message)
+        {
+            _camera.ZoomLevel *= 1.5f;
+        }
+
+        public void Handle(ZoomOut message)
+        {
+            _camera.ZoomLevel /= 1.5f;
         }
     }
 }

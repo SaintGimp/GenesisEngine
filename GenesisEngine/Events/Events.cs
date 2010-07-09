@@ -62,6 +62,14 @@ namespace GenesisEngine
     {
     }
 
+    public class ZoomIn : InputMessage
+    {
+    }
+
+    public class ZoomOut : InputMessage
+    {
+    }
+
     public class GarbageCollect : InputMessage
     {
     }

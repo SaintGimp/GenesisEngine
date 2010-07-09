@@ -17,6 +17,8 @@ namespace GenesisEngine
         
         void SetClippingPlanes(float nearPlane, float farPlane);
 
+        float ZoomLevel { get; set; }
+
         float Yaw { get; set; }
         
         float Pitch { get; set; }

@@ -15,8 +15,8 @@ namespace GenesisEngine
                            IListener<ExitApplication>,
                            IListener<GarbageCollect>
     {
-        private MainPresenter _mainPresenter;
-        private IInputState _inputState;
+        MainPresenter _mainPresenter;
+        IInputState _inputState;
         IInputMapper _inputMapper;
         Scenario.Scenario _drawMarker = new Scenario.Scenario(0, "Draw pass");
 
@@ -81,13 +81,15 @@ namespace GenesisEngine
             _inputMapper.AddKeyDownMessage<MoveRight>(Keys.D);
             _inputMapper.AddKeyDownMessage<MoveUp>(Keys.E);
             _inputMapper.AddKeyDownMessage<MoveDown>(Keys.C);
+            _inputMapper.AddKeyPressMessage<IncreaseCameraSpeed>(Keys.OemPlus);
+            _inputMapper.AddKeyPressMessage<DecreaseCameraSpeed>(Keys.OemMinus);
+            _inputMapper.AddKeyPressMessage<ZoomIn>(Keys.OemPeriod);
+            _inputMapper.AddKeyPressMessage<ZoomOut>(Keys.OemComma);
             _inputMapper.AddKeyDownMessage<GoToGround>(Keys.Z);
 
             _inputMapper.AddKeyPressMessage<ToggleDrawWireframeSetting>(Keys.F);
             _inputMapper.AddKeyPressMessage<ToggleUpdateSetting>(Keys.U);
             _inputMapper.AddKeyPressMessage<ToggleSingleStepSetting>(Keys.P);
-            _inputMapper.AddKeyPressMessage<IncreaseCameraSpeed>(Keys.OemPlus);
-            _inputMapper.AddKeyPressMessage<DecreaseCameraSpeed>(Keys.OemMinus);
 
             _inputMapper.AddKeyPressMessage<GarbageCollect>(Keys.G);
 

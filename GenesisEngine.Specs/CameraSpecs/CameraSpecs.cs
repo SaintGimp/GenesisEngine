@@ -93,11 +93,17 @@ namespace GenesisEngine.Specs.CameraSpecs
     [Subject(typeof(Camera))]
     public class when_projection_parameters_are_set : CameraContext
     {
+        public static Matrix _previousProjectionMatrix;
+
+        Establish context = () =>
+            _previousProjectionMatrix = _camera.ProjectionTransformation;
+
         Because of = () =>
             _camera.SetProjectionParameters(1f, 1f, 1f, 1f, 2f);
 
-        It should_do_something_awesome;
-            // TODO
+        // TODO: need to figure out what kind of projection matrix this should generate
+        It should_change_the_projection_matrix = () =>
+            _camera.ProjectionTransformation.ShouldNotEqual(_previousProjectionMatrix);
     }
 
     [Subject(typeof(Camera))]
@@ -111,6 +117,37 @@ namespace GenesisEngine.Specs.CameraSpecs
 
         It should_set_the_far_plane_of_the_view_frustum = () =>
             _camera.OriginBasedViewFrustum.Far.D.ShouldBeCloseTo(-456, 0.001f);
+    }
+
+    [Subject(typeof(Camera))]
+    public class when_the_zoom_level_is_set : CameraContext
+    {
+        public static Matrix _previousProjectionMatrix;
+
+        Establish context = () =>
+            _previousProjectionMatrix = _camera.ProjectionTransformation;
+
+        Because of = () =>
+            _camera.ZoomLevel = 3f;
+
+        // TODO: need to figure out what kind of projection matrix this should generate
+        It should_change_the_projection_matrix = () =>
+            _camera.ProjectionTransformation.ShouldNotEqual(_previousProjectionMatrix);
+    }
+
+    [Subject(typeof(Camera))]
+    public class when_the_zoom_level_is_set_to_an_invalid_value : CameraContext
+    {
+        public static Matrix _previousProjectionMatrix;
+
+        Establish context = () =>
+            _previousProjectionMatrix = _camera.ProjectionTransformation;
+
+        Because of = () =>
+            _camera.ZoomLevel = 0f;
+
+        It should_not_change_the_projection_matrix = () =>
+            _camera.ProjectionTransformation.ShouldEqual(_previousProjectionMatrix);
     }
 
     [Subject(typeof(Camera))]

@@ -137,6 +137,19 @@ namespace GenesisEngine
             CreateProjectionMatrix();
         }
 
+        public float ZoomLevel
+        {
+            get { return _zoomLevel; }
+            set
+            {
+                if (value > 0)
+                {
+                    _zoomLevel = value;
+                    CreateProjectionMatrix();
+                }
+            }
+        }
+
         public DoubleVector3 Location
         {
             get

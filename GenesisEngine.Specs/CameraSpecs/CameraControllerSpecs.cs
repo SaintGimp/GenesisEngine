@@ -95,8 +95,34 @@ namespace GenesisEngine.Specs.CameraSpecs
         Because of = () =>
             _controller.Handle(new GoToGround() { InputState = _input });
 
-        It should_go_to_ground_level = () =>
+        It should_move_the_camera_to_ground_level = () =>
             _camera.Location.ShouldEqual(DoubleVector3.Up * 125);
+    }
+
+    [Subject(typeof(CameraController))]
+    public class when_a_zoom_in_message_is_received : CameraControllerContext
+    {
+        Establish context = () =>
+            _camera.ZoomLevel = 3f;
+
+        Because of = () =>
+            _controller.Handle(new ZoomIn());
+
+        It should_increase_the_zoom_level_of_the_camera = () =>
+            _camera.ZoomLevel.ShouldBeGreaterThan(3f);
+    }
+
+    [Subject(typeof(CameraController))]
+    public class when_a_zoom_out_message_is_received : CameraControllerContext
+    {
+        Establish context = () =>
+            _camera.ZoomLevel = 3f;
+
+        Because of = () =>
+            _controller.Handle(new ZoomOut());
+
+        It should_decrease_the_zoom_level_of_the_camera = () =>
+            _camera.ZoomLevel.ShouldBeLessThan(3f);
     }
 
     public class CameraControllerContext

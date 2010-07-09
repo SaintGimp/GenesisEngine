@@ -27,6 +27,7 @@ The GenesisEngine project is a Visual Studio 2010 solution with dependencies on 
 * E/C for up/down
 * Z to go to ground level
 * -/= to decrease/increase camera speed
+* ,/. to decrease/increase camera zoom level
 * hold the right mouse button for mouselook
 * U to toggle state updates (useful for moving around close to the ground because the renderer stutters so badly.  Turn updates off, move somewhere, then turn updates back on.)
 * F to toggle wireframe rendering
