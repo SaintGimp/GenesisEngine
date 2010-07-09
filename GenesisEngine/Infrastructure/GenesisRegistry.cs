@@ -14,11 +14,16 @@ namespace GenesisEngine
     {
         public GenesisRegistry()
         {
-            // The single argument to the Scan method is a nested closure
             Scan(x =>
             {
                 x.TheCallingAssembly();
                 x.WithDefaultConventions();
+                
+                // These are excluded because they have contructor dependencies that are satisfied by
+                // factories, aren't pulled from the container, and we don't want them checked in unit tests.
+                x.ExcludeType<QuadNode>();
+                x.ExcludeType<QuadMesh>();
+                x.ExcludeType<QuadMeshRenderer>();
             });
 
             MakeSingleton<Genesis>();

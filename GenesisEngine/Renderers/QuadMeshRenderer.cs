@@ -56,6 +56,7 @@ namespace GenesisEngine
             _effect.Projection = projectionMatrix;
             _effect.World = GetWorldMatrix(location, cameraLocation);
 
+            // TODO: we shouldn't have to set all of these every time - could be optimized
             SetLightingEffects();
             SetFogEffects();
             SetFillMode();

@@ -10,18 +10,24 @@ namespace GenesisEngine
     public class QuadMeshRendererFactory : IQuadMeshRendererFactory
     {
         readonly GraphicsDevice _graphicsDevice;
-        readonly BasicEffect _basicEffect;
         readonly ISettings _settings;
+        BasicEffect _basicEffect;
 
         public QuadMeshRendererFactory(GraphicsDevice graphicsDevice, ISettings settings)
         {
             _graphicsDevice = graphicsDevice;
-            _basicEffect = new BasicEffect(_graphicsDevice);
             _settings = settings;
         }
 
         public IQuadMeshRenderer Create()
         {
+            if (_basicEffect == null)
+            {
+                // This is not created in the constructor because it can't be created at unit test time
+                // and that messes up our container tests.
+                _basicEffect = new BasicEffect(_graphicsDevice);
+            }
+
             return new QuadMeshRenderer(_graphicsDevice, _basicEffect, _settings);
         }
     }
