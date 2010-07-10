@@ -97,7 +97,7 @@
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="Scenario.Managed">
-      <HintPath>..\dependencies\Scenario\Managed\net4.0\Release\Scenario.Managed.dll</HintPath>
+      <HintPath>..\dependencies\Scenario\Scenario.Managed.dll</HintPath>
     </Reference>
     <Reference Include="StructureMap">
       <HintPath>..\dependencies\StructureMap\StructureMap.dll</HintPath>
