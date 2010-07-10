@@ -136,15 +136,19 @@ namespace GenesisEngine.Specs.CameraSpecs
     }
 
     [Subject(typeof(Camera))]
-    public class when_the_zoom_level_is_set_to_an_invalid_value : CameraContext
+    public class when_the_zoom_level_would_create_an_invalid_field_of_view : CameraContext
     {
         public static Matrix _previousProjectionMatrix;
 
         Establish context = () =>
+        {
+            _camera.SetProjectionParameters(MathHelper.PiOver4, 1f, 1f, 1f, 2f);
             _previousProjectionMatrix = _camera.ProjectionTransformation;
+        };
 
+        // Field of view / zoom level must be < Pi
         Because of = () =>
-            _camera.ZoomLevel = 0f;
+            _camera.ZoomLevel = 0.2f;
 
         It should_not_change_the_projection_matrix = () =>
             _camera.ProjectionTransformation.ShouldEqual(_previousProjectionMatrix);

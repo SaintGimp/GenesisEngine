@@ -142,7 +142,7 @@ namespace GenesisEngine
             get { return _zoomLevel; }
             set
             {
-                if (value > 0)
+                if (_fieldOfView / value < MathHelper.Pi)
                 {
                     _zoomLevel = value;
                     CreateProjectionMatrix();
