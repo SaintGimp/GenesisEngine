@@ -21,7 +21,7 @@ namespace GenesisEngine
         bool _hasSubnodes;
         bool _splitInProgress;
         bool _mergeInProgress;
-        protected Task _backgroundSplitTask;
+        protected Task _splitCompletionTask;
         protected Task _backgroundMergeTask;
         protected List<IQuadNode> _subnodes = new List<IQuadNode>();
 
@@ -88,11 +88,16 @@ namespace GenesisEngine
 
         private void Split(DoubleVector3 cameraLocation, DoubleVector3 planetLocation)
         {
+            // TODO: should we bother to write specs for the threading behavior?
+
+            var tasks = CreateBackgroundSplitTasks(cameraLocation, planetLocation);
+            CreateSplitCompletionTask(tasks);
+        }
+
+        List<Task<IQuadNode>> CreateBackgroundSplitTasks(DoubleVector3 cameraLocation, DoubleVector3 planetLocation)
+        {
             _splitInProgress = true;
             var subextents = _extents.Split();
-
-            // TODO: refactor
-            // TODO: should we bother to write specs for the threading behavior?
 
             var tasks = new List<Task<IQuadNode>>();
             foreach (var subextent in subextents)
@@ -108,8 +113,12 @@ namespace GenesisEngine
 
                 tasks.Add(task);
             }
+            return tasks;
+        }
 
-            _backgroundSplitTask = Task.Factory.ContinueWhenAll(tasks.ToArray(), finishedTasks =>
+        void CreateSplitCompletionTask(List<Task<IQuadNode>> tasks)
+        {
+            _splitCompletionTask = Task.Factory.ContinueWhenAll(tasks.ToArray(), finishedTasks =>
             {
                 foreach (var task in finishedTasks)
                 {
@@ -123,7 +132,6 @@ namespace GenesisEngine
 
         private void Merge()
         {
-            // TODO: Do async disposal
             // TODO: if a split is pending, cancel it
             _mergeInProgress = true;
             _hasSubnodes = false;

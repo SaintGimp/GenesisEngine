@@ -312,9 +312,7 @@ namespace GenesisEngine
         private struct MeshDistance
         {
             public DoubleVector3 ClosestVertex { get; set; }
-            public DoubleVector3 FurthestVertex { get; set; }
             public double ClosestDistance { get; set; }
-            public double FurthestDistance { get; set; }
         }
     }
 }

@@ -29,7 +29,7 @@ The GenesisEngine project is a Visual Studio 2010 solution with dependencies on 
 * -/= to decrease/increase camera speed
 * ,/. to decrease/increase camera zoom level
 * hold the right mouse button for mouselook
-* U to toggle state updates (useful for moving around close to the ground because the renderer stutters so badly.  Turn updates off, move somewhere, then turn updates back on.)
+* U to toggle state updates (useful for inspecting the current quad node tree from different angles.)
 * F to toggle wireframe rendering
 
 Right now the camera is fixed to a universal reference frame, not a planetary reference frame, so if you want to explore close to the ground it's probably better to stay close to the north pole where camera-up matches planet-up.

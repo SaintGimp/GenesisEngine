@@ -361,7 +361,7 @@ namespace GenesisEngine.Specs.DomainSpecs
 
         public void WaitForSplitToComplete()
         {
-            _backgroundSplitTask.Wait();
+            _splitCompletionTask.Wait();
         }
 
         public void WaitForMergeToComplete()
