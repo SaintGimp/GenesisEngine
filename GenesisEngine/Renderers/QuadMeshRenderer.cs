@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace GenesisEngine
@@ -13,23 +12,27 @@ namespace GenesisEngine
         readonly GraphicsDevice _graphicsDevice;
         readonly BasicEffect _effect;
         readonly ISettings _settings;
-        
+        readonly Statistics _statistics;
+
         VertexBuffer _vertexBuffer;
         IndexBuffer _indexBuffer;
         int _numberOfVertices;
         int _numberOfIndices;
+        BoundingBox _boundingBox;
 
-        public QuadMeshRenderer(GraphicsDevice graphicsDevice, BasicEffect effect, ISettings settings)
+        public QuadMeshRenderer(GraphicsDevice graphicsDevice, BasicEffect effect, ISettings settings, Statistics statistics)
         {
             _graphicsDevice = graphicsDevice;
             _effect = effect;
             _settings = settings;
+            _statistics = statistics;
         }
 
-        public void Initialize(VertexPositionNormalColor[] vertices, short[] indices)
+        public void Initialize(VertexPositionNormalColor[] vertices, short[] indices, BoundingBox boundingBox)
         {
             CreateVertexBuffer(vertices);
             CreateIndexBuffer(indices);
+            _boundingBox = boundingBox;
         }
 
         private void CreateVertexBuffer(VertexPositionNormalColor[] vertices)
@@ -62,6 +65,12 @@ namespace GenesisEngine
             SetFillMode();
 
             DrawMesh();
+            if (_settings.ShouldDrawMeshBoundingBoxes)
+            {
+                DrawBoundingBox();
+            }
+
+            _statistics.NumberOfQuadMeshesRendered++;
         }
 
         Matrix GetWorldMatrix(DoubleVector3 location, DoubleVector3 cameraLocation)
@@ -144,6 +153,46 @@ namespace GenesisEngine
                 _graphicsDevice.Indices = _indexBuffer;
                 _graphicsDevice.SetVertexBuffer(_vertexBuffer);
                 _graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, _numberOfVertices, 0, _numberOfIndices / 3);
+            }
+        }
+
+        void DrawBoundingBox()
+        {
+            // TODO: set this stuff up once
+            var vertices = new VertexPositionNormalColor[8];
+            var indices = new short[]
+            {
+                0, 1,
+                1, 2,
+                2, 3,
+                3, 0,
+                0, 4,
+                1, 5,
+                2, 6,
+                3, 7,
+                4, 5,
+                5, 6,
+                6, 7,
+                7, 4,
+            };
+
+            Vector3[] corners = _boundingBox.GetCorners();
+            for (int i = 0; i < 8; i++)
+            {
+                vertices[i].Position = corners[i];
+                vertices[i].Color = Color.DarkGreen;
+                vertices[i].Normal = Vector3.Up;
+            }
+
+            _effect.CurrentTechnique.Passes[0].Apply();
+
+            foreach (EffectPass pass in _effect.CurrentTechnique.Passes)
+            {
+                pass.Apply();
+
+                _graphicsDevice.Indices = _indexBuffer;
+                _graphicsDevice.SetVertexBuffer(_vertexBuffer);
+                _graphicsDevice.DrawUserIndexedPrimitives(PrimitiveType.LineList, vertices, 0, 8, indices, 0, indices.Length / 2);
             }
         }
 

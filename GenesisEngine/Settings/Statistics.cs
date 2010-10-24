@@ -19,5 +19,15 @@ namespace GenesisEngine
         public int[] NumberOfQuadNodesAtLevel { get; private set; }
 
         public double CameraAltitude { get; set; }
+
+        public int NumberOfQuadMeshesRendered { get; set; }
+
+        public int PreviousNumberOfQuadMeshesRendered { get; set; }
+
+        public void Flush()
+        {
+            PreviousNumberOfQuadMeshesRendered = NumberOfQuadMeshesRendered;
+            NumberOfQuadMeshesRendered = 0;
+        }
     }
 }

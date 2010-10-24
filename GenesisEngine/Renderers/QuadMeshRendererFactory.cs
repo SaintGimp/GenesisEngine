@@ -11,12 +11,14 @@ namespace GenesisEngine
     {
         readonly GraphicsDevice _graphicsDevice;
         readonly ISettings _settings;
+        readonly Statistics _statistics;
         BasicEffect _basicEffect;
 
-        public QuadMeshRendererFactory(GraphicsDevice graphicsDevice, ISettings settings)
+        public QuadMeshRendererFactory(GraphicsDevice graphicsDevice, ISettings settings, Statistics statistics)
         {
             _graphicsDevice = graphicsDevice;
             _settings = settings;
+            _statistics = statistics;
         }
 
         public IQuadMeshRenderer Create()
@@ -28,7 +30,7 @@ namespace GenesisEngine
                 _basicEffect = new BasicEffect(_graphicsDevice);
             }
 
-            return new QuadMeshRenderer(_graphicsDevice, _basicEffect, _settings);
+            return new QuadMeshRenderer(_graphicsDevice, _basicEffect, _settings, _statistics);
         }
     }
 }

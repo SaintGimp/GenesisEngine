@@ -10,6 +10,6 @@ namespace GenesisEngine
     {
         void Update(DoubleVector3 cameraLocation, DoubleVector3 planetLocation);
 
-        void Draw(DoubleVector3 cameraLocation, Matrix originBasedViewMatrix, Matrix projectionMatrix);
+        void Draw(DoubleVector3 cameraLocation, BoundingFrustum originBasedViewFrustum, Matrix originBasedViewMatrix, Matrix projectionMatrix);
     }
 }

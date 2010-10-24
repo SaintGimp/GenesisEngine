@@ -27,5 +27,7 @@ namespace GenesisEngine
         bool ShowQuadBoundaries { get; set; }
 
         double FarClippingPlaneDistance { get; set; }
+
+        bool ShouldDrawMeshBoundingBoxes { get; set; }
     }
 }

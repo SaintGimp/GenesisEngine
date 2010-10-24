@@ -46,5 +46,7 @@ namespace GenesisEngine
         Matrix OriginBasedViewTransformation { get; }
         
         Matrix ProjectionTransformation { get; }
+
+        BoundingFrustum OriginBasedViewFrustum { get; }
     }
 }

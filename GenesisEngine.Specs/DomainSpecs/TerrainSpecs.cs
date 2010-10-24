@@ -13,21 +13,23 @@ namespace GenesisEngine.Specs.DomainSpecs
     public class when_the_terrain_is_drawn : TerrainContext
     {
         public static DoubleVector3 _cameraLocation;
+        public static BoundingFrustum _viewFrustum;
         public static Matrix _viewMatrix;
         public static Matrix _projectionMatrix;
 
         Establish context = () =>
         {
             _cameraLocation = DoubleVector3.Up;
+            _viewFrustum = new BoundingFrustum(Matrix.Identity);
             _viewMatrix = Matrix.Identity;
             _projectionMatrix = Matrix.Identity;
         };
 
         Because of = () =>
-            _terrain.Draw(_cameraLocation, _viewMatrix, _projectionMatrix);
+            _terrain.Draw(_cameraLocation, _viewFrustum, _viewMatrix, _projectionMatrix);
 
         It should_draw_the_faces = () =>
-            _face.AssertWasCalled(x => x.Draw(_cameraLocation, _viewMatrix, _projectionMatrix));
+            _face.AssertWasCalled(x => x.Draw(_cameraLocation, _viewFrustum, _viewMatrix, _projectionMatrix));
     }
 
     [Subject(typeof(Terrain))]

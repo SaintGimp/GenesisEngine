@@ -15,19 +15,19 @@ namespace GenesisEngine
             _faces = faces;
         }
 
-        public void Draw(DoubleVector3 cameraLocation, Matrix originBasedViewMatrix, Matrix projectionMatrix)
-        {
-            foreach (var face in _faces)
-            {
-                face.Draw(cameraLocation, originBasedViewMatrix, projectionMatrix);
-            }
-        }
-
         public void Update(DoubleVector3 cameraLocation, DoubleVector3 planetLocation)
         {
             foreach (var face in _faces)
             {
                 face.Update(cameraLocation, planetLocation);
+            }
+        }
+
+        public void Draw(DoubleVector3 cameraLocation, BoundingFrustum originBasedViewFrustum, Matrix originBasedViewMatrix, Matrix projectionMatrix)
+        {
+            foreach (var face in _faces)
+            {
+                face.Draw(cameraLocation, originBasedViewFrustum, originBasedViewMatrix, projectionMatrix);
             }
         }
     }

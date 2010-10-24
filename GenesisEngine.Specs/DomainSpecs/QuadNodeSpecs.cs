@@ -50,7 +50,7 @@ namespace GenesisEngine.Specs.DomainSpecs
     {
         Establish context = () =>
         {
-            _mesh.Stub(x => x.IsVisibleToCamera).Return(true);
+            _mesh.Stub(x => x.IsAboveHorizonToCamera).Return(true);
 
             _node.Initialize(10, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 5);
         };
@@ -86,7 +86,7 @@ namespace GenesisEngine.Specs.DomainSpecs
     {
         Establish context = () =>
         {
-            _mesh.Stub(x => x.IsVisibleToCamera).Return(true);
+            _mesh.Stub(x => x.IsAboveHorizonToCamera).Return(true);
 
             _node.Initialize(10, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 0);
             _node.Update(DoubleVector3.Up * 11, DoubleVector3.Zero);
@@ -107,7 +107,7 @@ namespace GenesisEngine.Specs.DomainSpecs
     {
         Establish context = () =>
         {
-            _mesh.Stub(x => x.IsVisibleToCamera).Return(true);
+            _mesh.Stub(x => x.IsAboveHorizonToCamera).Return(true);
 
             _node.Initialize(10, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 19);
             _node.Update(DoubleVector3.Up * 11, DoubleVector3.Zero);
@@ -128,7 +128,7 @@ namespace GenesisEngine.Specs.DomainSpecs
 
         Establish context = () =>
         {
-            _mesh.Stub(x => x.IsVisibleToCamera).Return(true);
+            _mesh.Stub(x => x.IsAboveHorizonToCamera).Return(true);
 
             _nearCameraLocation = DoubleVector3.Up * 11;
             _farCameraLocation = DoubleVector3.Up * 15 * 10 * 2;
@@ -189,14 +189,16 @@ namespace GenesisEngine.Specs.DomainSpecs
     public class when_a_nonleaf_node_is_drawn : QuadNodeContext
     {
         public static DoubleVector3 _cameraLocation;
+        public static BoundingFrustum _viewFrustum;
         public static Matrix _viewMatrix;
         public static Matrix _projectionMatrix;
 
         Establish context = () =>
         {
-            _mesh.Stub(x => x.IsVisibleToCamera).Return(true);
+            _mesh.Stub(x => x.IsAboveHorizonToCamera).Return(true);
 
             _cameraLocation = DoubleVector3.Up;
+            _viewFrustum = new BoundingFrustum(Matrix.Identity);
             _viewMatrix = Matrix.Identity;
             _projectionMatrix = Matrix.Identity;
 
@@ -206,19 +208,19 @@ namespace GenesisEngine.Specs.DomainSpecs
         };
 
         Because of = () =>
-            _node.Draw(_cameraLocation, _viewMatrix, _projectionMatrix);
+            _node.Draw(_cameraLocation, _viewFrustum, _viewMatrix, _projectionMatrix);
 
         It should_not_draw_the_node = () =>
             _renderer.DrawWasCalled.ShouldBeFalse();
 
         It should_not_draw_the_mesh = () =>
-            _mesh.AssertWasNotCalled(x => x.Draw(Arg<DoubleVector3>.Is.Anything, Arg<Matrix>.Is.Anything, Arg<Matrix>.Is.Anything));
+            _mesh.AssertWasNotCalled(x => x.Draw(Arg<DoubleVector3>.Is.Anything, Arg<BoundingFrustum>.Is.Anything, Arg<Matrix>.Is.Anything, Arg<Matrix>.Is.Anything));
 
         It should_draw_the_subnodes_in_the_correct_location = () =>
         {
             foreach (var subnode in _node.Subnodes)
             {
-                subnode.AssertWasCalled(x => x.Draw(_cameraLocation, _viewMatrix, _projectionMatrix));
+                subnode.AssertWasCalled(x => x.Draw(_cameraLocation, _viewFrustum, _viewMatrix, _projectionMatrix));
             }
         };
     }
@@ -227,14 +229,14 @@ namespace GenesisEngine.Specs.DomainSpecs
     public class when_a_leaf_node_is_drawn : QuadNodeContext
     {
         public static DoubleVector3 _cameraLocation;
+        public static BoundingFrustum _viewFrustum;
         public static Matrix _viewMatrix;
         public static Matrix _projectionMatrix;
 
         Establish context = () =>
         {
-            _mesh.Stub(x => x.IsVisibleToCamera).Return(true);
-
             _cameraLocation = DoubleVector3.Up;
+            _viewFrustum = new BoundingFrustum(Matrix.Identity);
             _viewMatrix = Matrix.Identity;
             _projectionMatrix = Matrix.Identity;
 
@@ -242,13 +244,13 @@ namespace GenesisEngine.Specs.DomainSpecs
         };
 
         Because of = () =>
-            _node.Draw(_cameraLocation, _viewMatrix, _projectionMatrix);
+            _node.Draw(_cameraLocation, _viewFrustum, _viewMatrix, _projectionMatrix);
 
         It should_draw_the_node = () =>
             _renderer.DrawWasCalled.ShouldBeTrue();
 
         It should_draw_the_mesh = () =>
-            _mesh.AssertWasCalled(x => x.Draw(_cameraLocation, _viewMatrix, _projectionMatrix));
+            _mesh.AssertWasCalled(x => x.Draw(_cameraLocation, _viewFrustum, _viewMatrix, _projectionMatrix));
 
         It should_draw_the_node_in_the_correct_location = () =>
             _renderer.Location.ShouldEqual(Vector3.Up * 10);

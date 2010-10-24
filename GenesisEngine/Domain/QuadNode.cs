@@ -68,7 +68,7 @@ namespace GenesisEngine
 
             // TODO: This algorithm could be improved to optimize the number of triangles that are drawn
 
-            if (_mesh.IsVisibleToCamera && _mesh.CameraDistanceToWidthRatio < 1 && !_hasSubnodes && !_splitInProgress && !_mergeInProgress && Level < _settings.MaximumQuadNodeLevel)
+            if (_mesh.IsAboveHorizonToCamera && _mesh.CameraDistanceToWidthRatio < 1 && !_hasSubnodes && !_splitInProgress && !_mergeInProgress && Level < _settings.MaximumQuadNodeLevel)
             {
                 Split(cameraLocation, planetLocation);
             }
@@ -153,7 +153,7 @@ namespace GenesisEngine
             }
         }
 
-        public void Draw(DoubleVector3 cameraLocation, Matrix originBasedViewMatrix, Matrix projectionMatrix)
+        public void Draw(DoubleVector3 cameraLocation, BoundingFrustum originBasedViewFrustum, Matrix originBasedViewMatrix, Matrix projectionMatrix)
         {
             if (_hasSubnodes)
             {
@@ -163,16 +163,13 @@ namespace GenesisEngine
                 // For now, we'll scan all subnodes regardless.
                 foreach (var subnode in _subnodes)
                 {
-                    subnode.Draw(cameraLocation, originBasedViewMatrix, projectionMatrix);
+                    subnode.Draw(cameraLocation, originBasedViewFrustum, originBasedViewMatrix, projectionMatrix);
                 }
             }
             else
             {
-                if (_mesh.IsVisibleToCamera)
-                {
-                    _renderer.Draw(_locationRelativeToPlanet, cameraLocation, originBasedViewMatrix, projectionMatrix);
-                    _mesh.Draw(cameraLocation, originBasedViewMatrix, projectionMatrix);
-                }
+                _renderer.Draw(_locationRelativeToPlanet, cameraLocation, originBasedViewMatrix, projectionMatrix);
+                _mesh.Draw(cameraLocation, originBasedViewFrustum, originBasedViewMatrix, projectionMatrix);
             }
         }
 

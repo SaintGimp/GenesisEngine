@@ -29,7 +29,14 @@
         </MODIFIERS_ORDER>
         <SPACE_AROUND_MULTIPLICATIVE_OP>True</SPACE_AROUND_MULTIPLICATIVE_OP>
       </FormatSettings>
-      <UsingsSettings />
+      <UsingsSettings>
+        <MandatoryImports IsNull="False">
+          <Item>System</Item>
+          <Item>System.Collections.Generic</Item>
+          <Item>System.Linq</Item>
+          <Item>System.Text</Item>
+        </MandatoryImports>
+      </UsingsSettings>
       <Naming2>
         <EventHandlerPatternLong>$object$_On$event$</EventHandlerPatternLong>
         <EventHandlerPatternShort>$event$Handler</EventHandlerPatternShort>

@@ -13,6 +13,7 @@ namespace GenesisEngine.Specs.DomainSpecs
     public class when_the_planet_is_drawn : PlanetContext
     {
         public static DoubleVector3 _cameraLocation;
+        public static BoundingFrustum _viewFrustum;
         public static Matrix _viewMatrix;
         public static Matrix _projectionMatrix;
         public static ICamera _camera;
@@ -20,11 +21,13 @@ namespace GenesisEngine.Specs.DomainSpecs
         Establish context = () =>
         {
             _cameraLocation = DoubleVector3.Up;
+            _viewFrustum = new BoundingFrustum(Matrix.Identity);
             _viewMatrix = Matrix.Identity;
             _projectionMatrix = Matrix.Identity;
 
             _camera = MockRepository.GenerateStub<ICamera>();
             _camera.Location = _cameraLocation;
+            _camera.Stub(x => x.OriginBasedViewFrustum).Return(_viewFrustum);
             _camera.Stub(x => x.OriginBasedViewTransformation).Return(_viewMatrix);
             _camera.Stub(x => x.ProjectionTransformation).Return(_projectionMatrix);
         };
@@ -36,7 +39,7 @@ namespace GenesisEngine.Specs.DomainSpecs
             _planetRenderer.AssertWasCalled(x => x.Draw(_location, _cameraLocation, _viewMatrix, _projectionMatrix));
 
         It should_draw_the_terrain = () =>
-            _terrain.AssertWasCalled(x => x.Draw(_cameraLocation, _viewMatrix, _projectionMatrix));
+            _terrain.AssertWasCalled(x => x.Draw(_cameraLocation, _viewFrustum, _viewMatrix, _projectionMatrix));
     }
 
     [Subject(typeof(Planet))]

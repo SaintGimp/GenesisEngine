@@ -8,12 +8,12 @@ namespace GenesisEngine
         void Initialize(double planetRadius, DoubleVector3 planeNormalVector, DoubleVector3 uVector,
                         DoubleVector3 vVector, QuadNodeExtents extents, int level);
 
-        bool IsVisibleToCamera { get; }
+        bool IsAboveHorizonToCamera { get; }
 
         double CameraDistanceToWidthRatio { get; }
 
         void Update(DoubleVector3 cameraLocation, DoubleVector3 planetLocation);
 
-        void Draw(DoubleVector3 cameraLocation, Matrix originBasedViewMatrix, Matrix projectionMatrix);
+        void Draw(DoubleVector3 cameraLocation, BoundingFrustum originBasedViewFrustum, Matrix originBasedViewMatrix, Matrix projectionMatrix);
     }
 }

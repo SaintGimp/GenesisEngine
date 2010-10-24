@@ -19,14 +19,15 @@ namespace GenesisEngine
         IInputState _inputState;
         IInputMapper _inputMapper;
         Scenario.Scenario _drawMarker = new Scenario.Scenario(0, "Draw pass");
+        Scenario.Scenario _updateMarker = new Scenario.Scenario(0, "Update pass");
 
         public Genesis()
         {
             this.GraphicsDeviceManager = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
 
-            this.GraphicsDeviceManager.SynchronizeWithVerticalRetrace = false;
             this.IsFixedTimeStep = false;
+            this.GraphicsDeviceManager.SynchronizeWithVerticalRetrace = true;
 
             GraphicsDeviceManager.PreferredDepthStencilFormat = DepthFormat.Depth24;
 
@@ -129,7 +130,9 @@ namespace GenesisEngine
             _inputMapper.HandleInput(_inputState);
 
             //Debug.WriteLine(Stopwatch.StartNew().Measure(() => _mainPresenter.Update(gameTime.ElapsedGameTime)));
+            _updateMarker.Begin();
             _mainPresenter.Update(gameTime.ElapsedGameTime);
+            _updateMarker.End();
             
             base.Update(gameTime);
         }

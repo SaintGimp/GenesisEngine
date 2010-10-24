@@ -43,7 +43,7 @@ namespace GenesisEngine
         public void Draw(ICamera camera)
         {
             _renderer.Draw(_location, camera.Location, camera.OriginBasedViewTransformation, camera.ProjectionTransformation);
-            _terrain.Draw(camera.Location, camera.OriginBasedViewTransformation, camera.ProjectionTransformation);
+            _terrain.Draw(camera.Location, camera.OriginBasedViewFrustum, camera.OriginBasedViewTransformation, camera.ProjectionTransformation);
         }
 
         public double GetGroundHeight(DoubleVector3 observerLocation)

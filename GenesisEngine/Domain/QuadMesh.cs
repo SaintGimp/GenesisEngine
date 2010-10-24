@@ -28,10 +28,10 @@ namespace GenesisEngine
         int _level;
         double _meshStride;
 
-
         VertexPositionNormalColor[] _vertices;
         static short[] _indices;
         DoubleVector3[] _vertexSamples;
+        BoundingBox _boundingBox;
 
         readonly IHeightfieldGenerator _generator;
         readonly ITerrainColorizer _terrainColorizer;
@@ -51,7 +51,7 @@ namespace GenesisEngine
             _settings = settings;
         }
 
-        public bool IsVisibleToCamera { get; private set; }
+        public bool IsAboveHorizonToCamera { get; private set; }
 
         public double CameraDistanceToWidthRatio { get; private set; }
 
@@ -71,10 +71,37 @@ namespace GenesisEngine
 
             _meshStride = _extents.Width / (_gridSize - 1);
 
+            // TODO: cover this in specs
+            _boundingBox.Min = new Vector3(float.MaxValue);
+            _boundingBox.Max = new Vector3(float.MinValue);
+
             GenerateMeshVertices();
             CollectMeshSamples();
 
-            _renderer.Initialize(_vertices, _indices);
+            _renderer.Initialize(_vertices, _indices, _boundingBox);
+        }
+
+        void GenerateMeshVertices()
+        {
+            _vertices = new VertexPositionNormalColor[_gridSize * _gridSize];
+
+            for (int row = 0; row < _gridSize; row++)
+            {
+                for (int column = 0; column < _gridSize; column++)
+                {
+                    var vertex = GetVertexInMeshSpace(column, row);
+                    AdjustBoundingBoxToInclude(vertex.Position);
+                    _vertices[row * _gridSize + column] = vertex;
+                }
+            }
+
+            GenerateNormals();
+        }
+
+        void AdjustBoundingBoxToInclude(Vector3 vertex)
+        {
+            Vector3.Min(ref vertex, ref _boundingBox.Min, out _boundingBox.Min);
+            Vector3.Max(ref vertex, ref _boundingBox.Max, out _boundingBox.Max);
         }
 
         void CollectMeshSamples()
@@ -98,21 +125,6 @@ namespace GenesisEngine
             {
                 _vertexSamples[x] += _locationRelativeToPlanet;
             }
-        }
-
-        void GenerateMeshVertices()
-        {
-            _vertices = new VertexPositionNormalColor[_gridSize * _gridSize];
-
-            for (int row = 0; row < _gridSize; row++)
-            {
-                for (int column = 0; column < _gridSize; column++)
-                {
-                    _vertices[row * _gridSize + column] = GetVertexInMeshSpace(column, row);
-                }
-            }
-
-            GenerateNormals();
         }
 
         VertexPositionNormalColor GetVertexInMeshSpace(int column, int row)
@@ -252,7 +264,7 @@ namespace GenesisEngine
             
             CameraDistanceToWidthRatio = distanceFromCamera / WidthInRealSpaceUnits();
 
-            IsVisibleToCamera = CalculateVisibility(cameraLocation, planetLocation, meshDistance.ClosestVertex);
+            IsAboveHorizonToCamera = CalculateIsAboveHorizonToCamera(cameraLocation, planetLocation, meshDistance.ClosestVertex);
         }
 
         MeshDistance GetDistanceFrom(DoubleVector3 location)
@@ -283,7 +295,7 @@ namespace GenesisEngine
             return _extents.Width * _planetRadius;
         }
 
-        bool CalculateVisibility(DoubleVector3 cameraLocation, DoubleVector3 planetLocation, DoubleVector3 closestVertex)
+        bool CalculateIsAboveHorizonToCamera(DoubleVector3 cameraLocation, DoubleVector3 planetLocation, DoubleVector3 closestVertex)
         {
             // Taken from http://www.crappycoding.com/2009/04/
 
@@ -299,9 +311,29 @@ namespace GenesisEngine
             return horizonAngle > angleToMesh;
         }
 
-        public void Draw(DoubleVector3 cameraLocation, Matrix originBasedViewMatrix, Matrix projectionMatrix)
+        public void Draw(DoubleVector3 cameraLocation, BoundingFrustum originBasedViewFrustum, Matrix originBasedViewMatrix, Matrix projectionMatrix)
         {
-            _renderer.Draw(_locationRelativeToPlanet, cameraLocation, originBasedViewMatrix, projectionMatrix);
+            // TODO: better spec coverage here
+            if (IsAboveHorizonToCamera && IsVisibleToCamera(cameraLocation, originBasedViewFrustum))
+            {
+                _renderer.Draw(_locationRelativeToPlanet, cameraLocation, originBasedViewMatrix, projectionMatrix);
+            }
+        }
+
+        bool IsVisibleToCamera(DoubleVector3 cameraLocation, BoundingFrustum originBasedViewFrustum)
+        {
+            var locationRelativeToCamera = _locationRelativeToPlanet - cameraLocation;
+            var translatedBoundingBox = new BoundingBox(_boundingBox.Min + (Vector3)locationRelativeToCamera,
+                                                        _boundingBox.Max + (Vector3)locationRelativeToCamera);
+
+            return IsInViewFrustumWithNoFarClipping(translatedBoundingBox, originBasedViewFrustum);
+        }
+
+        bool IsInViewFrustumWithNoFarClipping(BoundingBox box, BoundingFrustum viewFrustum)
+        {
+            var planes = new [] { viewFrustum.Near, viewFrustum.Left, viewFrustum.Right, viewFrustum.Top, viewFrustum.Bottom};
+
+            return planes.All(plane => box.Intersects(plane) != PlaneIntersectionType.Front);
         }
 
         public void Dispose()

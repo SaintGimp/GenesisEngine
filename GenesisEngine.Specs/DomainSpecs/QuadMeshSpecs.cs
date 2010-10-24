@@ -65,11 +65,11 @@ namespace GenesisEngine.Specs.DomainSpecs
             _mesh.Update(DoubleVector3.Down * 100, DoubleVector3.Zero);
 
         It should_not_be_visible = () =>
-            _mesh.IsVisibleToCamera.ShouldBeFalse();
+            _mesh.IsAboveHorizonToCamera.ShouldBeFalse();
     }
 
     [Subject(typeof(QuadMesh))]
-    public class when_a_mesh_is_not_below_the_horizon : QuadMeshContext
+    public class when_a_mesh_is_above_the_horizon : QuadMeshContext
     {
         Establish context = () =>
             InitializeTopFacingMesh();
@@ -78,7 +78,7 @@ namespace GenesisEngine.Specs.DomainSpecs
             _mesh.Update(DoubleVector3.Up * 100, DoubleVector3.Zero);
 
         It should_be_visible = () =>
-            _mesh.IsVisibleToCamera.ShouldBeTrue();
+            _mesh.IsAboveHorizonToCamera.ShouldBeTrue();
     }
 
     [Subject(typeof(QuadMesh))]
@@ -103,15 +103,17 @@ namespace GenesisEngine.Specs.DomainSpecs
     }
 
     [Subject(typeof(QuadMesh))]
-    public class when_a_mesh_is_drawn : QuadMeshContext
+    public class when_a_mesh_in_the_view_frustum_is_drawn : QuadMeshContext
     {
         public static DoubleVector3 _cameraLocation;
+        public static BoundingFrustum _viewFrustum;
         public static Matrix _viewMatrix;
         public static Matrix _projectionMatrix;
 
         Establish context = () =>
         {
-            _cameraLocation = DoubleVector3.Up;
+            _cameraLocation = DoubleVector3.Up * 100;
+            _viewFrustum = CreateFrustumLookingAt(DoubleVector3.Down * 200);
             _viewMatrix = Matrix.Identity;
             _projectionMatrix = Matrix.Identity;
 
@@ -119,13 +121,38 @@ namespace GenesisEngine.Specs.DomainSpecs
         };
 
         Because of = () =>
-            _mesh.Draw(_cameraLocation, _viewMatrix, _projectionMatrix);
+            _mesh.Draw(_cameraLocation, _viewFrustum, _viewMatrix, _projectionMatrix);
 
         It should_draw_the_mesh = () =>
             _renderer.DrawWasCalled.ShouldBeTrue();
 
         It should_draw_the_mesh_in_the_correct_location = () =>
             _renderer.Location.ShouldEqual(Vector3.Up * _radius);
+    }
+
+    [Subject(typeof(QuadMesh))]
+    public class when_a_mesh_not_in_the_view_frustum_is_drawn : QuadMeshContext
+    {
+        public static DoubleVector3 _cameraLocation;
+        public static BoundingFrustum _viewFrustum;
+        public static Matrix _viewMatrix;
+        public static Matrix _projectionMatrix;
+
+        Establish context = () =>
+        {
+            _cameraLocation = DoubleVector3.Up * 100;
+            _viewFrustum = CreateFrustumLookingAt(DoubleVector3.Up * 200 + DoubleVector3.Right);
+            _viewMatrix = Matrix.Identity;
+            _projectionMatrix = Matrix.Identity;
+
+            InitializeTopFacingMesh();
+        };
+
+        Because of = () =>
+            _mesh.Draw(_cameraLocation, _viewFrustum, _viewMatrix, _projectionMatrix);
+
+        It should_not_draw_the_mesh = () =>
+            _renderer.DrawWasCalled.ShouldBeFalse();
     }
 
     [Subject(typeof(QuadMesh))]
@@ -193,6 +220,14 @@ namespace GenesisEngine.Specs.DomainSpecs
             expectedVector -= normalVector * _radius;
             return expectedVector;
         }
+
+        public static BoundingFrustum CreateFrustumLookingAt(Vector3 lookingAt)
+        {
+            var projectionMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.Pi / 4 / 1f, 1f, 1f, 10f);
+            var originBasedViewMatrix = Matrix.CreateLookAt(Vector3.Zero, lookingAt, Vector3.Up);
+            
+            return new BoundingFrustum(Matrix.Multiply(originBasedViewMatrix, projectionMatrix));
+        }
     }
 
     public class MockQuadMeshRenderer : IQuadMeshRenderer, IDisposable
@@ -203,7 +238,7 @@ namespace GenesisEngine.Specs.DomainSpecs
         public Vector3 Location { get; private set; }
         public VertexPositionNormalColor[] Vertices { get; private set; }
 
-        public virtual void Initialize(VertexPositionNormalColor[] vertices, short[] indices)
+        public virtual void Initialize(VertexPositionNormalColor[] vertices, short[] indices, BoundingBox boundingBox)
         {
             InitializeWasCalled = true;
             Vertices = vertices;
@@ -221,3 +256,4 @@ namespace GenesisEngine.Specs.DomainSpecs
         }
     }
 }
+

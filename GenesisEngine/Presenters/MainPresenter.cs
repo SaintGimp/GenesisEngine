@@ -51,6 +51,7 @@ namespace GenesisEngine
         void UpdateStatistics(TimeSpan elapsedTime)
         {
             _statistics.FrameRate =  (float)Math.Round(1000.0 / elapsedTime.TotalMilliseconds, 1);
+            _statistics.Flush();
         }
 
         public void Draw()
