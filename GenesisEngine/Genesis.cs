@@ -1,13 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using StructureMap;
-using Scenario;
 
 namespace GenesisEngine
 {
@@ -23,11 +21,11 @@ namespace GenesisEngine
 
         public Genesis()
         {
-            this.GraphicsDeviceManager = new GraphicsDeviceManager(this);
+            GraphicsDeviceManager = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
 
-            this.IsFixedTimeStep = false;
-            this.GraphicsDeviceManager.SynchronizeWithVerticalRetrace = true;
+            IsFixedTimeStep = false;
+            GraphicsDeviceManager.SynchronizeWithVerticalRetrace = true;
 
             GraphicsDeviceManager.PreferredDepthStencilFormat = DepthFormat.Depth24;
 
@@ -60,7 +58,7 @@ namespace GenesisEngine
         {
             Thread.CurrentThread.Priority = ThreadPriority.AboveNormal;
 
-            this.IsMouseVisible = true;
+            IsMouseVisible = true;
 
             _mainPresenter = ObjectFactory.GetInstance<MainPresenter>();
             _mainPresenter.Show();
@@ -143,7 +141,7 @@ namespace GenesisEngine
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            this.GraphicsDeviceManager.GraphicsDevice.Clear(Color.Black);
+            GraphicsDeviceManager.GraphicsDevice.Clear(Color.Black);
 
             _drawMarker.Begin();
             _mainPresenter.Draw();

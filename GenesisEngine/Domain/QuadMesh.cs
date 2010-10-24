@@ -2,10 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System.Diagnostics;
 
 namespace GenesisEngine
 {
@@ -283,7 +280,7 @@ namespace GenesisEngine
             }
 
             // TODO: We're spamming the garbage collector with this.  Allocate one instance per mesh and reuse.
-            return new MeshDistance()
+            return new MeshDistance
             {
                 ClosestDistance = Math.Sqrt(closestDistanceSquared),
                 ClosestVertex = closestVertex,

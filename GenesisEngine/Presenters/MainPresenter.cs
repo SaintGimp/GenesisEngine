@@ -18,9 +18,9 @@ namespace GenesisEngine
         IPlanet _planet;
 
         public MainPresenter(IPlanetFactory planetFactory, ICamera camera, ICameraController cameraController, IWindowManager windowManager, Statistics statistics, ISettings settings)
-		{
+        {
             _planetFactory = planetFactory;
-			_camera = camera;
+            _camera = camera;
             _cameraController = cameraController;
             _windowManager = windowManager;
             _statistics = statistics;
@@ -37,16 +37,16 @@ namespace GenesisEngine
         }
 
         public void Update(TimeSpan elapsedTime)
-		{
-			if (_settings.ShouldUpdate || _settings.ShouldSingleStep)
-			{
+        {
+            if (_settings.ShouldUpdate || _settings.ShouldSingleStep)
+            {
                 _planet.Update(_camera.Location);
-				
-				_settings.ShouldSingleStep = false;
-			}
+                
+                _settings.ShouldSingleStep = false;
+            }
 
             UpdateStatistics(elapsedTime);
-		}
+        }
 
         void UpdateStatistics(TimeSpan elapsedTime)
         {
@@ -59,10 +59,10 @@ namespace GenesisEngine
             _planet.Draw(_camera);
         }
 
-		public void SetViewportSize(int width, int height)
-		{
-			float aspectRatio = width / (float)height;
-			const float fieldOfView = MathHelper.Pi / 4;
+        public void SetViewportSize(int width, int height)
+        {
+            float aspectRatio = width / (float)height;
+            const float fieldOfView = MathHelper.Pi / 4;
 
             // TODO: better z-buffer handling?  Not sure what we can do to improve the mechanics of
             // the z-buffer itself from inside XNA.  We should test the (scaled and transformed) objects
@@ -82,6 +82,6 @@ namespace GenesisEngine
             // http://www.humus.name/index.php?ID=255
             
             _camera.SetProjectionParameters(fieldOfView, 1f, aspectRatio, 2f, (float)_settings.FarClippingPlaneDistance);
-		}
+        }
     }
 }
