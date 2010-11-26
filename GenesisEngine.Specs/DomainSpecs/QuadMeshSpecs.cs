@@ -118,6 +118,7 @@ namespace GenesisEngine.Specs.DomainSpecs
             _projectionMatrix = Matrix.Identity;
 
             InitializeTopFacingMesh();
+            _mesh.Update(_cameraLocation, DoubleVector3.Zero);
         };
 
         Because of = () =>
@@ -146,6 +147,7 @@ namespace GenesisEngine.Specs.DomainSpecs
             _projectionMatrix = Matrix.Identity;
 
             InitializeTopFacingMesh();
+            _mesh.Update(_cameraLocation, DoubleVector3.Zero);
         };
 
         Because of = () =>
