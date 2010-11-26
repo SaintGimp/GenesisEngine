@@ -35,11 +35,6 @@ namespace GenesisEngine
         readonly IQuadMeshRenderer _renderer;
         readonly ISettings _settings;
 
-        static QuadMesh()
-        {
-            GenerateIndices();    
-        }
-
         public QuadMesh(IHeightfieldGenerator generator, ITerrainColorizer terrainColorizer, IQuadMeshRenderer renderer, ISettings settings)
         {
             _generator = generator;
@@ -72,6 +67,7 @@ namespace GenesisEngine
             _boundingBox.Min = new Vector3(float.MaxValue);
             _boundingBox.Max = new Vector3(float.MinValue);
 
+            GenerateIndices();
             GenerateMeshVertices();
             CollectMeshSamples();
 
@@ -193,33 +189,37 @@ namespace GenesisEngine
 
         static void GenerateIndices()
         {
-            // We can generate the indices once and share it for all
-            // instances since it never changes.  In the future we'll want to deal
-            // with adjacent nodes at different levels by constructing special
-            // index sets that blend them at the edge.
-
             // TODO: Right now our indices must be 16 bits because we have to target
             // the XNA 4.0 Reach profile until RTM is released.  After RTM we should
             // be able to push this up to 32 bits if we want to.
 
-            _indices = new short[(_gridSize - 1) * (_gridSize - 1) * 6];
-            int counter = 0;
-            for (var x = 0; x < _gridSize - 1; x++)
+            // We can generate the indices once and share it for all
+            // instances since it never changes.
+            // TODO: In the future we'll want to deal
+            // with adjacent nodes at different levels by constructing special
+            // index sets that blend them at the edge as in the _Interactive Visualization_ paper
+
+            if (_indices == null)
             {
-                for (var y = 0; y < _gridSize - 1; y++)
+                _indices = new short[(_gridSize - 1) * (_gridSize - 1) * 6];
+                int counter = 0;
+                for (var x = 0; x < _gridSize - 1; x++)
                 {
-                    var topLeft = (short)(x * _gridSize + y);
-                    var lowerLeft = (short)((x + 1) * _gridSize + y);
-                    var topRight = (short)(x * _gridSize + (y + 1));
-                    var lowerRight = (short)((x + 1) * _gridSize + (y + 1));
+                    for (var y = 0; y < _gridSize - 1; y++)
+                    {
+                        var topLeft = (short) (x * _gridSize + y);
+                        var lowerLeft = (short) ((x + 1) * _gridSize + y);
+                        var topRight = (short) (x * _gridSize + (y + 1));
+                        var lowerRight = (short) ((x + 1) * _gridSize + (y + 1));
 
-                    _indices[counter++] = topLeft;
-                    _indices[counter++] = lowerRight;
-                    _indices[counter++] = lowerLeft;
+                        _indices[counter++] = topLeft;
+                        _indices[counter++] = lowerRight;
+                        _indices[counter++] = lowerLeft;
 
-                    _indices[counter++] = topLeft;
-                    _indices[counter++] = topRight;
-                    _indices[counter++] = lowerRight;
+                        _indices[counter++] = topLeft;
+                        _indices[counter++] = topRight;
+                        _indices[counter++] = lowerRight;
+                    }
                 }
             }
         }

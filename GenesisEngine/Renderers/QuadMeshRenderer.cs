@@ -15,9 +15,9 @@ namespace GenesisEngine
         readonly Statistics _statistics;
 
         VertexBuffer _vertexBuffer;
-        IndexBuffer _indexBuffer;
+        static IndexBuffer _indexBuffer;
         int _numberOfVertices;
-        int _numberOfIndices;
+        static int _numberOfIndices;
         BoundingBox _boundingBox;
 
         public QuadMeshRenderer(GraphicsDevice graphicsDevice, BasicEffect effect, ISettings settings, Statistics statistics)
@@ -44,13 +44,15 @@ namespace GenesisEngine
 
         private void CreateIndexBuffer(short[] indices)
         {
-            // TODO: according to the _Interactive Visualization_ paper, we should be able to pre-generate
-            // all possible index buffers once (tweaked on the edges to match lower LOD neighbors) and reuse
-            // them for all nodes.
-
-            _numberOfIndices = indices.Length;
-            _indexBuffer = new IndexBuffer(_graphicsDevice, IndexElementSize.SixteenBits, _numberOfIndices, BufferUsage.WriteOnly);
-            _indexBuffer.SetData(indices);
+            // Right now all of our index buffers are exactly identical so we'll create just one to be shared across
+            // all instances
+            if (_indexBuffer == null)
+            {
+                _numberOfIndices = indices.Length;
+                _indexBuffer = new IndexBuffer(_graphicsDevice, IndexElementSize.SixteenBits, _numberOfIndices,
+                                               BufferUsage.WriteOnly);
+                _indexBuffer.SetData(indices);
+            }
         }
 
         public void Draw(DoubleVector3 location, DoubleVector3 cameraLocation, Matrix originBasedViewMatrix, Matrix projectionMatrix)
@@ -195,7 +197,6 @@ namespace GenesisEngine
         public void Dispose()
         {
             _vertexBuffer.Dispose();
-            _indexBuffer.Dispose();
         }
     }
 }
