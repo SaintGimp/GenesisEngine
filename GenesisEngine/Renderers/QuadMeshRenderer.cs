@@ -188,8 +188,6 @@ namespace GenesisEngine
             {
                 pass.Apply();
 
-                _graphicsDevice.Indices = _indexBuffer;
-                _graphicsDevice.SetVertexBuffer(_vertexBuffer);
                 _graphicsDevice.DrawUserIndexedPrimitives(PrimitiveType.LineList, vertices, 0, 8, indices, 0, indices.Length / 2);
             }
         }
