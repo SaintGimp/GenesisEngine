@@ -144,8 +144,6 @@ namespace GenesisEngine
 
         void DrawMesh()
         {
-            _effect.CurrentTechnique.Passes[0].Apply();
-
             foreach (EffectPass pass in _effect.CurrentTechnique.Passes)
             {
                 pass.Apply();
@@ -183,8 +181,6 @@ namespace GenesisEngine
                 vertices[i].Color = Color.DarkGreen;
                 vertices[i].Normal = Vector3.Up;
             }
-
-            _effect.CurrentTechnique.Passes[0].Apply();
 
             foreach (EffectPass pass in _effect.CurrentTechnique.Passes)
             {
