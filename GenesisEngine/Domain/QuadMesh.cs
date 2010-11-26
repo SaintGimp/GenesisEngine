@@ -58,7 +58,8 @@ namespace GenesisEngine
             _extents = extents;
             _level = level;
 
-            _locationRelativeToPlanet = (_planeNormalVector) + (_uVector * ((_extents.West + (_extents.Width / 2.0)))) + (_vVector * ((_extents.North + (_extents.Width / 2.0))));
+            // TODO: get this from the QuadNode instead
+            _locationRelativeToPlanet = (_planeNormalVector) + (_uVector * (_extents.North + (_extents.Width / 2.0))) + (_vVector * (_extents.West + (_extents.Width / 2.0)));
             _locationRelativeToPlanet = _locationRelativeToPlanet.ProjectUnitPlaneToUnitSphere() * _planetRadius;
 
             _meshStride = _extents.Width / (_gridSize - 1);
