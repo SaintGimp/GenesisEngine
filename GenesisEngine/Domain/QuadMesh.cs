@@ -76,6 +76,13 @@ namespace GenesisEngine
             CollectMeshSamples();
 
             _renderer.Initialize(_vertices, _indices, _boundingBox);
+            
+            TrimUnneededMemory();
+        }
+
+        void TrimUnneededMemory()
+        {
+            _vertices = null;
         }
 
         void GenerateMeshVertices()
@@ -266,6 +273,12 @@ namespace GenesisEngine
 
         MeshDistance GetDistanceFrom(DoubleVector3 location)
         {
+            // TODO: This method contributes a significant portion of the CPU cost of an update sweep.
+            // Can we simplify it somehow, maybe by calculating distance based on the center of the
+            // bounding box or something?  For calculating horizon visibility, it might be both faster
+            // and better to pre-calc the vertex with the highest altitude and use that, rather than the
+            // closest vertex.
+
             double closestDistanceSquared = double.MaxValue;
             DoubleVector3 closestVertex = _vertexSamples[0];
 
@@ -328,6 +341,9 @@ namespace GenesisEngine
 
         bool IsInViewFrustumWithNoFarClipping(BoundingBox box, BoundingFrustum viewFrustum)
         {
+            // TODO: this causes a lot of allocations - maybe use a extension method with custom iterator?
+            // Actually, the lambda below also generates allocations.  Maybe unroll this?  Not sure what
+            // perf improvement that would have, if any
             var planes = new [] { viewFrustum.Near, viewFrustum.Left, viewFrustum.Right, viewFrustum.Top, viewFrustum.Bottom};
 
             return planes.All(plane => box.Intersects(plane) != PlaneIntersectionType.Front);
