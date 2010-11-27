@@ -138,14 +138,14 @@ namespace GenesisEngine
             // camera-relative translation for rendering.
 
             // We have several different reference frames to deal with here:
-            //   "heightfield" coordinates which is the column and row index of the vertex in the mesh grid
+            //   "Quad grid" coordinates which is the column and row index of the vertex in the mesh grid
             //   "Unit plane" coordinates which is the coordinates of the vertex on the unit plane of this quadtree
             //   "Unit sphere" coordinates which is the coordinates of the vertex on the unit sphere arc of this quadtree
             //   "Planet space" coordinates which is the coordinates of the vertex in real units relative to the planet center
             //   "Mesh space" coordinates which is the coordinates of the vertex in real units after the center point of the mesh
             //   has been translated to the center of the planet
 
-            // We start with quad-relative coordinates.  We first convert the quad coordinates into a unit plane vector that
+            // We start with quad grid coordinates.  We first convert the quad coordinates into a unit plane vector that
             // points to the equivalent point on the quadtree's plane.  Then we project the unit plane to its equivalent unit
             // sphere vector.  We then calculate the terrain height for the vertex and use that information to extend the unit
             // sphere vector to the proper length for the real-space size of our planet.  Finally we translate the vector
