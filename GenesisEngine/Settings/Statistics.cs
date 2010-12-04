@@ -7,22 +7,21 @@ namespace GenesisEngine
 {
     public class Statistics
     {
-        public Statistics()
-        {
-            NumberOfQuadNodesAtLevel = new int[30];
-        }
+        public float FrameRate;
 
-        public float FrameRate { get; set; }
+        public int NumberOfQuadNodes;
 
-        public int NumberOfQuadNodes { get; set; }
+        public int[] NumberOfQuadNodesAtLevel = new int[30];
 
-        public int[] NumberOfQuadNodesAtLevel { get; private set; }
+        public double CameraAltitude;
 
-        public double CameraAltitude { get; set; }
+        public int NumberOfQuadMeshesRendered;
 
-        public int NumberOfQuadMeshesRendered { get; set; }
+        public int PreviousNumberOfQuadMeshesRendered;
 
-        public int PreviousNumberOfQuadMeshesRendered { get; set; }
+        public int NumberOfPendingSplits;
+
+        public int NumberOfPendingMerges;
 
         public void Flush()
         {

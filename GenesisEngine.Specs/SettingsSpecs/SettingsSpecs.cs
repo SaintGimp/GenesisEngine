@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 
 using Machine.Specifications;
+using Rhino.Mocks;
 using StructureMap;
 
 namespace GenesisEngine.Specs.SettingsSpecs
@@ -85,11 +86,13 @@ namespace GenesisEngine.Specs.SettingsSpecs
 
     public class SettingsContext
     {
+        public static IEventAggregator _eventAggregator;
         public static Settings _settings;
 
         Establish context = () =>
         {
-            _settings = new Settings();
+            _eventAggregator = MockRepository.GenerateStub<IEventAggregator>();
+            _settings = new Settings(_eventAggregator);
         };
     }
 }

@@ -90,12 +90,28 @@ namespace GenesisEngine
         {
             // TODO: should we bother to write specs for the threading behavior?
 
+            System.Threading.Interlocked.Increment(ref _statistics.NumberOfPendingSplits);
+
             var tasks = CreateBackgroundSplitTasks(cameraLocation, planetLocation);
             CreateSplitCompletionTask(tasks);
         }
 
         List<Task<IQuadNode>> CreateBackgroundSplitTasks(DoubleVector3 cameraLocation, DoubleVector3 planetLocation)
         {
+            // TODO: there's a problem with this algorithm.  If we need to split very deeply because for example
+            // the camera is teleported to the surface, we only split one level at a time and wait for that level
+            // to finish and for the next update sweep to occur before queuing splits for the next level.  There
+            // may be wasted time in there (not clear yet).  We also spend time generating meshes for quads that
+            // we know we don't need.  Ideally we'd jump straight to rendering meshes for the new leaves and worry
+            // about rendering meshes for the intermediate nodes later when we need them.  This means we need a
+            // general way to delay completing a merge (continuing to render its children in the meantime) until
+            // a mesh is rendered for that node.  Once we have that behavior
+            // we can maybe throw away the vertex buffers for all non-leaf meshes to save memory and regenerate them
+            // as needed.  That would take more CPU overall but it's not time sensitive because we'd just keep
+            // rendering the child nodes until we got around to it.  That would be a problem only if we end up
+            // overloading the GPU but in many cases that wouldn't happen because the merging nodes would be behind
+            // the camera as it travels and thus not rendered.
+
             _splitInProgress = true;
             var subextents = _extents.Split();
 
@@ -127,11 +143,15 @@ namespace GenesisEngine
 
                 _hasSubnodes = true;
                 _splitInProgress = false;
+
+                System.Threading.Interlocked.Decrement(ref _statistics.NumberOfPendingSplits);
             });
         }
 
         private void Merge()
         {
+            System.Threading.Interlocked.Increment(ref _statistics.NumberOfPendingMerges);
+
             // TODO: if a split is pending, cancel it
             _mergeInProgress = true;
             _hasSubnodes = false;
@@ -142,6 +162,8 @@ namespace GenesisEngine
                 _subnodes.Clear();
 
                 _mergeInProgress = false;
+
+                System.Threading.Interlocked.Decrement(ref _statistics.NumberOfPendingMerges);
             });
         }
 

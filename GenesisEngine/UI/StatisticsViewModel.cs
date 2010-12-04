@@ -34,8 +34,10 @@ namespace GenesisEngine
             StatisticsList.Add("Frame rate: " + _statistics.FrameRate);
             StatisticsList.Add("Number of quad nodes: " + _statistics.NumberOfQuadNodes);
             StatisticsList.Add("Number of quad nodes per level: " + GetQuadNodesPerLevel());
-            StatisticsList.Add("Number of quad meshes rendered: " + _statistics.PreviousNumberOfQuadMeshesRendered);
             StatisticsList.Add("Highest level: " + GetHighestQuadNodeLevel());
+            StatisticsList.Add("Number of quad meshes rendered: " + _statistics.PreviousNumberOfQuadMeshesRendered);
+            StatisticsList.Add("Number of pending quad node splits: " + _statistics.NumberOfPendingSplits);
+            StatisticsList.Add("Number of pending quad node merges: " + _statistics.NumberOfPendingMerges);
             StatisticsList.Add("Camera altitude: " + _statistics.CameraAltitude.ToString("F0") + " m (" + DoubleMathHelper.MetersToFeet(_statistics.CameraAltitude).ToString("F0") + " ft) ASL");
         }
 

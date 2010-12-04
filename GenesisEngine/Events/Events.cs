@@ -70,6 +70,10 @@ namespace GenesisEngine
     {
     }
 
+    public class SettingsChanged
+    {
+    }
+
     public class GarbageCollect : InputMessage
     {
     }

@@ -110,6 +110,7 @@
     <Compile Include="SettingsSpecs\SettingsSpecs.cs" />
     <Compile Include="PresenterSpecs\MainPresenterSpecs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SettingsSpecs\SettingsViewModelSpecs.cs" />
     <Compile Include="UISpecs\ScreenCustodianSpecs.cs" />
     <Compile Include="UISpecs\StatisticsViewModelSpecs.cs" />
     <Compile Include="UISpecs\WindowManagerSpecs.cs" />
