@@ -46,7 +46,7 @@ namespace GenesisEngine.Specs.DomainSpecs
     }
 
     [Subject(typeof(QuadNode))]
-    public class when_split_is_recommended : QuadNodeContext
+    public class when_split_is_recommended_for_a_leaf_node : QuadNodeContext
     {
         Establish context = () =>
         {
@@ -80,9 +80,67 @@ namespace GenesisEngine.Specs.DomainSpecs
         //};
     }
 
+    [Subject(typeof(QuadNode))]
+    public class when_split_is_recommended_for_a_nonleaf_node : QuadNodeContext
+    {
+        Establish context = () =>
+        {
+            InitializeNodeAsNonleaf();
+            ConfigureStrategyForSplit();
+        };
+
+        Because of = () =>
+        {
+            _node.Update(DoubleVector3.Zero, DoubleVector3.Zero);
+            _node.WaitForSplitToComplete();
+        };
+
+        It should_not_split_again = () =>
+            _quadNodeFactory.AssertWasCalled(x => x.Create(), c => c.Repeat.Times(4));
+    }
 
     [Subject(typeof(QuadNode))]
-    public class when_a_merge_is_recommended : QuadNodeContext
+    public class when_split_is_recommended_but_a_split_is_already_in_progress : QuadNodeContext
+    {
+        Establish context = () =>
+        {
+            InitializeNodeAsLeaf();
+            _node.ConfigureAsSplitInProgress();
+            ConfigureStrategyForSplit();
+        };
+
+        Because of = () =>
+        {
+            _node.Update(DoubleVector3.Zero, DoubleVector3.Zero);
+            _node.WaitForSplitToComplete();
+        };
+
+        It should_not_split_again = () =>
+            _quadNodeFactory.AssertWasNotCalled(x => x.Create());
+    }
+
+    [Subject(typeof(QuadNode))]
+    public class when_split_is_recommended_but_a_merge_is_in_progress : QuadNodeContext
+    {
+        Establish context = () =>
+        {
+            InitializeNodeAsLeaf();
+            _node.ConfigureAsSplitInProgress();
+            ConfigureStrategyForMerge();
+        };
+
+        Because of = () =>
+        {
+            _node.Update(DoubleVector3.Zero, DoubleVector3.Zero);
+            _node.WaitForMergeToComplete();
+        };
+
+        It should_not_split = () =>
+            _quadNodeFactory.AssertWasNotCalled(x => x.Create());
+    }
+
+    [Subject(typeof(QuadNode))]
+    public class when_a_merge_is_recommended_for_a_nonleaf_node : QuadNodeContext
     {
         Establish context = () =>
         {
@@ -106,6 +164,73 @@ namespace GenesisEngine.Specs.DomainSpecs
                 ((IDisposable)subnode).AssertWasCalled(x => x.Dispose());
             }
         };
+    }
+
+    [Subject(typeof(QuadNode))]
+    public class when_a_merge_is_recommended_for_a_leaf_node : QuadNodeContext
+    {
+        Establish context = () =>
+        {
+            InitializeNodeAsLeaf();
+            ConfigureStrategyForMerge();
+        };
+
+        Because of = () =>
+        {
+            _node.Update(DoubleVector3.Zero, DoubleVector3.Zero);
+            _node.WaitForMergeToComplete();
+        };
+
+        It should_not_attempt_to_merge = () =>
+            _node.WasMergeStarted.ShouldBeFalse();
+
+        It should_dispose_subnodes = () =>
+        {
+            foreach (var subnode in _node.Subnodes)
+            {
+                ((IDisposable)subnode).AssertWasCalled(x => x.Dispose());
+            }
+        };
+    }
+
+    [Subject(typeof(QuadNode))]
+    public class when_merge_is_recommended_but_a_split_is_in_progress : QuadNodeContext
+    {
+        Establish context = () =>
+        {
+            InitializeNodeAsNonleaf();
+            _node.ConfigureAsSplitInProgress();
+            ConfigureStrategyForMerge();
+        };
+
+        Because of = () =>
+        {
+            _node.Update(DoubleVector3.Zero, DoubleVector3.Zero);
+            _node.WaitForMergeToComplete();
+        };
+
+        It should_not_merge = () =>
+            _node.WasMergeStarted.ShouldBeFalse();
+    }
+
+    [Subject(typeof(QuadNode))]
+    public class when_merge_is_recommended_but_a_merge_is_already_in_progress : QuadNodeContext
+    {
+        Establish context = () =>
+        {
+            InitializeNodeAsNonleaf();
+            _node.ConfigureAsMergeInProgress();
+            ConfigureStrategyForMerge();
+        };
+
+        Because of = () =>
+        {
+            _node.Update(DoubleVector3.Zero, DoubleVector3.Zero);
+            _node.WaitForMergeToComplete();
+        };
+
+        It should_not_merge_again = () =>
+            _node.WasMergeStarted.ShouldBeFalse();
     }
 
     [Subject(typeof(QuadNode))]
@@ -290,14 +415,12 @@ namespace GenesisEngine.Specs.DomainSpecs
 
         public static void ConfigureStrategyForSplit()
         {
-            _splitMergeStrategy.Stub(x => x.ShouldSplit(Arg<IQuadMesh>.Is.Anything, Arg<bool>.Is.Anything,
-                Arg<bool>.Is.Anything, Arg<int>.Is.Anything)).Return(true).Repeat.Once();
+            _splitMergeStrategy.Stub(x => x.ShouldSplit(Arg<IQuadMesh>.Is.Anything, Arg<int>.Is.Anything)).Return(true).Repeat.Once();
         }
 
         public static void ConfigureStrategyForMerge()
         {
-            _splitMergeStrategy.Stub(x => x.ShouldMerge(Arg<IQuadMesh>.Is.Anything, Arg<bool>.Is.Anything,
-                Arg<bool>.Is.Anything)).Return(true).Repeat.Once();
+            _splitMergeStrategy.Stub(x => x.ShouldMerge(Arg<IQuadMesh>.Is.Anything)).Return(true).Repeat.Once();
         }
 
         public static void AssertCornerIsProjected(Vector3 projectedVector, Vector3 normalVector, Vector3 uVector, Vector3 vVector)
@@ -330,12 +453,33 @@ namespace GenesisEngine.Specs.DomainSpecs
 
         public void WaitForSplitToComplete()
         {
-            _splitCompletionTask.Wait();
+            if (_splitCompletionTask != null)
+            {
+                _splitCompletionTask.Wait();
+            }
         }
 
         public void WaitForMergeToComplete()
         {
-            _backgroundMergeTask.Wait();
+            if (_backgroundMergeTask != null)
+            {
+                _backgroundMergeTask.Wait();
+            }
+        }
+
+        public bool WasMergeStarted
+        {
+            get { return _backgroundMergeTask != null; }
+        }
+
+        public void ConfigureAsSplitInProgress()
+        {
+            _splitInProgress = true;
+        }
+
+        public void ConfigureAsMergeInProgress()
+        {
+            _mergeInProgress = true;
         }
     }
 

@@ -20,9 +20,9 @@ namespace GenesisEngine
             _settings = settings;
         }
 
-        public bool ShouldSplit(IQuadMesh mesh, bool hasSubnodes, bool splitOrMergeInProgress, int level)
+        public bool ShouldSplit(IQuadMesh mesh, int level)
         {
-            return (IsMeshCloseAndVisible(mesh) && IsNodeSplittable(hasSubnodes, splitOrMergeInProgress, level));
+            return (IsMeshCloseAndVisible(mesh) && !IsAtMaximumLevelOfDetail(level));
         }
 
         bool IsMeshCloseAndVisible(IQuadMesh mesh)
@@ -30,19 +30,14 @@ namespace GenesisEngine
             return mesh.IsAboveHorizonToCamera && mesh.CameraDistanceToWidthRatio < 1;
         }
 
-        bool IsNodeSplittable(bool hasSubnodes, bool splitOrMergeInProgress, int level)
+        bool IsAtMaximumLevelOfDetail(int level)
         {
-            return !hasSubnodes && !splitOrMergeInProgress && level < _settings.MaximumQuadNodeLevel;
+            return level >= _settings.MaximumQuadNodeLevel;
         }
 
-        public bool ShouldMerge(IQuadMesh mesh, bool hasSubnodes, bool splitOrMergeInProgress)
+        public bool ShouldMerge(IQuadMesh mesh)
         {
-            return (!IsMeshCloseAndVisible(mesh) && IsNodeMergable(hasSubnodes, splitOrMergeInProgress));
-        }
-
-        bool IsNodeMergable(bool hasSubnodes, bool splitOrMergeInProgress)
-        {
-            return hasSubnodes && !splitOrMergeInProgress;
+            return (!IsMeshCloseAndVisible(mesh));
         }
     }
 }

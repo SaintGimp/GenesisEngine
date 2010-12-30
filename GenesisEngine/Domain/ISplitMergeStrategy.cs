@@ -7,8 +7,8 @@ namespace GenesisEngine
 {
     public interface ISplitMergeStrategy
     {
-        bool ShouldSplit(IQuadMesh mesh, bool hasSubnodes, bool splitOrMergeInProgress, int level);
+        bool ShouldSplit(IQuadMesh mesh, int level);
 
-        bool ShouldMerge(IQuadMesh mesh, bool hasSubnodes, bool splitOrMergeInProgress);
+        bool ShouldMerge(IQuadMesh mesh);
     }
 }

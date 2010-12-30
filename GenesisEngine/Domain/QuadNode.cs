@@ -19,8 +19,8 @@ namespace GenesisEngine
         protected QuadNodeExtents _extents;
 
         bool _hasSubnodes;
-        bool _splitInProgress;
-        bool _mergeInProgress;
+        protected bool _splitInProgress;
+        protected bool _mergeInProgress;
         protected Task _splitCompletionTask;
         protected Task _backgroundMergeTask;
         protected List<IQuadNode> _subnodes = new List<IQuadNode>();
@@ -68,17 +68,40 @@ namespace GenesisEngine
         {
             _mesh.Update(cameraLocation, planetLocation);
 
-            // TODO: This algorithm could be improved to optimize the number of triangles that are drawn
-
-            if (_splitMergeStrategy.ShouldSplit(_mesh, _hasSubnodes, _splitInProgress || _mergeInProgress, Level))
+            if (ShouldSplit())
             {
                 Split(cameraLocation, planetLocation);
             }
-            else if (_splitMergeStrategy.ShouldMerge(_mesh, _hasSubnodes, _splitInProgress || _mergeInProgress))
+            else if (ShouldMerge())
             {
                 Merge();
             }
 
+            UpdateSubnodes(cameraLocation, planetLocation);
+        }
+
+        bool ShouldSplit()
+        {
+            return IsSplittable() && _splitMergeStrategy.ShouldSplit(_mesh, Level);
+        }
+
+        bool IsSplittable()
+        {
+            return !_hasSubnodes && !(_splitInProgress || _mergeInProgress);
+        }
+
+        bool ShouldMerge()
+        {
+            return IsMergable() && _splitMergeStrategy.ShouldMerge(_mesh);
+        }
+
+        bool IsMergable()
+        {
+            return _hasSubnodes && !(_splitInProgress || _mergeInProgress);
+        }
+
+        void UpdateSubnodes(DoubleVector3 cameraLocation, DoubleVector3 planetLocation)
+        {
             if (_hasSubnodes)
             {
                 foreach (var subnode in _subnodes)
