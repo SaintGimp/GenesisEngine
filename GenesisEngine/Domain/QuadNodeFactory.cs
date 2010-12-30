@@ -10,13 +10,15 @@ namespace GenesisEngine
     {
         readonly IQuadMeshFactory _meshFactory;
         readonly IQuadNodeRendererFactory _rendererFactory;
+        readonly ISplitMergeStrategy _splitMergeStrategy;
         readonly Settings _settings;
         readonly Statistics _statistics;
 
-        public QuadNodeFactory(IQuadMeshFactory meshFactory, IQuadNodeRendererFactory rendererFactory, Settings settings, Statistics statistics)
+        public QuadNodeFactory(IQuadMeshFactory meshFactory, IQuadNodeRendererFactory rendererFactory, ISplitMergeStrategy splitMergeStrategy, Settings settings, Statistics statistics)
         {
             _meshFactory = meshFactory;
             _rendererFactory = rendererFactory;
+            _splitMergeStrategy = splitMergeStrategy;
             _settings = settings;
             _statistics = statistics;
         }
@@ -25,7 +27,7 @@ namespace GenesisEngine
         {
             var mesh = _meshFactory.Create();
             var quadNodeRenderer = _rendererFactory.Create();
-            return new QuadNode(mesh, this, quadNodeRenderer, _settings, _statistics);
+            return new QuadNode(mesh, this, _splitMergeStrategy, quadNodeRenderer, _settings, _statistics);
         }
     }
 }

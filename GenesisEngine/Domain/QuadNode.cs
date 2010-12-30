@@ -27,14 +27,16 @@ namespace GenesisEngine
 
         readonly IQuadMesh _mesh;
         readonly IQuadNodeFactory _quadNodeFactory;
+        readonly ISplitMergeStrategy _splitMergeStrategy;
         readonly IQuadNodeRenderer _renderer;
         readonly ISettings _settings;
         readonly Statistics _statistics;
 
-        public QuadNode(IQuadMesh mesh, IQuadNodeFactory quadNodeFactory, IQuadNodeRenderer renderer, ISettings settings, Statistics statistics)
+        public QuadNode(IQuadMesh mesh, IQuadNodeFactory quadNodeFactory, ISplitMergeStrategy splitMergeStrategy, IQuadNodeRenderer renderer, ISettings settings, Statistics statistics)
         {
             _mesh = mesh;
             _quadNodeFactory = quadNodeFactory;
+            _splitMergeStrategy = splitMergeStrategy;
             _renderer = renderer;
             _settings = settings;
             _statistics = statistics;
@@ -68,11 +70,11 @@ namespace GenesisEngine
 
             // TODO: This algorithm could be improved to optimize the number of triangles that are drawn
 
-            if (_mesh.IsAboveHorizonToCamera && _mesh.CameraDistanceToWidthRatio < 1 && !_hasSubnodes && !_splitInProgress && !_mergeInProgress && Level < _settings.MaximumQuadNodeLevel)
+            if (_splitMergeStrategy.ShouldSplit(_mesh, _hasSubnodes, _splitInProgress || _mergeInProgress, Level))
             {
                 Split(cameraLocation, planetLocation);
             }
-            else if (_mesh.CameraDistanceToWidthRatio > 1.2 && _hasSubnodes && !_mergeInProgress && !_splitInProgress)
+            else if (_splitMergeStrategy.ShouldMerge(_mesh, _hasSubnodes, _splitInProgress || _mergeInProgress))
             {
                 Merge();
             }
@@ -111,6 +113,7 @@ namespace GenesisEngine
             // rendering the child nodes until we got around to it.  That would be a problem only if we end up
             // overloading the GPU but in many cases that wouldn't happen because the merging nodes would be behind
             // the camera as it travels and thus not rendered.
+            // Potential problem: we don't know for sure if a node needs to be split until after we generate its mesh.
 
             _splitInProgress = true;
             var subextents = _extents.Split();

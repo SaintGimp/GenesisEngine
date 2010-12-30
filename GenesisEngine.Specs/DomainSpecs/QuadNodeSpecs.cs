@@ -33,31 +33,30 @@ namespace GenesisEngine.Specs.DomainSpecs
     }
 
     [Subject(typeof(QuadNode))]
-    public class when_a_node_is_updated : QuadNodeContext
+    public class when_a_leaf_node_is_updated : QuadNodeContext
     {
         Establish context = () =>
-            _node.Initialize(10, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 5);
+            InitializeNodeAsLeaf();
 
         Because of = () =>
-            _node.Update(DoubleVector3.Up * 11, DoubleVector3.Zero);
+            _node.Update(DoubleVector3.Up, DoubleVector3.Down);
 
         It should_update_the_mesh = () =>
-            _mesh.AssertWasCalled(x => x.Update(DoubleVector3.Up * 11, DoubleVector3.Zero));
+            _mesh.AssertWasCalled(x => x.Update(DoubleVector3.Up, DoubleVector3.Down));
     }
 
     [Subject(typeof(QuadNode))]
-    public class when_a_leaf_node_is_updated_and_the_camera_is_close : QuadNodeContext
+    public class when_split_is_recommended : QuadNodeContext
     {
         Establish context = () =>
         {
-            _mesh.Stub(x => x.IsAboveHorizonToCamera).Return(true);
-
-            _node.Initialize(10, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 5);
+            InitializeNodeAsLeaf();
+            ConfigureStrategyForSplit();
         };
 
         Because of = () =>
         {
-            _node.Update(DoubleVector3.Up * 11, DoubleVector3.Zero);
+            _node.Update(DoubleVector3.Zero, DoubleVector3.Zero);
             _node.WaitForSplitToComplete();
         };
 
@@ -81,68 +80,19 @@ namespace GenesisEngine.Specs.DomainSpecs
         //};
     }
 
+
     [Subject(typeof(QuadNode))]
-    public class when_a_leaf_node_is_updated_more_than_once_and_the_camera_is_close : QuadNodeContext
+    public class when_a_merge_is_recommended : QuadNodeContext
     {
         Establish context = () =>
         {
-            _mesh.Stub(x => x.IsAboveHorizonToCamera).Return(true);
-
-            _node.Initialize(10, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 0);
-            _node.Update(DoubleVector3.Up * 11, DoubleVector3.Zero);
+            InitializeNodeAsNonleaf();
+            ConfigureStrategyForMerge();
         };
 
         Because of = () =>
         {
-            _node.Update(DoubleVector3.Up * 11, DoubleVector3.Zero);
-            _node.WaitForSplitToComplete();
-        };
-
-        It should_split_only_once = () =>
-            _node.Subnodes.Count.ShouldEqual(4);
-    }
-
-    [Subject(typeof(QuadNode))]
-    public class when_a_max_level_leaf_node_is_updated_and_the_camera_is_close : QuadNodeContext
-    {
-        Establish context = () =>
-        {
-            _mesh.Stub(x => x.IsAboveHorizonToCamera).Return(true);
-
-            _node.Initialize(10, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 19);
-            _node.Update(DoubleVector3.Up * 11, DoubleVector3.Zero);
-        };
-
-        Because of = () =>
-            _node.Update(DoubleVector3.Up * 11, DoubleVector3.Zero);
-
-        It should_not_split = () =>
-            _node.Subnodes.Count.ShouldEqual(0);
-    }
-
-    [Subject(typeof(QuadNode))]
-    public class when_a_nonleaf_node_is_updated_and_the_camera_is_far : QuadNodeContext
-    {
-        public static DoubleVector3 _nearCameraLocation;
-        public static DoubleVector3 _farCameraLocation;
-
-        Establish context = () =>
-        {
-            _mesh.Stub(x => x.IsAboveHorizonToCamera).Return(true);
-
-            _nearCameraLocation = DoubleVector3.Up * 11;
-            _farCameraLocation = DoubleVector3.Up * 15 * 10 * 2;
-
-            _node.Initialize(10, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 0);
-            _node.Update(_nearCameraLocation, DoubleVector3.Zero);
-            _node.WaitForSplitToComplete();
-
-            _mesh.Stub(x => x.CameraDistanceToWidthRatio).Return(2);
-        };
-
-        Because of = () =>
-        {
-            _node.Update(_farCameraLocation, DoubleVector3.Zero);
+            _node.Update(DoubleVector3.Zero, DoubleVector3.Zero);
             _node.WaitForMergeToComplete();
         };
 
@@ -159,32 +109,56 @@ namespace GenesisEngine.Specs.DomainSpecs
     }
 
     [Subject(typeof(QuadNode))]
-    public class when_a_nonleaf_node_is_updated_and_the_camera_is_near : QuadNodeContext
+    public class when_a_nonleaf_node_is_updated : QuadNodeContext
     {
-        public static DoubleVector3 _cameraLocation;
-
         Establish context = () =>
-        {
-            _cameraLocation = DoubleVector3.Up;
-
-            _node.Initialize(10, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 0);
-            _node.Update(_cameraLocation, DoubleVector3.Zero);
-        };
+            InitializeNodeAsNonleaf();
 
         Because of = () =>
-            _node.Update(_cameraLocation, DoubleVector3.Zero);
+            _node.Update(DoubleVector3.Zero, DoubleVector3.Zero);
 
         It should_update_subquads = () =>
         {
             foreach (var subnode in _node.Subnodes)
             {
-                subnode.AssertWasCalled(x => x.Update(_cameraLocation, DoubleVector3.Zero));
+                subnode.AssertWasCalled(x => x.Update(DoubleVector3.Zero, DoubleVector3.Zero));
             }
         };
     }
 
     // TODO: update statistics
 
+    [Subject(typeof(QuadNode))]
+    public class when_a_leaf_node_is_drawn : QuadNodeContext
+    {
+        public static DoubleVector3 _cameraLocation;
+        public static BoundingFrustum _viewFrustum;
+        public static Matrix _viewMatrix;
+        public static Matrix _projectionMatrix;
+
+        Establish context = () =>
+        {
+            _cameraLocation = DoubleVector3.Up;
+            _viewFrustum = new BoundingFrustum(Matrix.Identity);
+            _viewMatrix = Matrix.Identity;
+            _projectionMatrix = Matrix.Identity;
+
+            InitializeNodeAsLeaf();
+        };
+
+        Because of = () =>
+            _node.Draw(_cameraLocation, _viewFrustum, _viewMatrix, _projectionMatrix);
+
+        It should_draw_the_node = () =>
+            _renderer.DrawWasCalled.ShouldBeTrue();
+
+        It should_draw_the_mesh = () =>
+            _mesh.AssertWasCalled(x => x.Draw(_cameraLocation, _viewFrustum, _viewMatrix, _projectionMatrix));
+
+        It should_draw_the_node_in_the_correct_location = () =>
+            _renderer.Location.ShouldEqual(Vector3.Up * 10);
+    }
+    
     [Subject(typeof(QuadNode))]
     public class when_a_nonleaf_node_is_drawn : QuadNodeContext
     {
@@ -202,9 +176,7 @@ namespace GenesisEngine.Specs.DomainSpecs
             _viewMatrix = Matrix.Identity;
             _projectionMatrix = Matrix.Identity;
 
-            _node.Initialize(10, Vector3.Up, Vector3.Backward, Vector3.Right, new QuadNodeExtents(-1.0, 1.0, -1.0, 1.0), 0);
-            _node.Update(DoubleVector3.Up, DoubleVector3.Zero);
-            _node.WaitForSplitToComplete();
+            InitializeNodeAsNonleaf();
         };
 
         Because of = () =>
@@ -226,41 +198,10 @@ namespace GenesisEngine.Specs.DomainSpecs
     }
 
     [Subject(typeof(QuadNode))]
-    public class when_a_leaf_node_is_drawn : QuadNodeContext
-    {
-        public static DoubleVector3 _cameraLocation;
-        public static BoundingFrustum _viewFrustum;
-        public static Matrix _viewMatrix;
-        public static Matrix _projectionMatrix;
-
-        Establish context = () =>
-        {
-            _cameraLocation = DoubleVector3.Up;
-            _viewFrustum = new BoundingFrustum(Matrix.Identity);
-            _viewMatrix = Matrix.Identity;
-            _projectionMatrix = Matrix.Identity;
-
-            _node.Initialize(10, Vector3.Up, Vector3.Backward, Vector3.Right, new QuadNodeExtents(-1.0, 1.0, -1.0, 1.0), 0);
-        };
-
-        Because of = () =>
-            _node.Draw(_cameraLocation, _viewFrustum, _viewMatrix, _projectionMatrix);
-
-        It should_draw_the_node = () =>
-            _renderer.DrawWasCalled.ShouldBeTrue();
-
-        It should_draw_the_mesh = () =>
-            _mesh.AssertWasCalled(x => x.Draw(_cameraLocation, _viewFrustum, _viewMatrix, _projectionMatrix));
-
-        It should_draw_the_node_in_the_correct_location = () =>
-            _renderer.Location.ShouldEqual(Vector3.Up * 10);
-    }
-
-    [Subject(typeof(QuadNode))]
     public class when_a_leaf_node_is_disposed : QuadNodeContext
     {
         Establish context = () =>
-            _node.Initialize(_radius, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 0);
+            InitializeNodeAsLeaf();
 
         Because of = () =>
             _node.Dispose();
@@ -276,10 +217,7 @@ namespace GenesisEngine.Specs.DomainSpecs
     public class when_a_nonleaf_node_is_disposed : QuadNodeContext
     {
         Establish context = () =>
-        {
-            _node.Initialize(_radius, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 0);
-            _node.Update(DoubleVector3.Up, DoubleVector3.Zero);
-        };
+            InitializeNodeAsNonleaf();
 
         Because of = () =>
             _node.Dispose();
@@ -307,6 +245,7 @@ namespace GenesisEngine.Specs.DomainSpecs
 
         public static IQuadMesh _mesh;
         public static IQuadNodeFactory _quadNodeFactory;
+        public static ISplitMergeStrategy _splitMergeStrategy;
         public static MockQuadNodeRenderer _renderer;
         public static ISettings _settings;
         public static Statistics _statistics;
@@ -320,6 +259,8 @@ namespace GenesisEngine.Specs.DomainSpecs
             _quadNodeFactory = MockRepository.GenerateStub<IQuadNodeFactory>();
             _quadNodeFactory.Stub(x => x.Create()).Do((Func<IQuadNode>)(() => (IQuadNode)MockRepository.GenerateMock(typeof(IQuadNode), new Type[] { typeof(IDisposable) })));
 
+            _splitMergeStrategy = MockRepository.GenerateStub<ISplitMergeStrategy>();
+
             // We're using a hand-rolled fake here because of a bug
             // in .Net that prevents mocking of multi-dimentional arrays:
             // http://code.google.com/p/moq/issues/detail?id=182#c0
@@ -330,8 +271,34 @@ namespace GenesisEngine.Specs.DomainSpecs
 
             _statistics = new Statistics();
 
-            _node = new TestableQuadNode(_mesh, _quadNodeFactory, _renderer, _settings, _statistics);
+            _node = new TestableQuadNode(_mesh, _quadNodeFactory, _splitMergeStrategy, _renderer, _settings, _statistics);
         };
+
+        public static void InitializeNodeAsLeaf()
+        {
+            _node.Initialize(10, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 5);
+        }
+
+        public static void InitializeNodeAsNonleaf()
+        {
+            _node.Initialize(10, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 5);
+
+            ConfigureStrategyForSplit();
+            _node.Update(Vector3.Up, Vector3.Down);
+            _node.WaitForSplitToComplete();
+        }
+
+        public static void ConfigureStrategyForSplit()
+        {
+            _splitMergeStrategy.Stub(x => x.ShouldSplit(Arg<IQuadMesh>.Is.Anything, Arg<bool>.Is.Anything,
+                Arg<bool>.Is.Anything, Arg<int>.Is.Anything)).Return(true).Repeat.Once();
+        }
+
+        public static void ConfigureStrategyForMerge()
+        {
+            _splitMergeStrategy.Stub(x => x.ShouldMerge(Arg<IQuadMesh>.Is.Anything, Arg<bool>.Is.Anything,
+                Arg<bool>.Is.Anything)).Return(true).Repeat.Once();
+        }
 
         public static void AssertCornerIsProjected(Vector3 projectedVector, Vector3 normalVector, Vector3 uVector, Vector3 vVector)
         {
@@ -346,8 +313,8 @@ namespace GenesisEngine.Specs.DomainSpecs
 
     public class TestableQuadNode : QuadNode
     {
-        public TestableQuadNode(IQuadMesh mesh, IQuadNodeFactory quadNodeFactory, IQuadNodeRenderer renderer, ISettings settings, Statistics statistics)
-            : base(mesh, quadNodeFactory, renderer, settings, statistics)
+        public TestableQuadNode(IQuadMesh mesh, IQuadNodeFactory quadNodeFactory, ISplitMergeStrategy splitMergeStrategy, IQuadNodeRenderer renderer, ISettings settings, Statistics statistics)
+            : base(mesh, quadNodeFactory, splitMergeStrategy, renderer, settings, statistics)
         {
         }
 

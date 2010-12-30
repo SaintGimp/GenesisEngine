@@ -44,6 +44,8 @@ namespace GenesisEngine
             For<ITerrainColorizer>().Use(x => new EdgeColorizer(ObjectFactory.GetInstance<TerrainColorizer>(), ObjectFactory.GetInstance<ISettings>()));
 
             For<IHeightfieldGenerator>().Use<LayeredHeightfieldGenerator>();
+            For<ISplitMergeStrategy>().Use<DefaultSplitMergeStrategy>();
+
             RegisterInterceptor(new EventAggregatorTypeInterceptor());
         }
 
