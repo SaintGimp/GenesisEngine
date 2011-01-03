@@ -61,8 +61,8 @@ namespace GenesisEngine
 
             _mesh.Initialize(planetRadius, planeNormalVector, uVector, vVector, extents, level);
 
-            _statistics.NumberOfQuadNodes++;
-            _statistics.NumberOfQuadNodesAtLevel[Level]++;
+            Interlocked.Increment(ref _statistics.NumberOfQuadNodes);
+            Interlocked.Increment(ref _statistics.NumberOfQuadNodesAtLevel[Level]);
         }
 
         public void Update(DoubleVector3 cameraLocation, DoubleVector3 planetLocation)
@@ -148,7 +148,7 @@ namespace GenesisEngine
                 node.Initialize(_planetRadius, _planeNormalVector, _uVector, _vVector, extent, Level + 1);
                 node.Update(cameraLocation, planetLocation);
                 return node;
-            }, CancellationToken.None, TaskCreationOptions.None, _taskSchedulerFactory.CreateFor(Level))).ToList();
+            }, CancellationToken.None, TaskCreationOptions.None, _taskSchedulerFactory.CreateForLevel(Level))).ToList();
         }
 
         void CreateSplitCompletionTask(List<Task<IQuadNode>> tasks)
@@ -164,7 +164,7 @@ namespace GenesisEngine
                 _splitInProgress = false;
 
                 Interlocked.Decrement(ref _statistics.NumberOfPendingSplits);
-            }, CancellationToken.None, TaskContinuationOptions.None, _taskSchedulerFactory.CreateFor(Level));
+            }, CancellationToken.None, TaskContinuationOptions.None, _taskSchedulerFactory.CreateForLevel(Level));
         }
 
         private void Merge()
@@ -183,7 +183,7 @@ namespace GenesisEngine
                 _mergeInProgress = false;
 
                 Interlocked.Decrement(ref _statistics.NumberOfPendingMerges);
-            });
+            }, CancellationToken.None, TaskCreationOptions.None, _taskSchedulerFactory.Create());
         }
 
         void DisposeSubNodes()
@@ -218,10 +218,11 @@ namespace GenesisEngine
         public void Dispose()
         {
             ((IDisposable)_renderer).Dispose();
+            ((IDisposable)_mesh).Dispose();
             DisposeSubNodes();
 
-            _statistics.NumberOfQuadNodes--;
-            _statistics.NumberOfQuadNodesAtLevel[Level]--;
+            Interlocked.Decrement(ref _statistics.NumberOfQuadNodes);
+            Interlocked.Decrement(ref _statistics.NumberOfQuadNodesAtLevel[Level]);
         }
     }
 }

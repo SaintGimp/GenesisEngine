@@ -170,6 +170,7 @@
     <Compile Include="Settings\Statistics.cs" />
     <Compile Include="Threading\ITaskSchedulerFactory.cs" />
     <Compile Include="Threading\QueuedTaskSchedulerFactory.cs" />
+    <Compile Include="Threading\CurrentThreadTaskSchedulerFactory.cs" />
     <Compile Include="UI\IScreenCustodian.cs" />
     <Compile Include="UI\IView.cs" />
     <Compile Include="UI\IWindowManager.cs" />

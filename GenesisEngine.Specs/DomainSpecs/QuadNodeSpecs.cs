@@ -55,10 +55,7 @@ namespace GenesisEngine.Specs.DomainSpecs
         };
 
         Because of = () =>
-        {
             _node.Update(DoubleVector3.Zero, DoubleVector3.Zero);
-            _node.WaitForSplitToComplete();
-        };
 
         It should_split_into_subquads = () =>
             _node.Subnodes.Count.ShouldEqual(4);
@@ -90,10 +87,7 @@ namespace GenesisEngine.Specs.DomainSpecs
         };
 
         Because of = () =>
-        {
             _node.Update(DoubleVector3.Zero, DoubleVector3.Zero);
-            _node.WaitForSplitToComplete();
-        };
 
         It should_not_split_again = () =>
             _quadNodeFactory.AssertWasCalled(x => x.Create(), c => c.Repeat.Times(4));
@@ -110,10 +104,7 @@ namespace GenesisEngine.Specs.DomainSpecs
         };
 
         Because of = () =>
-        {
             _node.Update(DoubleVector3.Zero, DoubleVector3.Zero);
-            _node.WaitForSplitToComplete();
-        };
 
         It should_not_split_again = () =>
             _quadNodeFactory.AssertWasNotCalled(x => x.Create());
@@ -130,10 +121,7 @@ namespace GenesisEngine.Specs.DomainSpecs
         };
 
         Because of = () =>
-        {
             _node.Update(DoubleVector3.Zero, DoubleVector3.Zero);
-            _node.WaitForMergeToComplete();
-        };
 
         It should_not_split = () =>
             _quadNodeFactory.AssertWasNotCalled(x => x.Create());
@@ -149,10 +137,7 @@ namespace GenesisEngine.Specs.DomainSpecs
         };
 
         Because of = () =>
-        {
             _node.Update(DoubleVector3.Zero, DoubleVector3.Zero);
-            _node.WaitForMergeToComplete();
-        };
 
         It should_remove_subnodes = () =>
             _node.Subnodes.Count.ShouldEqual(0);
@@ -176,10 +161,7 @@ namespace GenesisEngine.Specs.DomainSpecs
         };
 
         Because of = () =>
-        {
             _node.Update(DoubleVector3.Zero, DoubleVector3.Zero);
-            _node.WaitForMergeToComplete();
-        };
 
         It should_not_attempt_to_merge = () =>
             _node.WasMergeStarted.ShouldBeFalse();
@@ -204,10 +186,7 @@ namespace GenesisEngine.Specs.DomainSpecs
         };
 
         Because of = () =>
-        {
             _node.Update(DoubleVector3.Zero, DoubleVector3.Zero);
-            _node.WaitForMergeToComplete();
-        };
 
         It should_not_merge = () =>
             _node.WasMergeStarted.ShouldBeFalse();
@@ -224,10 +203,7 @@ namespace GenesisEngine.Specs.DomainSpecs
         };
 
         Because of = () =>
-        {
             _node.Update(DoubleVector3.Zero, DoubleVector3.Zero);
-            _node.WaitForMergeToComplete();
-        };
 
         It should_not_merge_again = () =>
             _node.WasMergeStarted.ShouldBeFalse();
@@ -275,13 +251,10 @@ namespace GenesisEngine.Specs.DomainSpecs
             _node.Draw(_cameraLocation, _viewFrustum, _viewMatrix, _projectionMatrix);
 
         It should_draw_the_node = () =>
-            _renderer.DrawWasCalled.ShouldBeTrue();
+            _renderer.AssertWasCalled(x => x.Draw(_location, _cameraLocation, _viewMatrix, _projectionMatrix));
 
         It should_draw_the_mesh = () =>
             _mesh.AssertWasCalled(x => x.Draw(_cameraLocation, _viewFrustum, _viewMatrix, _projectionMatrix));
-
-        It should_draw_the_node_in_the_correct_location = () =>
-            _renderer.Location.ShouldEqual(Vector3.Up * 10);
     }
     
     [Subject(typeof(QuadNode))]
@@ -308,7 +281,7 @@ namespace GenesisEngine.Specs.DomainSpecs
             _node.Draw(_cameraLocation, _viewFrustum, _viewMatrix, _projectionMatrix);
 
         It should_not_draw_the_node = () =>
-            _renderer.DrawWasCalled.ShouldBeFalse();
+            _renderer.AssertWasNotCalled(x => x.Draw(Arg<DoubleVector3>.Is.Anything, Arg<DoubleVector3>.Is.Anything, Arg<Matrix>.Is.Anything, Arg<Matrix>.Is.Anything));
 
         It should_not_draw_the_mesh = () =>
             _mesh.AssertWasNotCalled(x => x.Draw(Arg<DoubleVector3>.Is.Anything, Arg<BoundingFrustum>.Is.Anything, Arg<Matrix>.Is.Anything, Arg<Matrix>.Is.Anything));
@@ -332,7 +305,10 @@ namespace GenesisEngine.Specs.DomainSpecs
             _node.Dispose();
 
         It should_dispose_the_renderer = () =>
-            _renderer.DisposeWasCalled.ShouldBeTrue();
+            ((IDisposable)_renderer).AssertWasCalled(x => x.Dispose());
+
+        It should_dispose_the_mesh = () =>
+            ((IDisposable)_mesh).AssertWasCalled(x => x.Dispose());
 
         It should_decrement_the_number_of_nodes = () =>
             _statistics.NumberOfQuadNodes.ShouldEqual(0);
@@ -348,7 +324,10 @@ namespace GenesisEngine.Specs.DomainSpecs
             _node.Dispose();
 
         It should_dispose_the_renderer = () =>
-            _renderer.DisposeWasCalled.ShouldBeTrue();
+            ((IDisposable)_renderer).AssertWasCalled(x => x.Dispose());
+
+        It should_dispose_the_mesh = () =>
+            ((IDisposable) _mesh).AssertWasCalled(x => x.Dispose());
 
         It should_dispose_the_subnodes = () =>
         {
@@ -364,31 +343,31 @@ namespace GenesisEngine.Specs.DomainSpecs
 
     public class QuadNodeContext
     {
-        public static readonly float _radius = 1;
-        public static DoubleVector3 _location;
+        public static readonly float _radius = 10;
+        public static DoubleVector3 _location = DoubleVector3.Up * _radius;
         public static QuadNodeExtents _extents = new QuadNodeExtents(-1.0, 1.0, -1.0, 1.0);
 
         public static IQuadMesh _mesh;
         public static IQuadNodeFactory _quadNodeFactory;
         public static ISplitMergeStrategy _splitMergeStrategy;
-        public static MockQuadNodeRenderer _renderer;
+        public static IQuadNodeRenderer _renderer;
         public static Statistics _statistics;
 
         public static TestableQuadNode _node;
 
         Establish context = () =>
         {
-            _mesh = MockRepository.GenerateStub<IQuadMesh>();
+            _mesh = MockRepository.GenerateMock<IQuadMesh, IDisposable>();
 
             _quadNodeFactory = MockRepository.GenerateStub<IQuadNodeFactory>();
-            _quadNodeFactory.Stub(x => x.Create()).Do((Func<IQuadNode>)(() => (IQuadNode)MockRepository.GenerateMock(typeof(IQuadNode), new Type[] { typeof(IDisposable) })));
+            _quadNodeFactory.Stub(x => x.Create()).Do((Func<IQuadNode>)(() => (IQuadNode)MockRepository.GenerateMock<IQuadNode, IDisposable>()));
 
             _splitMergeStrategy = MockRepository.GenerateStub<ISplitMergeStrategy>();
 
             // We're using a hand-rolled fake here because of a bug
             // in .Net that prevents mocking of multi-dimentional arrays:
             // http://code.google.com/p/moq/issues/detail?id=182#c0
-            _renderer = new MockQuadNodeRenderer();
+            _renderer = MockRepository.GenerateMock<IQuadNodeRenderer, IDisposable>();
 
             _statistics = new Statistics();
 
@@ -397,16 +376,15 @@ namespace GenesisEngine.Specs.DomainSpecs
 
         public static void InitializeNodeAsLeaf()
         {
-            _node.Initialize(10, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 5);
+            _node.Initialize(_radius, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 5);
         }
 
         public static void InitializeNodeAsNonleaf()
         {
-            _node.Initialize(10, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 5);
+            _node.Initialize(_radius, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 5);
 
             ConfigureStrategyForSplit();
             _node.Update(Vector3.Up, Vector3.Down);
-            _node.WaitForSplitToComplete();
         }
 
         public static void ConfigureStrategyForSplit()
@@ -418,23 +396,15 @@ namespace GenesisEngine.Specs.DomainSpecs
         {
             _splitMergeStrategy.Stub(x => x.ShouldMerge(Arg<IQuadMesh>.Is.Anything)).Return(true).Repeat.Once();
         }
-
-        public static void AssertCornerIsProjected(Vector3 projectedVector, Vector3 normalVector, Vector3 uVector, Vector3 vVector)
-        {
-            var expectedVector = (normalVector * _radius) + (uVector * _radius) + (vVector * _radius);
-            expectedVector.Normalize();
-            expectedVector *= _radius;
-            expectedVector -= normalVector * _radius;
-
-            projectedVector.ShouldBeCloseTo(expectedVector);
-        }
     }
 
     public class TestableQuadNode : QuadNode
     {
         public TestableQuadNode(IQuadMesh mesh, IQuadNodeFactory quadNodeFactory, ISplitMergeStrategy splitMergeStrategy, IQuadNodeRenderer renderer, Statistics statistics)
-            : base(mesh, quadNodeFactory, splitMergeStrategy, new QueuedTaskSchedulerFactory(), renderer, statistics)
+            : base(mesh, quadNodeFactory, splitMergeStrategy, new CurrentThreadTaskSchedulerFactory(), renderer, statistics)
         {
+            // We create this version of the QuadNode with a task scheduler type that runs everything on the
+            // current thread, i.e. everything is synchronous and there are no threading issues to worry about.
         }
 
         public IList<IQuadNode> Subnodes
@@ -445,26 +415,6 @@ namespace GenesisEngine.Specs.DomainSpecs
         public double Width
         {
             get { return _extents.Width; }
-        }
-
-        // TODO: we could set up the QuadNode class to use an injectable TPL task scheduler
-        // and then inject a CurrentThreadTaskScheduler scheduler that causes everything
-        // to run synchronously on the main thread.  That way our tests don't have to
-        // explicitly worry about threading concerns.
-        public void WaitForSplitToComplete()
-        {
-            if (_splitCompletionTask != null)
-            {
-                _splitCompletionTask.Wait();
-            }
-        }
-
-        public void WaitForMergeToComplete()
-        {
-            if (_backgroundMergeTask != null)
-            {
-                _backgroundMergeTask.Wait();
-            }
         }
 
         public bool WasMergeStarted
@@ -480,32 +430,6 @@ namespace GenesisEngine.Specs.DomainSpecs
         public void ConfigureAsMergeInProgress()
         {
             _mergeInProgress = true;
-        }
-    }
-
-    public class MockQuadNodeRenderer : IQuadNodeRenderer, IDisposable
-    {
-        public bool InitializeWasCalled { get; private set; }
-        public bool DrawWasCalled { get; private set; }
-        public bool DisposeWasCalled { get; private set; }
-        public Vector3 Location { get; private set; }
-        public VertexPositionNormalColor[] Vertices { get; private set; }
-
-        public virtual void Initialize(VertexPositionNormalColor[] vertices, int[] indices)
-        {
-            this.InitializeWasCalled = true;
-            this.Vertices = vertices;
-        }
-
-        public virtual void Draw(DoubleVector3 location, DoubleVector3 cameraLocation, Matrix originBasedViewMatrix, Matrix projectionMatrix)
-        {
-            this.DrawWasCalled = true;
-            this.Location = location;
-        }
-
-        public void Dispose()
-        {
-            DisposeWasCalled = true;
         }
     }
 }

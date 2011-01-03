@@ -8,6 +8,7 @@ namespace GenesisEngine
 {
     public interface ITaskSchedulerFactory
     {
-        TaskScheduler CreateFor(int level);
+        TaskScheduler Create();
+        TaskScheduler CreateForLevel(int level);
     }
 }

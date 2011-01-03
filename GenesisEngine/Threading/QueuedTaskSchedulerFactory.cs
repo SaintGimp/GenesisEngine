@@ -27,19 +27,21 @@ namespace GenesisEngine
             _scheduler = new QueuedTaskScheduler(0, "", false, ThreadPriority.BelowNormal);
         }
 
-        public TaskScheduler CreateFor(int level)
+        public TaskScheduler Create()
         {
-            EnsureQueueExists(level);
-
-            return _queues[level];
+            return CreateForLevel(0);
         }
 
-        void EnsureQueueExists(int level)
+        public TaskScheduler CreateForLevel(int level)
         {
-            if (!_queues.ContainsKey(level))
+            TaskScheduler queue;
+            if (!_queues.TryGetValue(level, out queue))
             {
-                _queues.Add(level, _scheduler.ActivateNewQueue(level));
+                queue = _scheduler.ActivateNewQueue(level);
+                _queues.Add(level, queue);
             }
+
+            return queue;
         }
     }
 }
