@@ -313,6 +313,11 @@ namespace GenesisEngine
             // TODO: This algorithm is poor.  Implement this algorithm instead:
             // http://www.gamedev.net/community/forums/mod/journal/journal.asp?jn=263350&reply_id=3173799
 
+            // TODO: sometimes the mesh is so large and we're so close the surface that none of the sampled
+            // vertices are above the horizon.  That causes problems when we want to do early termination
+            // when we do a draw walk on the QuadNode tree (see comments there).  Can we add a test here to
+            // see if we're inside the mesh's bounding box?
+
             var planetToCamera = DoubleVector3.Normalize(cameraLocation - planetLocation);
             var planetToMesh = DoubleVector3.Normalize(closestVertex - planetLocation);
 

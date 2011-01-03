@@ -45,6 +45,7 @@ namespace GenesisEngine
 
             For<IHeightfieldGenerator>().Use<LayeredHeightfieldGenerator>();
             For<ISplitMergeStrategy>().Use<DefaultSplitMergeStrategy>();
+            For<ITaskSchedulerFactory>().Use<QueuedTaskSchedulerFactory>();
 
             RegisterInterceptor(new EventAggregatorTypeInterceptor());
         }

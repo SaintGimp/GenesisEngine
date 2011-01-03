@@ -372,7 +372,6 @@ namespace GenesisEngine.Specs.DomainSpecs
         public static IQuadNodeFactory _quadNodeFactory;
         public static ISplitMergeStrategy _splitMergeStrategy;
         public static MockQuadNodeRenderer _renderer;
-        public static ISettings _settings;
         public static Statistics _statistics;
 
         public static TestableQuadNode _node;
@@ -391,12 +390,9 @@ namespace GenesisEngine.Specs.DomainSpecs
             // http://code.google.com/p/moq/issues/detail?id=182#c0
             _renderer = new MockQuadNodeRenderer();
 
-            _settings = MockRepository.GenerateStub<ISettings>();
-            _settings.MaximumQuadNodeLevel = 19;
-
             _statistics = new Statistics();
 
-            _node = new TestableQuadNode(_mesh, _quadNodeFactory, _splitMergeStrategy, _renderer, _settings, _statistics);
+            _node = new TestableQuadNode(_mesh, _quadNodeFactory, _splitMergeStrategy, _renderer, _statistics);
         };
 
         public static void InitializeNodeAsLeaf()
@@ -436,8 +432,8 @@ namespace GenesisEngine.Specs.DomainSpecs
 
     public class TestableQuadNode : QuadNode
     {
-        public TestableQuadNode(IQuadMesh mesh, IQuadNodeFactory quadNodeFactory, ISplitMergeStrategy splitMergeStrategy, IQuadNodeRenderer renderer, ISettings settings, Statistics statistics)
-            : base(mesh, quadNodeFactory, splitMergeStrategy, renderer, settings, statistics)
+        public TestableQuadNode(IQuadMesh mesh, IQuadNodeFactory quadNodeFactory, ISplitMergeStrategy splitMergeStrategy, IQuadNodeRenderer renderer, Statistics statistics)
+            : base(mesh, quadNodeFactory, splitMergeStrategy, new QueuedTaskSchedulerFactory(), renderer, statistics)
         {
         }
 
@@ -451,6 +447,10 @@ namespace GenesisEngine.Specs.DomainSpecs
             get { return _extents.Width; }
         }
 
+        // TODO: we could set up the QuadNode class to use an injectable TPL task scheduler
+        // and then inject a CurrentThreadTaskScheduler scheduler that causes everything
+        // to run synchronously on the main thread.  That way our tests don't have to
+        // explicitly worry about threading concerns.
         public void WaitForSplitToComplete()
         {
             if (_splitCompletionTask != null)

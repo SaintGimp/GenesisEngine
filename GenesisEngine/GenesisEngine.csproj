@@ -67,6 +67,9 @@
     <Reference Include="mscorlib">
       <Private>False</Private>
     </Reference>
+    <Reference Include="ParallelExtensionsExtras">
+      <HintPath>..\dependencies\ParallelExtensionExtras\ParallelExtensionsExtras.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="Scenario.Managed">
@@ -165,6 +168,8 @@
     <Compile Include="Renderers\VertexPositionNormalColor.cs" />
     <Compile Include="Settings\Settings.cs" />
     <Compile Include="Settings\Statistics.cs" />
+    <Compile Include="Threading\ITaskSchedulerFactory.cs" />
+    <Compile Include="Threading\QueuedTaskSchedulerFactory.cs" />
     <Compile Include="UI\IScreenCustodian.cs" />
     <Compile Include="UI\IView.cs" />
     <Compile Include="UI\IWindowManager.cs" />
@@ -232,6 +237,7 @@
   <ItemGroup>
     <None Include="app.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\Microsoft.Xna.GameStudio.targets" />
   <!--

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -28,17 +29,17 @@ namespace GenesisEngine
         readonly IQuadMesh _mesh;
         readonly IQuadNodeFactory _quadNodeFactory;
         readonly ISplitMergeStrategy _splitMergeStrategy;
+        readonly ITaskSchedulerFactory _taskSchedulerFactory;
         readonly IQuadNodeRenderer _renderer;
-        readonly ISettings _settings;
         readonly Statistics _statistics;
 
-        public QuadNode(IQuadMesh mesh, IQuadNodeFactory quadNodeFactory, ISplitMergeStrategy splitMergeStrategy, IQuadNodeRenderer renderer, ISettings settings, Statistics statistics)
+        public QuadNode(IQuadMesh mesh, IQuadNodeFactory quadNodeFactory, ISplitMergeStrategy splitMergeStrategy, ITaskSchedulerFactory taskSchedulerFactory, IQuadNodeRenderer renderer, Statistics statistics)
         {
             _mesh = mesh;
             _quadNodeFactory = quadNodeFactory;
             _splitMergeStrategy = splitMergeStrategy;
+            _taskSchedulerFactory = taskSchedulerFactory;
             _renderer = renderer;
-            _settings = settings;
             _statistics = statistics;
         }
 
@@ -115,7 +116,7 @@ namespace GenesisEngine
         {
             // TODO: should we bother to write specs for the threading behavior?
 
-            System.Threading.Interlocked.Increment(ref _statistics.NumberOfPendingSplits);
+            Interlocked.Increment(ref _statistics.NumberOfPendingSplits);
 
             var tasks = CreateBackgroundSplitTasks(cameraLocation, planetLocation);
             CreateSplitCompletionTask(tasks);
@@ -141,21 +142,13 @@ namespace GenesisEngine
             _splitInProgress = true;
             var subextents = _extents.Split();
 
-            var tasks = new List<Task<IQuadNode>>();
-            foreach (var subextent in subextents)
+            return subextents.Select(extent => Task<IQuadNode>.Factory.StartNew(() =>
             {
-                var capturedExtent = subextent;
-                var task = Task<IQuadNode>.Factory.StartNew(() =>
-                {
-                    var node = _quadNodeFactory.Create();
-                    node.Initialize(_planetRadius, _planeNormalVector, _uVector, _vVector, capturedExtent, Level + 1);
-                    node.Update(cameraLocation, planetLocation);
-                    return node;
-                });
-
-                tasks.Add(task);
-            }
-            return tasks;
+                var node = _quadNodeFactory.Create();
+                node.Initialize(_planetRadius, _planeNormalVector, _uVector, _vVector, extent, Level + 1);
+                node.Update(cameraLocation, planetLocation);
+                return node;
+            }, CancellationToken.None, TaskCreationOptions.None, _taskSchedulerFactory.CreateFor(Level))).ToList();
         }
 
         void CreateSplitCompletionTask(List<Task<IQuadNode>> tasks)
@@ -170,13 +163,13 @@ namespace GenesisEngine
                 _hasSubnodes = true;
                 _splitInProgress = false;
 
-                System.Threading.Interlocked.Decrement(ref _statistics.NumberOfPendingSplits);
-            });
+                Interlocked.Decrement(ref _statistics.NumberOfPendingSplits);
+            }, CancellationToken.None, TaskContinuationOptions.None, _taskSchedulerFactory.CreateFor(Level));
         }
 
         private void Merge()
         {
-            System.Threading.Interlocked.Increment(ref _statistics.NumberOfPendingMerges);
+            Interlocked.Increment(ref _statistics.NumberOfPendingMerges);
 
             // TODO: if a split is pending, cancel it
             _mergeInProgress = true;
@@ -189,7 +182,7 @@ namespace GenesisEngine
 
                 _mergeInProgress = false;
 
-                System.Threading.Interlocked.Decrement(ref _statistics.NumberOfPendingMerges);
+                Interlocked.Decrement(ref _statistics.NumberOfPendingMerges);
             });
         }
 
@@ -207,8 +200,9 @@ namespace GenesisEngine
             {
                 // TODO: we'd like to stop traversing into subnodes if this node's mesh isn't visibile, but our
                 // horizon culling algorithm isn't that great right now and the primary faces are so large that
-                // sometimes all of their sample points are below the horizon even though we're above that face.
-                // For now, we'll scan all subnodes regardless.
+                // sometimes all of their sample points are below the horizon even though we're above that face
+                // and would want to draw its children.  For now, we'll scan all subnodes regardless.  The child
+                // node's meshes will do visibility culling on an individual basis.
                 foreach (var subnode in _subnodes)
                 {
                     subnode.Draw(cameraLocation, originBasedViewFrustum, originBasedViewMatrix, projectionMatrix);
