@@ -23,6 +23,10 @@ namespace GenesisEngine
 
         public int NumberOfPendingMerges;
 
+        public int NumberOfSplitsScheduledPerInterval;
+
+        public int NumberOfSplitsCancelledPerInterval;
+
         public void Flush()
         {
             PreviousNumberOfQuadMeshesRendered = NumberOfQuadMeshesRendered;

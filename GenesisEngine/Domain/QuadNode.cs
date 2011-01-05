@@ -108,11 +108,13 @@ namespace GenesisEngine
 
         bool ShouldCancelSplit()
         {
-            return _splitInProgress && !_splitMergeStrategy.ShouldSplit(_mesh, Level);
+            return _splitInProgress && !_cancellationTokenSource.IsCancellationRequested && !_splitMergeStrategy.ShouldSplit(_mesh, Level);
         }
 
         void CancelSplit()
         {
+            Interlocked.Increment(ref _statistics.NumberOfSplitsCancelledPerInterval);
+
             _cancellationTokenSource.Cancel();
         }
 
@@ -131,6 +133,7 @@ namespace GenesisEngine
         {
             // TODO: should we bother to write specs for the threading behavior?
 
+            Interlocked.Increment(ref _statistics.NumberOfSplitsScheduledPerInterval);
             Interlocked.Increment(ref _statistics.NumberOfPendingSplits);
 
             CreateCancellationTokenSource();
@@ -187,7 +190,10 @@ namespace GenesisEngine
                 }
                 else
                 {
-                    
+                    foreach (var task in finishedTasks.Where(task => task.Result != null))
+                    {
+                        ((IDisposable)task.Result).Dispose();
+                    }
                 }
 
                 _splitInProgress = false;
