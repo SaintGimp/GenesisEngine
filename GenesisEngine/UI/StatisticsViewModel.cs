@@ -37,7 +37,7 @@ namespace GenesisEngine
             StatisticsList.Add("Highest level: " + GetHighestQuadNodeLevel());
             StatisticsList.Add("Number of quad meshes rendered per frame: " + _statistics.PreviousNumberOfQuadMeshesRendered);
             StatisticsList.Add("Number of quad node splits scheduled per interval: " + _statistics.NumberOfSplitsScheduledPerInterval);
-            StatisticsList.Add("Number of quad node splits cancelled per interval: " + _statistics.NumberOfSplitsCancelledPerInterval);
+            StatisticsList.Add("Number of quad node splits canceled per interval: " + _statistics.NumberOfSplitsCanceledPerInterval);
             StatisticsList.Add("Number of pending quad node splits: " + _statistics.NumberOfPendingSplits);
             StatisticsList.Add("Number of pending quad node merges: " + _statistics.NumberOfPendingMerges);
             StatisticsList.Add("Camera altitude: " + _statistics.CameraAltitude.ToString("F0") + " m (" + DoubleMathHelper.MetersToFeet(_statistics.CameraAltitude).ToString("F0") + " ft) ASL");
@@ -48,7 +48,7 @@ namespace GenesisEngine
         void ResetPerIntervalStatistics()
         {
             Interlocked.Exchange(ref _statistics.NumberOfSplitsScheduledPerInterval, 0);
-            Interlocked.Exchange(ref _statistics.NumberOfSplitsCancelledPerInterval, 0);
+            Interlocked.Exchange(ref _statistics.NumberOfSplitsCanceledPerInterval, 0);
         }
 
         string GetQuadNodesPerLevel()
@@ -56,14 +56,7 @@ namespace GenesisEngine
             string text = "";
             for (int x = 0; x < _statistics.NumberOfQuadNodesAtLevel.Length; x++)
             {
-                if (_statistics.NumberOfQuadNodesAtLevel[x] > 0)
-                {
-                    text += x + "[" + _statistics.NumberOfQuadNodesAtLevel[x] + "] ";
-                }
-                else
-                {
-                    break;
-                }
+                text += x + "[" + _statistics.NumberOfQuadNodesAtLevel[x] + "] ";
             }
 
             return text;

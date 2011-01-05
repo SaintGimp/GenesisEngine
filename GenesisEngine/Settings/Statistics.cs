@@ -25,7 +25,7 @@ namespace GenesisEngine
 
         public int NumberOfSplitsScheduledPerInterval;
 
-        public int NumberOfSplitsCancelledPerInterval;
+        public int NumberOfSplitsCanceledPerInterval;
 
         public void Flush()
         {

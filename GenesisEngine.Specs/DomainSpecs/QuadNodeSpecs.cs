@@ -140,7 +140,7 @@ namespace GenesisEngine.Specs.DomainSpecs
             _node.Update(DoubleVector3.Zero, DoubleVector3.Zero);
 
         It should_cancel_the_split = () =>
-            _node.WasTaskCancelled.ShouldBeTrue();
+            _node.WasTaskCanceled.ShouldBeTrue();
     }
 
     [Subject(typeof(QuadNode))]
@@ -357,6 +357,22 @@ namespace GenesisEngine.Specs.DomainSpecs
             _statistics.NumberOfQuadNodes.ShouldEqual(0);
     }
 
+    [Subject(typeof(QuadNode))]
+    public class when_a_node_with_a_pending_split_or_merge_is_disposed : QuadNodeContext
+    {
+        Establish context = () =>
+        {
+            InitializeNodeAsLeaf();
+            _node.ConfigureAsSplitInProgress();
+        };
+
+        Because of = () =>
+            _node.Dispose();
+
+        It should_cancel_the_pending_operation = () =>
+            _node.WasTaskCanceled.ShouldBeTrue();
+    }
+
     public class QuadNodeContext
     {
         public static readonly float _radius = 10;
@@ -438,7 +454,7 @@ namespace GenesisEngine.Specs.DomainSpecs
             get { return _backgroundMergeTask != null; }
         }
 
-        public bool WasTaskCancelled
+        public bool WasTaskCanceled
         {
             get { return _cancellationTokenSource != null && _cancellationTokenSource.IsCancellationRequested; }
         }

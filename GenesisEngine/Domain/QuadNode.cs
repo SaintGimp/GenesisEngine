@@ -113,7 +113,7 @@ namespace GenesisEngine
 
         void CancelSplit()
         {
-            Interlocked.Increment(ref _statistics.NumberOfSplitsCancelledPerInterval);
+            Interlocked.Increment(ref _statistics.NumberOfSplitsCanceledPerInterval);
 
             _cancellationTokenSource.Cancel();
         }
@@ -181,25 +181,37 @@ namespace GenesisEngine
             {
                 if (!_cancellationTokenSource.IsCancellationRequested)
                 {
-                    foreach (var task in finishedTasks)
-                    {
-                        _subnodes.Add(task.Result);
-                    }
-
-                    _hasSubnodes = true;
+                    StoreCompletedSubnodes(finishedTasks);
                 }
                 else
                 {
-                    foreach (var task in finishedTasks.Where(task => task.Result != null))
-                    {
-                        ((IDisposable)task.Result).Dispose();
-                    }
+                    // TODO: this class is coupled too closely with the test-unfriendly TPL so we can't
+                    // easily write tests for this kind of required behavior.  How to fix?
+                    DisposeCompletedSubnodes(finishedTasks);
                 }
 
                 _splitInProgress = false;
 
                 Interlocked.Decrement(ref _statistics.NumberOfPendingSplits);
             }, CancellationToken.None, TaskContinuationOptions.None, _taskSchedulerFactory.CreateForLevel(Level));
+        }
+
+        void StoreCompletedSubnodes(Task<IQuadNode>[] finishedTasks)
+        {
+            foreach (var task in finishedTasks)
+            {
+                _subnodes.Add(task.Result);
+            }
+
+            _hasSubnodes = true;
+        }
+
+        void DisposeCompletedSubnodes(Task<IQuadNode>[] finishedTasks)
+        {
+            foreach (var task in finishedTasks.Where(task => task.Status == TaskStatus.RanToCompletion))
+            {
+                ((IDisposable)task.Result).Dispose();
+            }
         }
 
         private void Merge()
@@ -261,6 +273,11 @@ namespace GenesisEngine
             ((IDisposable)_renderer).Dispose();
             ((IDisposable)_mesh).Dispose();
             DisposeSubNodes();
+
+            if (_cancellationTokenSource != null)
+            {
+                _cancellationTokenSource.Cancel();
+            }
 
             Interlocked.Decrement(ref _statistics.NumberOfQuadNodes);
             Interlocked.Decrement(ref _statistics.NumberOfQuadNodesAtLevel[Level]);
