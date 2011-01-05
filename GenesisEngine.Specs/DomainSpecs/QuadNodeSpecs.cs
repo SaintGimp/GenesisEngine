@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
+using System.Threading;
 using Machine.Specifications;
 using Rhino.Mocks;
 using Microsoft.Xna.Framework;
@@ -125,6 +125,22 @@ namespace GenesisEngine.Specs.DomainSpecs
 
         It should_not_split = () =>
             _quadNodeFactory.AssertWasNotCalled(x => x.Create());
+    }
+
+    [Subject(typeof(QuadNode))]
+    public class when_split_is_not_recommended_but_a_split_is_already_in_progress : QuadNodeContext
+    {
+        Establish context = () =>
+        {
+            InitializeNodeAsLeaf();
+            _node.ConfigureAsSplitInProgress();
+        };
+
+        Because of = () =>
+            _node.Update(DoubleVector3.Zero, DoubleVector3.Zero);
+
+        It should_cancel_the_split = () =>
+            _node.WasTaskCancelled.ShouldBeTrue();
     }
 
     [Subject(typeof(QuadNode))]
@@ -422,14 +438,21 @@ namespace GenesisEngine.Specs.DomainSpecs
             get { return _backgroundMergeTask != null; }
         }
 
+        public bool WasTaskCancelled
+        {
+            get { return _cancellationTokenSource != null && _cancellationTokenSource.IsCancellationRequested; }
+        }
+
         public void ConfigureAsSplitInProgress()
         {
             _splitInProgress = true;
+            _cancellationTokenSource = new CancellationTokenSource();
         }
 
         public void ConfigureAsMergeInProgress()
         {
             _mergeInProgress = true;
+            _cancellationTokenSource = new CancellationTokenSource();
         }
     }
 }

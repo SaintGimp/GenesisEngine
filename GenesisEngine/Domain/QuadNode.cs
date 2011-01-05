@@ -24,6 +24,7 @@ namespace GenesisEngine
         protected bool _mergeInProgress;
         protected Task _splitCompletionTask;
         protected Task _backgroundMergeTask;
+        protected CancellationTokenSource _cancellationTokenSource;
         protected List<IQuadNode> _subnodes = new List<IQuadNode>();
 
         readonly IQuadMesh _mesh;
@@ -77,6 +78,10 @@ namespace GenesisEngine
             {
                 Merge();
             }
+            else if (ShouldCancelSplit())
+            {
+                CancelSplit();
+            }
 
             UpdateSubnodes(cameraLocation, planetLocation);
         }
@@ -101,6 +106,16 @@ namespace GenesisEngine
             return _hasSubnodes && !(_splitInProgress || _mergeInProgress);
         }
 
+        bool ShouldCancelSplit()
+        {
+            return _splitInProgress && !_splitMergeStrategy.ShouldSplit(_mesh, Level);
+        }
+
+        void CancelSplit()
+        {
+            _cancellationTokenSource.Cancel();
+        }
+
         void UpdateSubnodes(DoubleVector3 cameraLocation, DoubleVector3 planetLocation)
         {
             if (_hasSubnodes)
@@ -118,8 +133,14 @@ namespace GenesisEngine
 
             Interlocked.Increment(ref _statistics.NumberOfPendingSplits);
 
-            var tasks = CreateBackgroundSplitTasks(cameraLocation, planetLocation);
-            CreateSplitCompletionTask(tasks);
+            CreateCancellationTokenSource();
+            var splitTasks = CreateBackgroundSplitTasks(cameraLocation, planetLocation);
+            CreateSplitCompletionTask(splitTasks);
+        }
+
+        void CreateCancellationTokenSource()
+        {
+            _cancellationTokenSource = new CancellationTokenSource();
         }
 
         List<Task<IQuadNode>> CreateBackgroundSplitTasks(DoubleVector3 cameraLocation, DoubleVector3 planetLocation)
@@ -148,19 +169,27 @@ namespace GenesisEngine
                 node.Initialize(_planetRadius, _planeNormalVector, _uVector, _vVector, extent, Level + 1);
                 node.Update(cameraLocation, planetLocation);
                 return node;
-            }, CancellationToken.None, TaskCreationOptions.None, _taskSchedulerFactory.CreateForLevel(Level))).ToList();
+            }, _cancellationTokenSource.Token, TaskCreationOptions.None, _taskSchedulerFactory.CreateForLevel(Level))).ToList();
         }
 
         void CreateSplitCompletionTask(List<Task<IQuadNode>> tasks)
         {
             _splitCompletionTask = Task.Factory.ContinueWhenAll(tasks.ToArray(), finishedTasks =>
             {
-                foreach (var task in finishedTasks)
+                if (!_cancellationTokenSource.IsCancellationRequested)
                 {
-                    _subnodes.Add(task.Result);
+                    foreach (var task in finishedTasks)
+                    {
+                        _subnodes.Add(task.Result);
+                    }
+
+                    _hasSubnodes = true;
+                }
+                else
+                {
+                    
                 }
 
-                _hasSubnodes = true;
                 _splitInProgress = false;
 
                 Interlocked.Decrement(ref _statistics.NumberOfPendingSplits);
@@ -175,6 +204,12 @@ namespace GenesisEngine
             _mergeInProgress = true;
             _hasSubnodes = false;
 
+            CreateCancellationTokenSource();
+            CreateBackgroundMergeTask();
+        }
+
+        void CreateBackgroundMergeTask()
+        {
             _backgroundMergeTask = Task.Factory.StartNew(() =>
             {
                 DisposeSubNodes();
@@ -183,7 +218,7 @@ namespace GenesisEngine
                 _mergeInProgress = false;
 
                 Interlocked.Decrement(ref _statistics.NumberOfPendingMerges);
-            }, CancellationToken.None, TaskCreationOptions.None, _taskSchedulerFactory.Create());
+            }, _cancellationTokenSource.Token, TaskCreationOptions.None, _taskSchedulerFactory.Create());
         }
 
         void DisposeSubNodes()
