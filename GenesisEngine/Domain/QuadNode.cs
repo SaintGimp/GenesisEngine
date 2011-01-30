@@ -241,6 +241,11 @@ namespace GenesisEngine
 
         void DisposeSubNodes()
         {
+            // TODO: we have a race condition here where the parent node might
+            // decide to dispose this node at the same time that this node is
+            // being split.  We get an exception here because the _subNodes
+            // collection is modified while we're iterating it.
+
             foreach (var node in _subnodes)
             {
                 ((IDisposable)node).Dispose();
