@@ -196,7 +196,7 @@ namespace GenesisEngine
             }, CancellationToken.None, TaskContinuationOptions.None, _taskSchedulerFactory.CreateForLevel(Level));
         }
 
-        void StoreCompletedSubnodes(Task<IQuadNode>[] finishedTasks)
+        void StoreCompletedSubnodes(IEnumerable<Task<IQuadNode>> finishedTasks)
         {
             foreach (var task in finishedTasks)
             {
@@ -206,7 +206,7 @@ namespace GenesisEngine
             _hasSubnodes = true;
         }
 
-        void DisposeCompletedSubnodes(Task<IQuadNode>[] finishedTasks)
+        void DisposeCompletedSubnodes(IEnumerable<Task<IQuadNode>> finishedTasks)
         {
             foreach (var task in finishedTasks.Where(task => task.Status == TaskStatus.RanToCompletion))
             {
