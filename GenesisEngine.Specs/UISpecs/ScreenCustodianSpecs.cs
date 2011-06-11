@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Machine.Specifications;
-using Rhino.Mocks;
+using NSubstitute;
 
 namespace GenesisEngine.Specs.UISpecs
 {
@@ -17,7 +17,7 @@ namespace GenesisEngine.Specs.UISpecs
             _view.Model.ShouldEqual(_model);
 
         It should_show_the_view = () =>
-            _view.AssertWasCalled(x => x.Show());
+            _view.Received().Show();
     }
 
     public class ScreenCustodianContext
@@ -28,8 +28,8 @@ namespace GenesisEngine.Specs.UISpecs
 
         Establish context = () =>
         {
-            _view = MockRepository.GenerateStub<ITestView>();
-            _model = MockRepository.GenerateStub<ITestViewModel>();
+            _view = Substitute.For<ITestView>();
+            _model = Substitute.For<ITestViewModel>();
             _custodian = new ScreenCustodian<ITestView, ITestViewModel>(_view, _model);
         };
     }

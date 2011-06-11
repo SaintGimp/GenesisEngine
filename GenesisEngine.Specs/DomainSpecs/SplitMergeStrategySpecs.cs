@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Machine.Specifications;
-using Rhino.Mocks;
+using NSubstitute;
 
 namespace GenesisEngine.Specs.DomainSpecs
 {
@@ -12,8 +12,8 @@ namespace GenesisEngine.Specs.DomainSpecs
     {
         Establish context = () =>
         {
-            _mesh.Stub(x => x.IsAboveHorizonToCamera).Return(true);
-            _mesh.Stub(x => x.CameraDistanceToWidthRatio).Return(0.1);
+            _mesh.IsAboveHorizonToCamera.Returns(true);
+            _mesh.CameraDistanceToWidthRatio.Returns(0.1);
         };
 
         It should_recommend_a_split = () =>
@@ -25,8 +25,8 @@ namespace GenesisEngine.Specs.DomainSpecs
     {
         Establish context = () =>
         {
-            _mesh.Stub(x => x.IsAboveHorizonToCamera).Return(false);
-            _mesh.Stub(x => x.CameraDistanceToWidthRatio).Return(0.1);
+            _mesh.IsAboveHorizonToCamera.Returns(false);
+            _mesh.CameraDistanceToWidthRatio.Returns(0.1);
         };
 
         It should_not_recommend_a_split = () =>
@@ -38,8 +38,8 @@ namespace GenesisEngine.Specs.DomainSpecs
     {
         Establish context = () =>
         {
-            _mesh.Stub(x => x.IsAboveHorizonToCamera).Return(true);
-            _mesh.Stub(x => x.CameraDistanceToWidthRatio).Return(10);
+            _mesh.IsAboveHorizonToCamera.Returns(true);
+            _mesh.CameraDistanceToWidthRatio.Returns(10);
         };
 
         It should_not_recommend_a_split = () =>
@@ -51,8 +51,8 @@ namespace GenesisEngine.Specs.DomainSpecs
     {
         Establish context = () =>
         {
-            _mesh.Stub(x => x.IsAboveHorizonToCamera).Return(true);
-            _mesh.Stub(x => x.CameraDistanceToWidthRatio).Return(0.1);
+            _mesh.IsAboveHorizonToCamera.Returns(true);
+            _mesh.CameraDistanceToWidthRatio.Returns(0.1);
         };
 
         It should_not_recommend_a_split = () =>
@@ -64,8 +64,8 @@ namespace GenesisEngine.Specs.DomainSpecs
     {
         Establish context = () =>
         {
-            _mesh.Stub(x => x.IsAboveHorizonToCamera).Return(false);
-            _mesh.Stub(x => x.CameraDistanceToWidthRatio).Return(0.1);
+            _mesh.IsAboveHorizonToCamera.Returns(false);
+            _mesh.CameraDistanceToWidthRatio.Returns(0.1);
         };
 
         It should_recommend_a_merge = () =>
@@ -77,8 +77,8 @@ namespace GenesisEngine.Specs.DomainSpecs
     {
         Establish context = () =>
         {
-            _mesh.Stub(x => x.IsAboveHorizonToCamera).Return(true);
-            _mesh.Stub(x => x.CameraDistanceToWidthRatio).Return(10);
+            _mesh.IsAboveHorizonToCamera.Returns(true);
+            _mesh.CameraDistanceToWidthRatio.Returns(10);
         };
 
         It should_recommend_a_merge = () =>
@@ -90,8 +90,8 @@ namespace GenesisEngine.Specs.DomainSpecs
     {
         Establish context = () =>
         {
-            _mesh.Stub(x => x.IsAboveHorizonToCamera).Return(true);
-            _mesh.Stub(x => x.CameraDistanceToWidthRatio).Return(0.1);
+            _mesh.IsAboveHorizonToCamera.Returns(true);
+            _mesh.CameraDistanceToWidthRatio.Returns(0.1);
         };
 
         It should_not_recommend_a_merge = () =>
@@ -106,8 +106,8 @@ namespace GenesisEngine.Specs.DomainSpecs
 
         Establish context = () =>
         {
-            _mesh = MockRepository.GenerateStub<IQuadMesh>();
-            _settings = MockRepository.GenerateStub<ISettings>();
+            _mesh = Substitute.For<IQuadMesh>();
+            _settings = Substitute.For<ISettings>();
             _strategy = new DefaultSplitMergeStrategy(_settings);
 
             _settings.MaximumQuadNodeLevel = 10;

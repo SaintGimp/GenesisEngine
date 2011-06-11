@@ -5,7 +5,7 @@ using System.Text;
 
 using Machine.Specifications;
 using Microsoft.Xna.Framework;
-using Rhino.Mocks;
+using NSubstitute;
 
 namespace GenesisEngine.Specs.PresenterSpecs
 {
@@ -16,13 +16,13 @@ namespace GenesisEngine.Specs.PresenterSpecs
             _mainPresenter.Show();
 
         It should_create_at_least_one_planet = () =>
-            _planetFactory.AssertWasCalled(x => x.Create(Arg<DoubleVector3>.Is.Anything, Arg<double>.Is.Anything));
+            _planetFactory.ReceivedWithAnyArgs().Create(Arg.Any<DoubleVector3>(), Arg.Any<double>());
 
         It should_attach_the_controller_to_a_planet = () =>
-            _cameraController.AssertWasCalled(x => x.AttachToPlanet(Arg<IPlanet>.Is.Anything));
+            _cameraController.Received().AttachToPlanet(Arg.Any<IPlanet>());
 
         It should_show_all_ui_windows = () =>
-            _windowManager.AssertWasCalled(x => x.ShowAllWindows());
+            _windowManager.Received().ShowAllWindows();
     }
 
     [Subject(typeof(MainPresenter))]
@@ -38,7 +38,7 @@ namespace GenesisEngine.Specs.PresenterSpecs
             _mainPresenter.Update(TimeSpan.FromMilliseconds(250));
 
         It should_update_the_planet = () =>
-            _planet.AssertWasCalled(x => x.Update(_camera.Location));
+            _planet.Received().Update(_camera.Location);
 
         It update_the_framerate_statistic = () =>
             _statistics.FrameRate.ShouldEqual(4);
@@ -57,7 +57,7 @@ namespace GenesisEngine.Specs.PresenterSpecs
             _mainPresenter.Update(TimeSpan.FromMilliseconds(250));
 
         It should_not_update_the_planet = () =>
-            _planet.AssertWasNotCalled(x => x.Update(Arg<DoubleVector3>.Is.Anything));
+            _planet.DidNotReceive().Update(Arg.Any<DoubleVector3>());
 
         It update_the_framerate_statistic = () =>
             _statistics.FrameRate.ShouldEqual(4);
@@ -77,7 +77,7 @@ namespace GenesisEngine.Specs.PresenterSpecs
             _mainPresenter.Update(TimeSpan.FromMilliseconds(250));
 
         It should_update_the_planet = () =>
-            _planet.AssertWasCalled(x => x.Update(_camera.Location));
+            _planet.Received().Update(_camera.Location);
 
         It should_turn_off_single_stepping = () =>
             _settings.ShouldSingleStep.ShouldBeFalse();
@@ -96,7 +96,7 @@ namespace GenesisEngine.Specs.PresenterSpecs
             _mainPresenter.Draw();
 
         It should_draw_the_planet = () =>
-            _planet.AssertWasCalled(x => x.Draw(_camera));
+            _planet.Received().Draw(_camera);
     }
 
     [Subject(typeof(MainPresenter))]
@@ -109,7 +109,7 @@ namespace GenesisEngine.Specs.PresenterSpecs
             _mainPresenter.SetViewportSize(640, 480);
 
         It should_set_camera_projection_parameters = () =>
-            _camera.AssertWasCalled(x => x.SetProjectionParameters(Arg<float>.Is.Anything, Arg<float>.Is.Anything, Arg<float>.Is.Anything, Arg<float>.Is.Anything, Arg<float>.Is.Anything));
+            _camera.Received().SetProjectionParameters(Arg.Any<float>(), Arg.Any<float>(), Arg.Any<float>(), Arg.Any<float>(), Arg.Any<float>());
     }
 
     public class MainPresenterContext
@@ -125,14 +125,14 @@ namespace GenesisEngine.Specs.PresenterSpecs
 
         Establish context = () =>
         {
-            _planet = MockRepository.GenerateStub<IPlanet>();
-            _planetFactory = MockRepository.GenerateStub<IPlanetFactory>();
-            _planetFactory.Stub(x => x.Create(Arg<DoubleVector3>.Is.Anything, Arg<double>.Is.Anything)).Return(_planet);
-            _camera = MockRepository.GenerateStub<ICamera>();
-            _cameraController = MockRepository.GenerateStub<ICameraController>();
-            _windowManager = MockRepository.GenerateStub<IWindowManager>();
+            _planet = Substitute.For<IPlanet>();
+            _planetFactory = Substitute.For<IPlanetFactory>();
+            _planetFactory.Create(Arg.Any<DoubleVector3>(), Arg.Any<double>()).Returns(_planet);
+            _camera = Substitute.For<ICamera>();
+            _cameraController = Substitute.For<ICameraController>();
+            _windowManager = Substitute.For<IWindowManager>();
             _statistics = new Statistics();
-            _settings = MockRepository.GenerateStub<ISettings>();
+            _settings = Substitute.For<ISettings>();
 
             _mainPresenter = new MainPresenter(_planetFactory, _camera, _cameraController, _windowManager, _statistics, _settings);
         };

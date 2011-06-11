@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using Machine.Specifications;
-using Rhino.Mocks;
+using NSubstitute;
 using Microsoft.Xna.Framework;
 
 namespace GenesisEngine.Specs.DomainSpecs
@@ -20,7 +20,7 @@ namespace GenesisEngine.Specs.DomainSpecs
             _node.Initialize(_radius, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 7);
 
         It should_initialize_the_mesh = () =>
-            _mesh.AssertWasCalled(x => x.Initialize(_radius, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 7));
+            _mesh.Received().Initialize(_radius, Vector3.Up, Vector3.Backward, Vector3.Right, _extents, 7);
 
         It should_increment_the_node_count_statistic = () =>
             _statistics.NumberOfQuadNodes.ShouldEqual(1);
@@ -42,7 +42,7 @@ namespace GenesisEngine.Specs.DomainSpecs
             _node.Update(DoubleVector3.Up, DoubleVector3.Down);
 
         It should_update_the_mesh = () =>
-            _mesh.AssertWasCalled(x => x.Update(DoubleVector3.Up, DoubleVector3.Down));
+            _mesh.Received().Update(DoubleVector3.Up, DoubleVector3.Down);
     }
 
     [Subject(typeof(QuadNode))]
@@ -64,7 +64,7 @@ namespace GenesisEngine.Specs.DomainSpecs
         {
             foreach (var subnode in _node.Subnodes)
             {
-                subnode.AssertWasCalled(x => x.Initialize(Arg<double>.Is.Anything, Arg<DoubleVector3>.Is.Anything, Arg<DoubleVector3>.Is.Anything, Arg<DoubleVector3>.Is.Anything, Arg<QuadNodeExtents>.Is.Anything, Arg.Is(6)));
+                subnode.Received().Initialize(Arg.Any<double>(), Arg.Any<DoubleVector3>(), Arg.Any<DoubleVector3>(), Arg.Any<DoubleVector3>(), Arg.Any<QuadNodeExtents>(), Arg.Is(6));
             }
         };
 
@@ -84,13 +84,14 @@ namespace GenesisEngine.Specs.DomainSpecs
         {
             InitializeNodeAsNonleaf();
             ConfigureStrategyForSplit();
+            _quadNodeFactory.ClearReceivedCalls();
         };
 
         Because of = () =>
             _node.Update(DoubleVector3.Zero, DoubleVector3.Zero);
 
         It should_not_split_again = () =>
-            _quadNodeFactory.AssertWasCalled(x => x.Create(), c => c.Repeat.Times(4));
+            _quadNodeFactory.DidNotReceive().Create();
     }
 
     [Subject(typeof(QuadNode))]
@@ -107,7 +108,7 @@ namespace GenesisEngine.Specs.DomainSpecs
             _node.Update(DoubleVector3.Zero, DoubleVector3.Zero);
 
         It should_not_split_again = () =>
-            _quadNodeFactory.AssertWasNotCalled(x => x.Create());
+            _quadNodeFactory.DidNotReceive().Create();
     }
 
     [Subject(typeof(QuadNode))]
@@ -124,7 +125,7 @@ namespace GenesisEngine.Specs.DomainSpecs
             _node.Update(DoubleVector3.Zero, DoubleVector3.Zero);
 
         It should_not_split = () =>
-            _quadNodeFactory.AssertWasNotCalled(x => x.Create());
+            _quadNodeFactory.DidNotReceive().Create();
     }
 
     [Subject(typeof(QuadNode))]
@@ -162,7 +163,7 @@ namespace GenesisEngine.Specs.DomainSpecs
         {
             foreach (var subnode in _node.Subnodes)
             {
-                ((IDisposable)subnode).AssertWasCalled(x => x.Dispose());
+                ((IDisposable)subnode).Received().Dispose();
             }
         };
     }
@@ -186,7 +187,7 @@ namespace GenesisEngine.Specs.DomainSpecs
         {
             foreach (var subnode in _node.Subnodes)
             {
-                ((IDisposable)subnode).AssertWasCalled(x => x.Dispose());
+                ((IDisposable)subnode).Received().Dispose();
             }
         };
     }
@@ -238,7 +239,7 @@ namespace GenesisEngine.Specs.DomainSpecs
         {
             foreach (var subnode in _node.Subnodes)
             {
-                subnode.AssertWasCalled(x => x.Update(DoubleVector3.Zero, DoubleVector3.Zero));
+                subnode.Received().Update(DoubleVector3.Zero, DoubleVector3.Zero);
             }
         };
     }
@@ -267,10 +268,10 @@ namespace GenesisEngine.Specs.DomainSpecs
             _node.Draw(_cameraLocation, _viewFrustum, _viewMatrix, _projectionMatrix);
 
         It should_draw_the_node = () =>
-            _renderer.AssertWasCalled(x => x.Draw(_location, _cameraLocation, _viewMatrix, _projectionMatrix));
+            _renderer.Received().Draw(_location, _cameraLocation, _viewMatrix, _projectionMatrix);
 
         It should_draw_the_mesh = () =>
-            _mesh.AssertWasCalled(x => x.Draw(_cameraLocation, _viewFrustum, _viewMatrix, _projectionMatrix));
+            _mesh.Received().Draw(_cameraLocation, _viewFrustum, _viewMatrix, _projectionMatrix);
     }
     
     [Subject(typeof(QuadNode))]
@@ -283,7 +284,7 @@ namespace GenesisEngine.Specs.DomainSpecs
 
         Establish context = () =>
         {
-            _mesh.Stub(x => x.IsAboveHorizonToCamera).Return(true);
+            _mesh.IsAboveHorizonToCamera.Returns(true);
 
             _cameraLocation = DoubleVector3.Up;
             _viewFrustum = new BoundingFrustum(Matrix.Identity);
@@ -297,16 +298,16 @@ namespace GenesisEngine.Specs.DomainSpecs
             _node.Draw(_cameraLocation, _viewFrustum, _viewMatrix, _projectionMatrix);
 
         It should_not_draw_the_node = () =>
-            _renderer.AssertWasNotCalled(x => x.Draw(Arg<DoubleVector3>.Is.Anything, Arg<DoubleVector3>.Is.Anything, Arg<Matrix>.Is.Anything, Arg<Matrix>.Is.Anything));
+            _renderer.DidNotReceive().Draw(Arg.Any<DoubleVector3>(), Arg.Any<DoubleVector3>(), Arg.Any<Matrix>(), Arg.Any<Matrix>());
 
         It should_not_draw_the_mesh = () =>
-            _mesh.AssertWasNotCalled(x => x.Draw(Arg<DoubleVector3>.Is.Anything, Arg<BoundingFrustum>.Is.Anything, Arg<Matrix>.Is.Anything, Arg<Matrix>.Is.Anything));
+            _mesh.DidNotReceive().Draw(Arg.Any<DoubleVector3>(), Arg.Any<BoundingFrustum>(), Arg.Any<Matrix>(), Arg.Any<Matrix>());
 
         It should_draw_the_subnodes_in_the_correct_location = () =>
         {
             foreach (var subnode in _node.Subnodes)
             {
-                subnode.AssertWasCalled(x => x.Draw(_cameraLocation, _viewFrustum, _viewMatrix, _projectionMatrix));
+                subnode.Received().Draw(_cameraLocation, _viewFrustum, _viewMatrix, _projectionMatrix);
             }
         };
     }
@@ -321,10 +322,10 @@ namespace GenesisEngine.Specs.DomainSpecs
             _node.Dispose();
 
         It should_dispose_the_renderer = () =>
-            ((IDisposable)_renderer).AssertWasCalled(x => x.Dispose());
+            ((IDisposable)_renderer).Received().Dispose();
 
         It should_dispose_the_mesh = () =>
-            ((IDisposable)_mesh).AssertWasCalled(x => x.Dispose());
+            ((IDisposable)_mesh).Received().Dispose();
 
         It should_decrement_the_number_of_nodes = () =>
             _statistics.NumberOfQuadNodes.ShouldEqual(0);
@@ -340,16 +341,16 @@ namespace GenesisEngine.Specs.DomainSpecs
             _node.Dispose();
 
         It should_dispose_the_renderer = () =>
-            ((IDisposable)_renderer).AssertWasCalled(x => x.Dispose());
+            ((IDisposable)_renderer).Received().Dispose();
 
         It should_dispose_the_mesh = () =>
-            ((IDisposable) _mesh).AssertWasCalled(x => x.Dispose());
+            ((IDisposable) _mesh).Received().Dispose();
 
         It should_dispose_the_subnodes = () =>
         {
             foreach (var subnode in _node.Subnodes)
             {
-                ((IDisposable)subnode).AssertWasCalled(x => x.Dispose());
+                ((IDisposable)subnode).Received().Dispose();
             }
         };
 
@@ -389,17 +390,17 @@ namespace GenesisEngine.Specs.DomainSpecs
 
         Establish context = () =>
         {
-            _mesh = MockRepository.GenerateMock<IQuadMesh, IDisposable>();
+            _mesh = Substitute.For<IQuadMesh, IDisposable>();
 
-            _quadNodeFactory = MockRepository.GenerateStub<IQuadNodeFactory>();
-            _quadNodeFactory.Stub(x => x.Create()).Do((Func<IQuadNode>)(() => (IQuadNode)MockRepository.GenerateMock<IQuadNode, IDisposable>()));
+            _quadNodeFactory = Substitute.For<IQuadNodeFactory>();
+            _quadNodeFactory.Create().Returns(args => Substitute.For<IQuadNode, IDisposable>());
 
-            _splitMergeStrategy = MockRepository.GenerateStub<ISplitMergeStrategy>();
+            _splitMergeStrategy = Substitute.For<ISplitMergeStrategy>();
 
             // We're using a hand-rolled fake here because of a bug
             // in .Net that prevents mocking of multi-dimentional arrays:
             // http://code.google.com/p/moq/issues/detail?id=182#c0
-            _renderer = MockRepository.GenerateMock<IQuadNodeRenderer, IDisposable>();
+            _renderer = Substitute.For<IQuadNodeRenderer, IDisposable>();
 
             _statistics = new Statistics();
 
@@ -421,12 +422,12 @@ namespace GenesisEngine.Specs.DomainSpecs
 
         public static void ConfigureStrategyForSplit()
         {
-            _splitMergeStrategy.Stub(x => x.ShouldSplit(Arg<IQuadMesh>.Is.Anything, Arg<int>.Is.Anything)).Return(true).Repeat.Once();
+            _splitMergeStrategy.ShouldSplit(Arg.Any<IQuadMesh>(), Arg.Any<int>()).Returns(true, false);
         }
 
         public static void ConfigureStrategyForMerge()
         {
-            _splitMergeStrategy.Stub(x => x.ShouldMerge(Arg<IQuadMesh>.Is.Anything)).Return(true).Repeat.Once();
+            _splitMergeStrategy.ShouldMerge(Arg.Any<IQuadMesh>()).Returns(true, false);
         }
     }
 

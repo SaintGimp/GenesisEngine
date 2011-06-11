@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Machine.Specifications;
-using Rhino.Mocks;
+using NSubstitute;
 
 namespace GenesisEngine.Specs.EventSpecs
 {
@@ -29,7 +29,7 @@ namespace GenesisEngine.Specs.EventSpecs
             _eventAggregator.SendMessage(_goodbyeMessage);
 
         It should_not_send_any_messages = () =>
-            _helloListener1.AssertWasNotCalled(x => x.Handle(Arg<Hello>.Is.Anything));
+            _helloListener1.DidNotReceive().Handle(Arg.Any<Hello>());
     }
 
     [Subject(typeof(EventAggregator))]
@@ -42,7 +42,7 @@ namespace GenesisEngine.Specs.EventSpecs
             _eventAggregator.SendMessage(_helloMessage);
 
         It should_send_the_message_to_the_listener = () =>
-            _helloListener1.AssertWasCalled(x => x.Handle(_helloMessage));
+            _helloListener1.Received().Handle(_helloMessage);
     }
 
     [Subject(typeof(EventAggregator))]
@@ -59,16 +59,20 @@ namespace GenesisEngine.Specs.EventSpecs
 
         It should_send_the_message_to_all_eligible_listeners = () =>
         {
-            _helloListener1.AssertWasCalled(x => x.Handle(_helloMessage));
-            _helloListener2.AssertWasCalled(x => x.Handle(_helloMessage));
+            _helloListener1.Received().Handle(_helloMessage);
+            _helloListener2.Received().Handle(_helloMessage);
         };
     }
 
     [Subject(typeof(EventAggregator))]
     public class when_a_listener_is_added_multiple_times : EventAggregatorContext
     {
+        static int _handleCounter;
+
         Establish context = () =>
         {
+            _helloListener1.When(x => x.Handle(_helloMessage)).Do(x => _handleCounter++);
+
             _eventAggregator.AddListener(_helloListener1);
             _eventAggregator.AddListener(_helloListener1);
         };
@@ -77,7 +81,7 @@ namespace GenesisEngine.Specs.EventSpecs
             _eventAggregator.SendMessage(_helloMessage);
 
         It should_send_the_message_to_the_listener_only_once = () =>
-            _helloListener1.AssertWasCalled(x => x.Handle(_helloMessage), options => options.Repeat.Once());
+            _handleCounter++;
     }
 
     [Subject(typeof(EventAggregator))]
@@ -85,7 +89,8 @@ namespace GenesisEngine.Specs.EventSpecs
     {
         Establish context = () =>
         {
-            _helloListener1.Stub(x => x.Handle(_helloMessage)).Do((Action<Hello>)(m => _eventAggregator.AddListener(_helloListener2)));
+            _helloListener1.When(x => x.Handle(_helloMessage)).Do(x => _eventAggregator.AddListener(_helloListener2));
+            
             _eventAggregator.AddListener(_helloListener1);
         };
 
@@ -101,7 +106,7 @@ namespace GenesisEngine.Specs.EventSpecs
     {
         Establish context = () =>
         {
-            var disposableListener = MockRepository.GenerateStub<IListener<Hello>>();
+            var disposableListener = Substitute.For<IListener<Hello>>();
             _eventAggregator.AddListener(disposableListener);
         };
 
@@ -125,9 +130,9 @@ namespace GenesisEngine.Specs.EventSpecs
         {
             _helloMessage = new Hello();
             _goodbyeMessage = new Goodbye();
-            _helloListener1 = MockRepository.GenerateStub<IListener<Hello>>();
-            _helloListener2 = MockRepository.GenerateStub<IListener<Hello>>();
-            _goodbyeListener = MockRepository.GenerateStub<IListener<Goodbye>>();
+            _helloListener1 = Substitute.For<IListener<Hello>>();
+            _helloListener2 = Substitute.For<IListener<Hello>>();
+            _goodbyeListener = Substitute.For<IListener<Goodbye>>();
             _eventAggregator = new TestableEventAggregator();
         };
     }

@@ -2,7 +2,7 @@ using System;
 using System.Text;
 using System.Collections.Generic;
 
-using Rhino.Mocks;
+using NSubstitute;
 using Machine.Specifications;
 
 namespace GenesisEngine.Specs.CameraSpecs
@@ -14,7 +14,7 @@ namespace GenesisEngine.Specs.CameraSpecs
             _controller.Handle(new MoveForward() { InputState = _input });
 
         It should_move_the_camera_forward_the_correct_distance = () =>
-            _camera.AssertWasCalled(x => x.MoveForwardHorizontally(_expectedDistance));
+            _camera.Received().MoveForwardHorizontally(_expectedDistance);
     }
 
     [Subject(typeof(CameraController))]
@@ -24,7 +24,7 @@ namespace GenesisEngine.Specs.CameraSpecs
             _controller.Handle(new MoveBackward() { InputState = _input });
 
         It should_move_the_camera_backward_the_correct_distance = () =>
-            _camera.AssertWasCalled(x => x.MoveBackwardHorizontally(_expectedDistance));
+            _camera.Received().MoveBackwardHorizontally(_expectedDistance);
     }
 
     [Subject(typeof(CameraController))]
@@ -34,7 +34,7 @@ namespace GenesisEngine.Specs.CameraSpecs
             _controller.Handle(new MoveLeft() { InputState = _input });
 
         It should_move_the_camera_left_the_correct_distance = () =>
-            _camera.AssertWasCalled(x => x.MoveLeft(_expectedDistance));
+            _camera.Received().MoveLeft(_expectedDistance);
     }
 
     [Subject(typeof(CameraController))]
@@ -44,7 +44,7 @@ namespace GenesisEngine.Specs.CameraSpecs
             _controller.Handle(new MoveRight() { InputState = _input });
 
         It should_move_the_camera_right_the_correct_distance = () =>
-            _camera.AssertWasCalled(x => x.MoveRight(_expectedDistance));
+            _camera.Received().MoveRight(_expectedDistance);
     }
 
     [Subject(typeof(CameraController))]
@@ -54,7 +54,7 @@ namespace GenesisEngine.Specs.CameraSpecs
             _controller.Handle(new MoveUp() { InputState = _input });
 
         It should_move_the_camera_up_the_correct_distance = () =>
-            _camera.AssertWasCalled(x => x.MoveUp(_expectedDistance));
+            _camera.Received().MoveUp(_expectedDistance);
     }
 
     [Subject(typeof(CameraController))]
@@ -64,7 +64,7 @@ namespace GenesisEngine.Specs.CameraSpecs
             _controller.Handle(new MoveDown() { InputState = _input });
 
         It should_move_the_camera_down_the_correct_distance = () =>
-            _camera.AssertWasCalled(x => x.MoveDown(_expectedDistance));
+            _camera.Received().MoveDown(_expectedDistance);
     }
 
     [Subject(typeof(CameraController))]
@@ -74,10 +74,10 @@ namespace GenesisEngine.Specs.CameraSpecs
             _controller.Handle(new MouseLook() { InputState = _input });
 
         It should_pitch_the_camera = () =>
-            _camera.AssertWasCalled(x => x.ChangePitch(_expectedPitch));
+            _camera.Received().ChangePitch(_expectedPitch);
 
         It should_yaw_the_camera = () =>
-        _camera.AssertWasCalled(x => x.ChangeYaw(_expectedYaw));
+        _camera.Received().ChangeYaw(_expectedYaw);
     }
 
     [Subject(typeof(CameraController))]
@@ -87,8 +87,8 @@ namespace GenesisEngine.Specs.CameraSpecs
         {
             _camera.Location = DoubleVector3.Up;
 
-            _planet = MockRepository.GenerateStub<IPlanet>();
-            _planet.Stub(x => x.GetGroundHeight(_camera.Location)).Return(123);
+            _planet = Substitute.For<IPlanet>();
+            _planet.GetGroundHeight(_camera.Location).Returns(123);
             _controller.AttachToPlanet(_planet);
         };
 
@@ -140,16 +140,16 @@ namespace GenesisEngine.Specs.CameraSpecs
 
         Establish context = () =>
         {
-            _camera = MockRepository.GenerateStub<ICamera>();
+            _camera = Substitute.For<ICamera>();
 
-            _settings = MockRepository.GenerateStub<ISettings>();
+            _settings = Substitute.For<ISettings>();
             _settings.CameraMoveSpeedPerSecond = 10;
             _settings.CameraMouseLookDamping = 300f;
 
-            _input = MockRepository.GenerateStub<IInputState>();
-            _input.Stub(x => x.ElapsedTime).Return(new TimeSpan(0, 0, 0, 0, 500));
-            _input.Stub(x => x.MouseDeltaX).Return(100);
-            _input.Stub(x => x.MouseDeltaY).Return(150);
+            _input = Substitute.For<IInputState>();
+            _input.ElapsedTime.Returns(new TimeSpan(0, 0, 0, 0, 500));
+            _input.MouseDeltaX.Returns(100);
+            _input.MouseDeltaY.Returns(150);
 
             _expectedDistance = 10 / 2;
             _expectedYaw = -100 / 300.0f;
