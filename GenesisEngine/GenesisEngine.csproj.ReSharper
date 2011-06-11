@@ -11,7 +11,7 @@
     <SkipFolder>8DC6196D-E090-4A0F-BC95-FCB8BEC36228/d:Renderers</SkipFolder>
     <SkipFolder>8DC6196D-E090-4A0F-BC95-FCB8BEC36228/d:Resources</SkipFolder>
     <SkipFolder>8DC6196D-E090-4A0F-BC95-FCB8BEC36228/d:Settings</SkipFolder>
-    <SkipFolder>8DC6196D-E090-4A0F-BC95-FCB8BEC36228/d:UI</SkipFolder>
     <SkipFolder>8DC6196D-E090-4A0F-BC95-FCB8BEC36228/d:Threading</SkipFolder>
+    <SkipFolder>8DC6196D-E090-4A0F-BC95-FCB8BEC36228/d:UI</SkipFolder>
   </NamespaceFolders>
 </Configuration>
