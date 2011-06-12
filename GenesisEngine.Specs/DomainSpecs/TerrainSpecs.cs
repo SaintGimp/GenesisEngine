@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 using Machine.Specifications;
-using Rhino.Mocks;
+using NSubstitute;
 using Microsoft.Xna.Framework;
 
 namespace GenesisEngine.Specs.DomainSpecs
@@ -29,7 +29,7 @@ namespace GenesisEngine.Specs.DomainSpecs
             _terrain.Draw(_cameraLocation, _viewFrustum, _viewMatrix, _projectionMatrix);
 
         It should_draw_the_faces = () =>
-            _face.AssertWasCalled(x => x.Draw(_cameraLocation, _viewFrustum, _viewMatrix, _projectionMatrix));
+            _face.Received().Draw(_cameraLocation, _viewFrustum, _viewMatrix, _projectionMatrix);
     }
 
     [Subject(typeof(Terrain))]
@@ -39,7 +39,7 @@ namespace GenesisEngine.Specs.DomainSpecs
             _terrain.Update(DoubleVector3.Zero, DoubleVector3.Zero);
 
         It should_update_the_faces = () =>
-            _face.AssertWasCalled(x => x.Update(DoubleVector3.Zero, DoubleVector3.Zero));
+            _face.Received().Update(DoubleVector3.Zero, DoubleVector3.Zero);
     }
     
     public class TerrainContext
@@ -49,7 +49,7 @@ namespace GenesisEngine.Specs.DomainSpecs
 
         Establish context = () =>
         {
-            _face = MockRepository.GenerateStub<IQuadNode>();
+            _face = Substitute.For<IQuadNode>();
             var faces = new List<IQuadNode>() {_face};
 
             _terrain = new Terrain(faces);

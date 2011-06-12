@@ -3,7 +3,7 @@ using System.Text;
 using System.Collections.Generic;
 
 using Microsoft.Xna.Framework;
-using Rhino.Mocks;
+using NSubstitute;
 using Machine.Specifications;
 
 namespace GenesisEngine.Specs.CameraSpecs
@@ -445,7 +445,7 @@ namespace GenesisEngine.Specs.CameraSpecs
 
         Establish context = () =>
         {
-            _settings = MockRepository.GenerateStub<ISettings>();
+            _settings = Substitute.For<ISettings>();
             _settings.FarClippingPlaneDistance = 50000.0f;
             _camera = new Camera(_settings);
         };

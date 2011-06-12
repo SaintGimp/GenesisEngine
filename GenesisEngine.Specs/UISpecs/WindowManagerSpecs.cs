@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Machine.Specifications;
-using Rhino.Mocks;
+using NSubstitute;
 using StructureMap;
 
 namespace GenesisEngine.Specs.UISpecs
@@ -15,10 +15,10 @@ namespace GenesisEngine.Specs.UISpecs
             _windowManager.ShowAllWindows();
 
         It should_show_the_settings_window = () =>
-            _settingsCustodian.AssertWasCalled(x => x.ShowInactive());
+            _settingsCustodian.Received().ShowInactive();
 
         It should_show_the_statistics_window = () =>
-            _statisticsCustodian.AssertWasCalled(x => x.ShowInactive());
+            _statisticsCustodian.Received().ShowInactive();
 
         Cleanup after = () =>
             _windowManager.Dispose();
@@ -33,12 +33,12 @@ namespace GenesisEngine.Specs.UISpecs
 
         Establish context = () =>
         {
-            _container = MockRepository.GenerateStub<IContainer>();
-            _settingsCustodian = MockRepository.GenerateStub<IScreenCustodian<SettingsView, SettingsViewModel>>();
-            _statisticsCustodian = MockRepository.GenerateStub<IScreenCustodian<StatisticsView, StatisticsViewModel>>();
+            _container = Substitute.For<IContainer>();
+            _settingsCustodian = Substitute.For<IScreenCustodian<SettingsView, SettingsViewModel>>();
+            _statisticsCustodian = Substitute.For<IScreenCustodian<StatisticsView, StatisticsViewModel>>();
 
-            _container.Stub(x => x.GetInstance<IScreenCustodian<SettingsView, SettingsViewModel>>()).Return(_settingsCustodian);
-            _container.Stub(x => x.GetInstance<IScreenCustodian<StatisticsView, StatisticsViewModel>>()).Return(_statisticsCustodian);
+            _container.GetInstance<IScreenCustodian<SettingsView, SettingsViewModel>>().Returns(_settingsCustodian);
+            _container.GetInstance<IScreenCustodian<StatisticsView, StatisticsViewModel>>().Returns(_statisticsCustodian);
 
             _windowManager = new WindowManager(_container);
         };

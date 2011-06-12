@@ -5,7 +5,7 @@ using System.Text;
 
 using Machine.Specifications;
 using Microsoft.Xna.Framework;
-using Rhino.Mocks;
+using NSubstitute;
 
 namespace GenesisEngine.Specs.DomainSpecs
 {
@@ -25,21 +25,21 @@ namespace GenesisEngine.Specs.DomainSpecs
             _viewMatrix = Matrix.Identity;
             _projectionMatrix = Matrix.Identity;
 
-            _camera = MockRepository.GenerateStub<ICamera>();
+            _camera = Substitute.For<ICamera>();
             _camera.Location = _cameraLocation;
-            _camera.Stub(x => x.OriginBasedViewFrustum).Return(_viewFrustum);
-            _camera.Stub(x => x.OriginBasedViewTransformation).Return(_viewMatrix);
-            _camera.Stub(x => x.ProjectionTransformation).Return(_projectionMatrix);
+            _camera.OriginBasedViewFrustum.Returns(_viewFrustum);
+            _camera.OriginBasedViewTransformation.Returns(_viewMatrix);
+            _camera.ProjectionTransformation.Returns(_projectionMatrix);
         };
 
         Because of = () =>
             _planet.Draw(_camera);
 
         It should_draw_the_planet = () =>
-            _planetRenderer.AssertWasCalled(x => x.Draw(_location, _cameraLocation, _viewMatrix, _projectionMatrix));
+            _planetRenderer.Received().Draw(_location, _cameraLocation, _viewMatrix, _projectionMatrix);
 
         It should_draw_the_terrain = () =>
-            _terrain.AssertWasCalled(x => x.Draw(_cameraLocation, _viewFrustum, _viewMatrix, _projectionMatrix));
+            _terrain.Received().Draw(_cameraLocation, _viewFrustum, _viewMatrix, _projectionMatrix);
     }
 
     [Subject(typeof(Planet))]
@@ -49,7 +49,7 @@ namespace GenesisEngine.Specs.DomainSpecs
             _planet.Update(DoubleVector3.Up);
 
         It should_update_the_terrain = () =>
-            _terrain.AssertWasCalled(x => x.Update(Arg.Is(DoubleVector3.Up), Arg.Is(_location)));
+            _terrain.Received().Update(Arg.Is(DoubleVector3.Up), Arg.Is(_location));
     }
 
     [Subject(typeof(Planet))]
@@ -61,7 +61,7 @@ namespace GenesisEngine.Specs.DomainSpecs
         Establish context = () =>
         {
             _observerLocation = DoubleVector3.Forward * 100;
-            _generator.Stub(x => x.GetHeight(DoubleVector3.Forward, 19, 8000)).Return(1234);
+            _generator.GetHeight(DoubleVector3.Forward, 19, 8000).Returns(1234);
         };
 
         Because of = () =>
@@ -89,10 +89,10 @@ namespace GenesisEngine.Specs.DomainSpecs
             _radius = 100;
             _location = DoubleVector3.Zero;
 
-            _terrain = MockRepository.GenerateStub<ITerrain>();
-            _planetRenderer = MockRepository.GenerateStub<IPlanetRenderer>();
-            _generator = MockRepository.GenerateStub<IHeightfieldGenerator>();
-            _settings = MockRepository.GenerateStub<ISettings>();
+            _terrain = Substitute.For<ITerrain>();
+            _planetRenderer = Substitute.For<IPlanetRenderer>();
+            _generator = Substitute.For<IHeightfieldGenerator>();
+            _settings = Substitute.For<ISettings>();
             _statistics = new Statistics();
 
             _planet = new Planet(_location, _radius, _terrain, _planetRenderer, _generator, _settings, _statistics);

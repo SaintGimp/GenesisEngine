@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Machine.Specifications;
 using Microsoft.Xna.Framework;
-using Rhino.Mocks;
+using NSubstitute;
 
 namespace GenesisEngine.Specs.DomainSpecs
 {
@@ -110,10 +110,10 @@ namespace GenesisEngine.Specs.DomainSpecs
         {
             _gridSize = 65;
 
-            _settings = MockRepository.GenerateStub<ISettings>();
-            _baseColorizer = MockRepository.GenerateStub<ITerrainColorizer>();
-            _baseColorizer.Stub(x => x.GetColor(Arg<double>.Is.Anything, Arg<int>.Is.Anything, Arg<int>.Is.Anything, Arg<int>.Is.Anything, Arg<QuadNodeExtents>.Is.Anything))
-                .Return(Color.White);
+            _settings = Substitute.For<ISettings>();
+            _baseColorizer = Substitute.For<ITerrainColorizer>();
+            _baseColorizer.GetColor(Arg.Any<double>(), Arg.Any<int>(), Arg.Any<int>(), Arg.Any<int>(), Arg.Any<QuadNodeExtents>())
+                .Returns(Color.White);
 
             _colorizer = new EdgeColorizer(_baseColorizer, _settings);
         };

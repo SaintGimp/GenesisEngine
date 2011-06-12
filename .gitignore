@@ -1,7 +1,8 @@
 /*/obj
 /*/bin
 /GenesisEngine/Content/obj
-_ReSharper.*
+_ReSharper*/
+[Tt]est[Rr]esult*
 *.csproj.user
 *.[Rr]e[Ss]harper.user
 *.suo
@@ -14,5 +15,6 @@ _ReSharper.*
 *.psess
 *.app.ctl
 *.krn.ctl
+*.docstates
 
 /Specs/*.xml

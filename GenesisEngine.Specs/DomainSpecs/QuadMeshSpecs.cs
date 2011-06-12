@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 
 using Machine.Specifications;
-using Rhino.Mocks;
+using NSubstitute;
 using Microsoft.Xna.Framework;
 
 namespace GenesisEngine.Specs.DomainSpecs
@@ -16,8 +16,8 @@ namespace GenesisEngine.Specs.DomainSpecs
     {
         Because of = () =>
         {
-            _terrainColorizer.Stub(x => x.GetColor(Arg<double>.Is.Anything, Arg<int>.Is.Anything, Arg<int>.Is.Anything, Arg<int>.Is.Anything, Arg<QuadNodeExtents>.Is.Anything))
-                .Return(Color.PapayaWhip);
+            _terrainColorizer.GetColor(Arg.Any<double>(), Arg.Any<int>(), Arg.Any<int>(), Arg.Any<int>(), Arg.Any<QuadNodeExtents>())
+                .Returns(Color.PapayaWhip);
             InitializeTopFacingMesh();
         };
 
@@ -25,7 +25,7 @@ namespace GenesisEngine.Specs.DomainSpecs
             _renderer.InitializeWasCalled.ShouldBeTrue();
 
         It should_get_height_data_from_the_generator = () =>
-            _generator.AssertWasCalled(x => x.GetHeight(Arg<DoubleVector3>.Is.Anything, Arg<int>.Is.Equal(5), Arg<double>.Is.Anything), s => s.Repeat.AtLeastOnce());
+            _generator.Received().GetHeight(Arg.Any<DoubleVector3>(), Arg.Is(5), Arg.Any<double>());
 
         It should_project_center_point_into_spherical_mesh_space = () =>
         {
@@ -186,16 +186,16 @@ namespace GenesisEngine.Specs.DomainSpecs
 
         Establish context = () =>
         {
-            _generator = MockRepository.GenerateStub<IHeightfieldGenerator>();
+            _generator = Substitute.For<IHeightfieldGenerator>();
 
-            _terrainColorizer = MockRepository.GenerateStub<ITerrainColorizer>();
+            _terrainColorizer = Substitute.For<ITerrainColorizer>();
 
             // We're using a hand-rolled fake here because of a bug
             // in .Net that prevents mocking of multi-dimentional arrays:
             // http://code.google.com/p/moq/issues/detail?id=182#c0
             _renderer = new MockQuadMeshRenderer();
 
-            _settings = MockRepository.GenerateStub<ISettings>();
+            _settings = Substitute.For<ISettings>();
 
             _statistics = new Statistics();
 

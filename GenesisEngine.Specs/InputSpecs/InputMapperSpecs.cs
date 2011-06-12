@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Machine.Specifications;
 using Microsoft.Xna.Framework.Input;
-using Rhino.Mocks;
+using NSubstitute;
 
 namespace GenesisEngine.Specs.InputSpecs
 {
@@ -14,17 +14,17 @@ namespace GenesisEngine.Specs.InputSpecs
         Establish context = () =>
         {
             _inputMapper.AddKeyPressMessage<DoSomething>(Keys.K);
-            _input.Stub(x => x.IsKeyPressed(Keys.K)).Return(true);
+            _input.IsKeyPressed(Keys.K).Returns(true);
         };
 
         Because of = () =>
             _inputMapper.HandleInput(_input);
 
         It should_send_a_keypress_message = () =>
-            _eventAggregator.AssertWasCalled(x => x.SendMessage(Arg<DoSomething>.Is.Anything));
+            _eventAggregator.Received().SendMessage(Arg.Any<DoSomething>());
 
         It should_send_a_message_containing_the_current_input_state = () =>
-            _eventAggregator.AssertWasCalled(x => x.SendMessage(Arg<DoSomething>.Matches(p => p.InputState == _input)));
+            _eventAggregator.Received().SendMessage(Arg.Is<DoSomething>(p => p.InputState == _input));
     }
 
     [Subject(typeof(InputMapper))]
@@ -34,17 +34,17 @@ namespace GenesisEngine.Specs.InputSpecs
         {
             _inputMapper.AddKeyPressMessage<DoSomething>(Keys.K);
             _inputMapper.AddKeyPressMessage<DoSomethingElse>(Keys.K);
-            _input.Stub(x => x.IsKeyPressed(Keys.K)).Return(true);
+            _input.IsKeyPressed(Keys.K).Returns(true);
         };
 
         Because of = () =>
             _inputMapper.HandleInput(_input);
 
         It should_send_the_first_keypress_message = () =>
-            _eventAggregator.AssertWasCalled(x => x.SendMessage(Arg<DoSomething>.Is.Anything));
+            _eventAggregator.Received().SendMessage(Arg.Any<DoSomething>());
 
         It should_send_the_second_keypress_message = () =>
-            _eventAggregator.AssertWasCalled(x => x.SendMessage(Arg<DoSomethingElse>.Is.Anything));
+            _eventAggregator.Received().SendMessage(Arg.Any<DoSomethingElse>());
     }
 
     [Subject(typeof(InputMapper))]
@@ -53,14 +53,14 @@ namespace GenesisEngine.Specs.InputSpecs
         Establish context = () =>
         {
             _inputMapper.AddKeyPressMessage<DoSomething>(Keys.K);
-            _input.Stub(x => x.IsKeyPressed(Keys.J)).Return(true);
+            _input.IsKeyPressed(Keys.J).Returns(true);
         };
 
         Because of = () =>
             _inputMapper.HandleInput(_input);
 
         It should_not_send_a_keypress_message = () =>
-            _eventAggregator.AssertWasNotCalled(x => x.SendMessage(Arg<DoSomething>.Is.Anything));
+            _eventAggregator.DidNotReceive().SendMessage(Arg.Any<DoSomething>());
     }
 
     [Subject(typeof(InputMapper))]
@@ -73,7 +73,7 @@ namespace GenesisEngine.Specs.InputSpecs
             _inputMapper.HandleInput(_input);
 
         It should_not_send_a_keypress_message = () =>
-            _eventAggregator.AssertWasNotCalled(x => x.SendMessage(Arg<DoSomething>.Is.Anything));
+            _eventAggregator.DidNotReceive().SendMessage(Arg.Any<DoSomething>());
     }
 
     [Subject(typeof(InputMapper))]
@@ -82,17 +82,17 @@ namespace GenesisEngine.Specs.InputSpecs
         Establish context = () =>
         {
             _inputMapper.AddKeyDownMessage<DoSomething>(Keys.K);
-            _input.Stub(x => x.IsKeyDown(Keys.K)).Return(true);
+            _input.IsKeyDown(Keys.K).Returns(true);
         };
 
         Because of = () =>
             _inputMapper.HandleInput(_input);
 
         It should_send_a_keydown_message = () =>
-            _eventAggregator.AssertWasCalled(x => x.SendMessage(Arg<DoSomething>.Is.Anything));
+            _eventAggregator.Received().SendMessage(Arg.Any<DoSomething>());
 
         It should_send_a_message_containing_the_current_input_state = () =>
-            _eventAggregator.AssertWasCalled(x => x.SendMessage(Arg<DoSomething>.Matches(p => p.InputState == _input)));
+            _eventAggregator.Received().SendMessage(Arg.Is<DoSomething>(p => p.InputState == _input));
     }
 
     [Subject(typeof(InputMapper))]
@@ -102,17 +102,17 @@ namespace GenesisEngine.Specs.InputSpecs
         {
             _inputMapper.AddKeyDownMessage<DoSomething>(Keys.K);
             _inputMapper.AddKeyDownMessage<DoSomethingElse>(Keys.K);
-            _input.Stub(x => x.IsKeyDown(Keys.K)).Return(true);
+            _input.IsKeyDown(Keys.K).Returns(true);
         };
 
         Because of = () =>
             _inputMapper.HandleInput(_input);
 
         It should_send_the_first_keydown_message = () =>
-            _eventAggregator.AssertWasCalled(x => x.SendMessage(Arg<DoSomething>.Is.Anything));
+            _eventAggregator.Received().SendMessage(Arg.Any<DoSomething>());
 
         It should_send_the_second_keydown_message = () =>
-        _eventAggregator.AssertWasCalled(x => x.SendMessage(Arg<DoSomethingElse>.Is.Anything));
+        _eventAggregator.Received().SendMessage(Arg.Any<DoSomethingElse>());
     }
 
     [Subject(typeof(InputMapper))]
@@ -121,14 +121,14 @@ namespace GenesisEngine.Specs.InputSpecs
         Establish context = () =>
         {
             _inputMapper.AddKeyDownMessage<DoSomething>(Keys.K);
-            _input.Stub(x => x.IsKeyDown(Keys.J)).Return(true);
+            _input.IsKeyDown(Keys.J).Returns(true);
         };
 
         Because of = () =>
             _inputMapper.HandleInput(_input);
 
         It should_not_send_a_keydown_message = () =>
-            _eventAggregator.AssertWasNotCalled(x => x.SendMessage(Arg<DoSomething>.Is.Anything));
+            _eventAggregator.DidNotReceive().SendMessage(Arg.Any<DoSomething>());
     }
 
     // TODO: how best to handle context name collisions with others in the same namespace?
@@ -139,7 +139,7 @@ namespace GenesisEngine.Specs.InputSpecs
             _inputMapper.HandleInput(_input);
 
         It should_not_send_a_keydown_message = () =>
-            _eventAggregator.AssertWasNotCalled(x => x.SendMessage(Arg<DoSomething>.Is.Anything));
+            _eventAggregator.DidNotReceive().SendMessage(Arg.Any<DoSomething>());
     }
 
     [Subject(typeof(InputMapper))]
@@ -148,15 +148,15 @@ namespace GenesisEngine.Specs.InputSpecs
         Establish context = () =>
         {
             _inputMapper.AddMouseMoveMessage<DoSomething>();
-            _input.Stub(x => x.MouseDeltaX).Return(10);
-            _input.Stub(x => x.IsRightMouseButtonDown).Return(true);
+            _input.MouseDeltaX.Returns(10);
+            _input.IsRightMouseButtonDown.Returns(true);
         };
 
         Because of = () =>
             _inputMapper.HandleInput(_input);
 
         It should_send_a_mousemove_message = () =>
-            _eventAggregator.AssertWasCalled(x => x.SendMessage(Arg<DoSomething>.Is.Anything));
+            _eventAggregator.Received().SendMessage(Arg.Any<DoSomething>());
     }
 
     [Subject(typeof(InputMapper))]
@@ -165,15 +165,15 @@ namespace GenesisEngine.Specs.InputSpecs
         Establish context = () =>
         {
             _inputMapper.AddMouseMoveMessage<DoSomething>();
-            _input.Stub(x => x.MouseDeltaY).Return(10);
-            _input.Stub(x => x.IsRightMouseButtonDown).Return(true);
+            _input.MouseDeltaY.Returns(10);
+            _input.IsRightMouseButtonDown.Returns(true);
         };
 
         Because of = () =>
             _inputMapper.HandleInput(_input);
 
         It should_send_a_mousemove_message = () =>
-            _eventAggregator.AssertWasCalled(x => x.SendMessage(Arg<DoSomething>.Is.Anything));
+            _eventAggregator.Received().SendMessage(Arg.Any<DoSomething>());
     }
 
     [Subject(typeof(InputMapper))]
@@ -182,15 +182,15 @@ namespace GenesisEngine.Specs.InputSpecs
         Establish context = () =>
         {
             _inputMapper.AddMouseMoveMessage<DoSomething>();
-            _input.Stub(x => x.MouseDeltaX).Return(10);
-            _input.Stub(x => x.MouseDeltaY).Return(10);
+            _input.MouseDeltaX.Returns(10);
+            _input.MouseDeltaY.Returns(10);
         };
 
         Because of = () =>
             _inputMapper.HandleInput(_input);
 
         It should_not_send_a_mousemove_message = () =>
-            _eventAggregator.AssertWasNotCalled(x => x.SendMessage(Arg<DoSomething>.Is.Anything));
+            _eventAggregator.DidNotReceive().SendMessage(Arg.Any<DoSomething>());
     }
 
     public class InputMapperContext
@@ -201,8 +201,8 @@ namespace GenesisEngine.Specs.InputSpecs
 
         Establish context = () =>
         {
-            _input = MockRepository.GenerateStub<IInputState>();
-            _eventAggregator = MockRepository.GenerateStub<IEventAggregator>();
+            _input = Substitute.For<IInputState>();
+            _eventAggregator = Substitute.For<IEventAggregator>();
             _inputMapper = new InputMapper(_eventAggregator);
         };
     }

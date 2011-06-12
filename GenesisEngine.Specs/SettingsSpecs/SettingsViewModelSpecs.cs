@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Machine.Specifications;
-using Rhino.Mocks;
+using NSubstitute;
 
 namespace GenesisEngine.Specs.SettingsSpecs
 {
@@ -175,7 +175,7 @@ namespace GenesisEngine.Specs.SettingsSpecs
 
         Establish context = () =>
         {
-            _settings = MockRepository.GenerateStub<ISettings>();
+            _settings = Substitute.For<ISettings>();
             _viewModel = new SettingsViewModel(_settings);
             _viewModel.PropertyChanged += (s, e) => _changedPropertyName = e.PropertyName;
         };
@@ -188,7 +188,7 @@ namespace GenesisEngine.Specs.SettingsSpecs
 
         Establish context = () =>
         {
-            _settings = MockRepository.GenerateStub<ISettings>();
+            _settings = Substitute.For<ISettings>();
             _viewModel = new SettingsViewModel(_settings);
         };
     }
