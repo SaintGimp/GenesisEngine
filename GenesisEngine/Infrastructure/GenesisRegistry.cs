@@ -43,7 +43,7 @@ namespace GenesisEngine
             For<IInputState>().Use<XnaInputState>();
             For<ITerrainColorizer>().Use(x => new EdgeColorizer(ObjectFactory.GetInstance<TerrainColorizer>(), ObjectFactory.GetInstance<ISettings>()));
 
-            For<IHeightfieldGenerator>().Use<LayeredHeightfieldGenerator>();
+            For<IHeightGenerator>().Use<LayeredHeightGenerator>();
             For<ISplitMergeStrategy>().Use<DefaultSplitMergeStrategy>();
             For<ITaskSchedulerFactory>().Use<QueuedTaskSchedulerFactory>();
 

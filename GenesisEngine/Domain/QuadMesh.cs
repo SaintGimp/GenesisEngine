@@ -30,12 +30,12 @@ namespace GenesisEngine
         DoubleVector3[] _vertexSamples;
         BoundingBox _boundingBox;
 
-        readonly IHeightfieldGenerator _generator;
+        readonly ISurfaceGenerator _generator;
         readonly ITerrainColorizer _terrainColorizer;
         readonly IQuadMeshRenderer _renderer;
         readonly ISettings _settings;
 
-        public QuadMesh(IHeightfieldGenerator generator, ITerrainColorizer terrainColorizer, IQuadMeshRenderer renderer, ISettings settings)
+        public QuadMesh(ISurfaceGenerator generator, ITerrainColorizer terrainColorizer, IQuadMeshRenderer renderer, ISettings settings)
         {
             _generator = generator;
             _terrainColorizer = terrainColorizer;
@@ -154,7 +154,7 @@ namespace GenesisEngine
             var unitPlaneVector = ConvertToUnitPlaneVector(column, row);
             var unitSphereVector = unitPlaneVector.ProjectUnitPlaneToUnitSphere();
 
-            var terrainHeight = _generator.GetHeight(unitSphereVector, _level, 8000);
+            var terrainHeight = 0.0;// _generator.GetHeight(unitSphereVector, _level, 8000);
 
             var planetSpaceVector = ConvertToPlanetSpace(unitSphereVector, terrainHeight);
             var meshSpaceVector = ConvertToMeshSpace(planetSpaceVector);

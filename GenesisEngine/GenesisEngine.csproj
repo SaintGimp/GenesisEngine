@@ -95,6 +95,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Domain\EdgeColorizer.cs" />
+    <Compile Include="Domain\SurfaceGenerator.cs" />
+    <Compile Include="Domain\IHeightFieldGenerator.cs" />
     <Compile Include="Domain\ISplitMergeStrategy.cs" />
     <Compile Include="Domain\ITerrainColorizer.cs" />
     <Compile Include="Domain\IQuadMesh.cs" />
@@ -113,9 +115,9 @@
     <Compile Include="Cameras\ICameraController.cs" />
     <Compile Include="Input\IInputState.cs" />
     <Compile Include="Input\XnaInputState.cs" />
-    <Compile Include="Domain\TestHeightfieldGenerator1.cs" />
-    <Compile Include="Domain\TestHeightfieldGenerator2.cs" />
-    <Compile Include="Domain\LayeredHeightfieldGenerator.cs" />
+    <Compile Include="Domain\TestHeightGenerator1.cs" />
+    <Compile Include="Domain\TestHeightGenerator2.cs" />
+    <Compile Include="Domain\LayeredHeightGenerator.cs" />
     <Compile Include="Math\DoubleMathHelper.cs" />
     <Compile Include="Noise\FractalBrownianMotionSpectralGenerator.cs" />
     <Compile Include="Domain\IPlanet.cs" />
@@ -126,7 +128,7 @@
     <Compile Include="Domain\ITerrainFactory.cs" />
     <Compile Include="Domain\PlanetFactory.cs" />
     <Compile Include="Domain\QuadNodeExtents.cs" />
-    <Compile Include="Domain\IHeightfieldGenerator.cs" />
+    <Compile Include="Domain\IHeightGenerator.cs" />
     <Compile Include="Noise\INoiseGenerator.cs" />
     <Compile Include="Noise\ISpectralGenerator.cs" />
     <Compile Include="Noise\RidgedMultiFractalSpectralGenerator.cs" />

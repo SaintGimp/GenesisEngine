@@ -24,8 +24,8 @@ namespace GenesisEngine.Specs.DomainSpecs
         It should_initialize_the_renderer = () =>
             _renderer.InitializeWasCalled.ShouldBeTrue();
 
-        It should_get_height_data_from_the_generator = () =>
-            _generator.Received().GetHeight(Arg.Any<DoubleVector3>(), Arg.Is(5), Arg.Any<double>());
+        //It should_get_height_data_from_the_generator = () =>
+        //    _generator.Received().GetHeight(Arg.Any<DoubleVector3>(), Arg.Is(5), Arg.Any<double>());
 
         It should_project_center_point_into_spherical_mesh_space = () =>
         {
@@ -176,7 +176,7 @@ namespace GenesisEngine.Specs.DomainSpecs
         public static DoubleVector3 _location;
         public static QuadNodeExtents _extents = new QuadNodeExtents(-1.0, 1.0, -1.0, 1.0);
 
-        public static IHeightfieldGenerator _generator;
+        public static ISurfaceGenerator _generator;
         public static ITerrainColorizer _terrainColorizer;
         public static MockQuadMeshRenderer _renderer;
         public static ISettings _settings;
@@ -186,7 +186,7 @@ namespace GenesisEngine.Specs.DomainSpecs
 
         Establish context = () =>
         {
-            _generator = Substitute.For<IHeightfieldGenerator>();
+            _generator = Substitute.For<ISurfaceGenerator>();
 
             _terrainColorizer = Substitute.For<ITerrainColorizer>();
 

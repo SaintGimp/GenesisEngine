@@ -14,7 +14,7 @@ namespace GenesisEngine
             _noiseGenerator = noiseGenerator;
         }
 
-        public double GetNoise(DoubleVector3 location, double initialFrequencyMultiplier, int numberOfOctaves, double lacunarity, double gain)
+        public double GetSpectralNoise(DoubleVector3 location, double initialFrequencyMultiplier, int numberOfOctaves, double lacunarity, double gain)
         {
             var sampleLocation = location * initialFrequencyMultiplier;
             return AccumulateNoise(sampleLocation, numberOfOctaves, lacunarity, gain);

@@ -27,7 +27,7 @@ namespace GenesisEngine
 
             var terrain = _terrainFactory.Create(radius);
             var renderer = CreateRenderer(radius);
-            var generator = ObjectFactory.GetInstance<IHeightfieldGenerator>();
+            var generator = ObjectFactory.GetInstance<IHeightGenerator>();
             var statistics = ObjectFactory.GetInstance<Statistics>();
 
             var planet = new Planet(location, radius, terrain, renderer, generator, _settings, statistics);

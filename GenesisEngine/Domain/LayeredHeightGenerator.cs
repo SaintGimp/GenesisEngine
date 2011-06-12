@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework;
 
 namespace GenesisEngine
 {
-    public class LayeredHeightfieldGenerator : IHeightfieldGenerator
+    public class LayeredHeightGenerator : IHeightGenerator
     {
         ISpectralGenerator _continentalGenerator = new FractalBrownianMotionSpectralGenerator(new SimplexNoiseGenerator());
         ISpectralGenerator _regionalGenerator1 = new RidgedMultiFractalSpectralGenerator2(new SimplexNoiseGenerator());
@@ -27,7 +27,7 @@ namespace GenesisEngine
 
         double GetContinentalHeight(DoubleVector3 location, int level, double scale)
         {
-            var noise = _continentalGenerator.GetNoise(location, 2, 10, 2.0, 0.5);
+            var noise = _continentalGenerator.GetSpectralNoise(location, 2, 10, 2.0, 0.5);
             var height = noise * scale;
             return height;
         }
@@ -43,10 +43,10 @@ namespace GenesisEngine
 
         double GetRegionalModifier(DoubleVector3 location)
         {
-            var lowFrequencyRegionalModifier = _regionalGenerator1.GetNoise(location, 21, 4, 2.0, 0.5);
+            var lowFrequencyRegionalModifier = _regionalGenerator1.GetSpectralNoise(location, 21, 4, 2.0, 0.5);
             lowFrequencyRegionalModifier += 1;
 
-            var mediumFrequencyRegionalModifier = _regionalGenerator2.GetNoise(location, 30, 4, 2.0, 0.5);
+            var mediumFrequencyRegionalModifier = _regionalGenerator2.GetSpectralNoise(location, 30, 4, 2.0, 0.5);
             mediumFrequencyRegionalModifier += 1;
 
             var regionalModifier = DoubleMathHelper.Clamp(lowFrequencyRegionalModifier * mediumFrequencyRegionalModifier, 0, 2);
@@ -55,8 +55,7 @@ namespace GenesisEngine
 
         double GetLocalHeight(DoubleVector3 location, int level, double scale)
         {
-
-            var noise = _localGenerator.GetNoise(location, 100, level + 1, 2.0, 0.5);
+            var noise = _localGenerator.GetSpectralNoise(location, 100, level + 1, 2.0, 0.5);
             var filteredNoise = (noise + 1) / 2;
 
             return filteredNoise * scale;
