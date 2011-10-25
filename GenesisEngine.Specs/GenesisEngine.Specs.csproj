@@ -58,9 +58,9 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Machine.Specifications, Version=0.4.13.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Machine.Specifications, Version=0.4.24.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\dependencies\Machine.Specifications.0.4.13.0\lib\Machine.Specifications.dll</HintPath>
+      <HintPath>..\dependencies\Machine.Specifications.0.4.24.0\lib\Machine.Specifications.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Xna.Framework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
     <Reference Include="Microsoft.Xna.Framework.Graphics, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86" />
