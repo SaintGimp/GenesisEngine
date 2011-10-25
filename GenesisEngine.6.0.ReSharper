@@ -1,0 +1,162 @@
+<Configuration>
+  <CodeStyleSettings>
+    <ExternalPath IsNull="False">
+    </ExternalPath>
+    <Sharing>SOLUTION</Sharing>
+    <CSS>
+      <FormatSettings />
+      <Naming2 />
+    </CSS>
+    <CSharp>
+      <FormatSettings>
+        <ALIGN_MULTILINE_EXPRESSION>False</ALIGN_MULTILINE_EXPRESSION>
+        <ANONYMOUS_METHOD_DECLARATION_BRACES>NEXT_LINE</ANONYMOUS_METHOD_DECLARATION_BRACES>
+        <CASE_BLOCK_BRACES>NEXT_LINE</CASE_BLOCK_BRACES>
+        <EXPLICIT_PRIVATE_MODIFIER>False</EXPLICIT_PRIVATE_MODIFIER>
+        <INDENT_ANONYMOUS_METHOD_BLOCK>False</INDENT_ANONYMOUS_METHOD_BLOCK>
+        <INITIALIZER_BRACES>NEXT_LINE</INITIALIZER_BRACES>
+        <MODIFIERS_ORDER IsNull="False">
+          <Item>public</Item>
+          <Item>protected</Item>
+          <Item>internal</Item>
+          <Item>private</Item>
+          <Item>new</Item>
+          <Item>abstract</Item>
+          <Item>virtual</Item>
+          <Item>override</Item>
+          <Item>sealed</Item>
+          <Item>static</Item>
+          <Item>readonly</Item>
+          <Item>extern</Item>
+          <Item>unsafe</Item>
+          <Item>volatile</Item>
+        </MODIFIERS_ORDER>
+        <SPACE_AROUND_MULTIPLICATIVE_OP>True</SPACE_AROUND_MULTIPLICATIVE_OP>
+      </FormatSettings>
+      <UsingsSettings>
+        <MandatoryImports IsNull="False">
+          <Item>System</Item>
+          <Item>System.Collections.Generic</Item>
+          <Item>System.Linq</Item>
+          <Item>System.Text</Item>
+        </MandatoryImports>
+      </UsingsSettings>
+      <Naming2>
+        <EventHandlerPatternLong>$object$_On$event$</EventHandlerPatternLong>
+        <EventHandlerPatternShort>$event$Handler</EventHandlerPatternShort>
+        <PredefinedRule Inspect="True" Prefix="" Suffix="" Style="AaBb" ElementKind="TypesAndNamespaces" />
+        <PredefinedRule Inspect="True" Prefix="I" Suffix="" Style="AaBb" ElementKind="Interfaces" />
+        <PredefinedRule Inspect="True" Prefix="T" Suffix="" Style="AaBb" ElementKind="TypeParameters" />
+        <PredefinedRule Inspect="True" Prefix="" Suffix="" Style="AaBb" ElementKind="MethodPropertyEvent" />
+        <PredefinedRule Inspect="True" Prefix="" Suffix="" Style="aaBb" ElementKind="Locals" />
+        <PredefinedRule Inspect="True" Prefix="" Suffix="" Style="aaBb" ElementKind="LocalConstants" />
+        <PredefinedRule Inspect="True" Prefix="" Suffix="" Style="aaBb" ElementKind="Parameters" />
+        <PredefinedRule Inspect="True" Prefix="" Suffix="" Style="AaBb" ElementKind="PublicFields" />
+        <PredefinedRule Inspect="True" Prefix="_" Suffix="" Style="aaBb" ElementKind="PrivateInstanceFields" />
+        <PredefinedRule Inspect="True" Prefix="_" Suffix="" Style="aaBb" ElementKind="PrivateStaticFields" />
+        <PredefinedRule Inspect="True" Prefix="" Suffix="" Style="AaBb" ElementKind="Constants" />
+        <PredefinedRule Inspect="True" Prefix="" Suffix="" Style="AaBb" ElementKind="PrivateConstants" />
+        <PredefinedRule Inspect="True" Prefix="" Suffix="" Style="AaBb" ElementKind="StaticReadonly" />
+        <PredefinedRule Inspect="True" Prefix="" Suffix="" Style="AaBb" ElementKind="PrivateStaticReadonly" />
+        <PredefinedRule Inspect="True" Prefix="" Suffix="" Style="AaBb" ElementKind="EnumMember" />
+        <PredefinedRule Inspect="True" Prefix="" Suffix="" Style="AaBb" ElementKind="Other" />
+      </Naming2>
+    </CSharp>
+    <HTML>
+      <FormatSettings />
+    </HTML>
+    <JavaScript>
+      <FormatSettings />
+      <Naming2 />
+    </JavaScript>
+    <VB>
+      <FormatSettings />
+      <ImportsSettings />
+      <Naming2>
+        <EventHandlerPatternLong>$object$_On$event$</EventHandlerPatternLong>
+        <EventHandlerPatternShort>$event$Handler</EventHandlerPatternShort>
+      </Naming2>
+    </VB>
+    <Web>
+      <Naming2 />
+    </Web>
+    <XML>
+      <FormatSettings />
+    </XML>
+    <Xaml>
+      <Naming2 />
+    </Xaml>
+    <GenerateMemberBody />
+    <Naming2>
+      <EventHandlerPatternLong>$object$_On$event$</EventHandlerPatternLong>
+      <EventHandlerPatternShort>$event$Handler</EventHandlerPatternShort>
+      <PredefinedRule Inspect="True" Prefix="" Suffix="" Style="AaBb" ElementKind="TypesAndNamespaces" />
+      <PredefinedRule Inspect="True" Prefix="I" Suffix="" Style="AaBb" ElementKind="Interfaces" />
+      <PredefinedRule Inspect="True" Prefix="T" Suffix="" Style="AaBb" ElementKind="TypeParameters" />
+      <PredefinedRule Inspect="True" Prefix="" Suffix="" Style="AaBb" ElementKind="MethodPropertyEvent" />
+      <PredefinedRule Inspect="True" Prefix="" Suffix="" Style="aaBb" ElementKind="Locals" />
+      <PredefinedRule Inspect="True" Prefix="" Suffix="" Style="aaBb" ElementKind="LocalConstants" />
+      <PredefinedRule Inspect="True" Prefix="" Suffix="" Style="aaBb" ElementKind="Parameters" />
+      <PredefinedRule Inspect="True" Prefix="" Suffix="" Style="AaBb" ElementKind="PublicFields" />
+      <PredefinedRule Inspect="True" Prefix="_" Suffix="" Style="aaBb" ElementKind="PrivateInstanceFields" />
+      <PredefinedRule Inspect="True" Prefix="_" Suffix="" Style="aaBb" ElementKind="PrivateStaticFields" />
+      <PredefinedRule Inspect="True" Prefix="" Suffix="" Style="AaBb" ElementKind="Constants" />
+      <PredefinedRule Inspect="True" Prefix="" Suffix="" Style="AaBb" ElementKind="PrivateConstants" />
+      <PredefinedRule Inspect="True" Prefix="" Suffix="" Style="AaBb" ElementKind="StaticReadonly" />
+      <PredefinedRule Inspect="True" Prefix="" Suffix="" Style="AaBb" ElementKind="PrivateStaticReadonly" />
+      <PredefinedRule Inspect="True" Prefix="" Suffix="" Style="AaBb" ElementKind="EnumMember" />
+      <PredefinedRule Inspect="True" Prefix="" Suffix="" Style="AaBb" ElementKind="Other" />
+      <UserRule Inspect="True" Prefix="" Suffix="" Style="aa_bb" StaticnessKind="Static, Instance" AccessRight="Private, Protected, ProtectedInternal, Internal, Public" Description="MSpec lower-case elements">
+        <ElementKinds>
+          <Kind Name="Machine.Specifications_Behavior" />
+          <Kind Name="Machine.Specifications_Context" />
+          <Kind Name="Machine.Specifications_Specification" />
+          <Kind Name="Machine.Specifications_SupportingField" />
+        </ElementKinds>
+      </UserRule>
+      <UserRule Inspect="True" Prefix="_" Suffix="" Style="aaBb" StaticnessKind="Static, Instance" AccessRight="Public" Description="MSpec public static fields">
+        <ElementKinds>
+          <Kind Name="Machine.Specifications_Field" />
+        </ElementKinds>
+      </UserRule>
+    </Naming2>
+  </CodeStyleSettings>
+  <SharedSolutionTemplateManager>
+    <LiveTemplates>
+      <Template uid="2dfeec5f-40f3-49a9-a400-e01745ea1419" shortcut="establish" description="MSpec Establish clause" text="Establish context = () =&gt;&#xD;&#xA;    " reformat="True" shortenQualifiedReferences="True">
+        <Scopes>
+          <Scope type="Everywhere" />
+        </Scopes>
+        <Categories />
+        <Variables />
+        <CustomProperties />
+      </Template>
+      <Template uid="407f2333-1b58-4e55-82b5-739733f3a26f" shortcut="it" description="MSpec It clause" text="It $SHOULD$ = () =&gt;&#xD;&#xA;	$ASSERT$" reformat="True" shortenQualifiedReferences="True">
+        <Scopes>
+          <Scope type="Everywhere" />
+        </Scopes>
+        <Categories />
+        <Variables>
+          <Variable name="SHOULD" expression="" initialRange="0" />
+          <Variable name="ASSERT" expression="" initialRange="0" />
+        </Variables>
+        <CustomProperties />
+      </Template>
+      <Template uid="378facd2-7ef3-48fe-9c81-e48be7e61ed4" shortcut="context" description="MSpec context class" text="    [Subject(typeof($TYPE$))]&#xD;&#xA;    public class $WHEN$&#xD;&#xA;    {&#xD;&#xA;        Establish context = () =&gt;&#xD;&#xA;            $CONTEXT$&#xD;&#xA;&#xD;&#xA;        Because of = () =&gt;&#xD;&#xA;            $BECAUSE$&#xD;&#xA;&#xD;&#xA;        It $SHOULD$ = () =&gt;&#xD;&#xA;            $ASSERT$&#xD;&#xA;    }&#xD;&#xA;" reformat="True" shortenQualifiedReferences="True">
+        <Scopes>
+          <Scope type="Everywhere" />
+        </Scopes>
+        <Categories />
+        <Variables>
+          <Variable name="TYPE" expression="" initialRange="0" />
+          <Variable name="WHEN" expression="" initialRange="0" />
+          <Variable name="CONTEXT" expression="" initialRange="0" />
+          <Variable name="BECAUSE" expression="" initialRange="0" />
+          <Variable name="SHOULD" expression="" initialRange="0" />
+          <Variable name="ASSERT" expression="" initialRange="0" />
+        </Variables>
+        <CustomProperties />
+      </Template>
+    </LiveTemplates>
+  </SharedSolutionTemplateManager>
+</Configuration>
