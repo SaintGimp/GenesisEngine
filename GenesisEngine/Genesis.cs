@@ -28,7 +28,7 @@ namespace GenesisEngine
             GraphicsDeviceManager.SynchronizeWithVerticalRetrace = true;
 
             GraphicsDeviceManager.PreferredDepthStencilFormat = DepthFormat.Depth24;
-            GraphicsDeviceManager.PreferMultiSampling = true;
+            GraphicsDeviceManager.PreferMultiSampling = false;
 
             Window.AllowUserResizing = true;
             Window.ClientSizeChanged += Window_ClientSizeChanged;
