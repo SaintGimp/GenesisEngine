@@ -6,6 +6,11 @@ using Microsoft.Xna.Framework;
 
 namespace GenesisEngine
 {
+    public interface IQuadMeshFactory
+    {
+        IQuadMesh Create();
+    }
+
     public class QuadMeshFactory : IQuadMeshFactory
     {
         readonly IHeightmapGenerator _generator;

@@ -6,6 +6,11 @@ using Microsoft.Xna.Framework;
 
 namespace GenesisEngine
 {
+    public interface ITerrainFactory
+    {
+        ITerrain Create(double planetRadius);
+    }
+
     public class TerrainFactory : ITerrainFactory
     {
         IQuadNodeFactory _quadNodeFactory;

@@ -8,6 +8,11 @@ using StructureMap;
 
 namespace GenesisEngine
 {
+    public interface IWindowManager
+    {
+        void ShowAllWindows();
+    }
+
     public class WindowManager : IWindowManager, IDisposable
     {
         IContainer _container;

@@ -96,23 +96,16 @@
   <ItemGroup>
     <Compile Include="Domain\EdgeColorizer.cs" />
     <Compile Include="Domain\HeightmapGenerator.cs" />
-    <Compile Include="Domain\IHeightmapGenerator.cs" />
-    <Compile Include="Domain\ISplitMergeStrategy.cs" />
-    <Compile Include="Domain\ITerrainColorizer.cs" />
-    <Compile Include="Domain\IQuadMesh.cs" />
-    <Compile Include="Domain\IQuadMeshFactory.cs" />
     <Compile Include="Domain\DefaultSplitMergeStrategy.cs" />
+    <Compile Include="Domain\ISplitMergeStrategy.cs" />
+    <Compile Include="Domain\Terrain.cs" />
     <Compile Include="Domain\TerrainColorizer.cs" />
     <Compile Include="Infrastructure\StopwatchExtensions.cs" />
-    <Compile Include="Renderers\IQuadMeshRendererFactory.cs" />
     <Compile Include="Domain\QuadMeshFactory.cs" />
-    <Compile Include="Renderers\IQuadMeshRenderer.cs" />
     <Compile Include="Domain\QuadMesh.cs" />
     <Compile Include="Infrastructure\Bootstrapper.cs" />
     <Compile Include="Cameras\Camera.cs" />
     <Compile Include="Cameras\CameraController.cs" />
-    <Compile Include="Cameras\ICamera.cs" />
-    <Compile Include="Cameras\ICameraController.cs" />
     <Compile Include="Input\IInputState.cs" />
     <Compile Include="Input\XnaInputState.cs" />
     <Compile Include="Domain\TestHeightGenerator1.cs" />
@@ -120,12 +113,6 @@
     <Compile Include="Domain\LayeredHeightGenerator.cs" />
     <Compile Include="Math\DoubleMathHelper.cs" />
     <Compile Include="Noise\FractalBrownianMotionSpectralGenerator.cs" />
-    <Compile Include="Domain\IPlanet.cs" />
-    <Compile Include="Domain\IPlanetFactory.cs" />
-    <Compile Include="Domain\IQuadNode.cs" />
-    <Compile Include="Domain\IQuadNodeFactory.cs" />
-    <Compile Include="Domain\ITerrain.cs" />
-    <Compile Include="Domain\ITerrainFactory.cs" />
     <Compile Include="Domain\PlanetFactory.cs" />
     <Compile Include="Domain\QuadNodeExtents.cs" />
     <Compile Include="Domain\IHeightGenerator.cs" />
@@ -136,7 +123,6 @@
     <Compile Include="Noise\RidgedSimplexNoiseGenerator.cs" />
     <Compile Include="Noise\SimplexNoiseGenerator.cs" />
     <Compile Include="Noise\RandomNoiseGenerator.cs" />
-    <Compile Include="Domain\Terrain.cs" />
     <Compile Include="Domain\TerrainFactory.cs" />
     <Compile Include="Domain\Planet.cs" />
     <Compile Include="Domain\QuadNodeFactory.cs" />
@@ -146,14 +132,10 @@
     <Compile Include="Events\EventAggregatorTypeInterceptor.cs" />
     <Compile Include="Events\Events.cs" />
     <Compile Include="Infrastructure\GenesisRegistry.cs" />
-    <Compile Include="Events\IEventAggregator.cs" />
-    <Compile Include="Input\IInputMapper.cs" />
     <Compile Include="Events\IListener.cs" />
     <Compile Include="Input\InputMapper.cs" />
-    <Compile Include="Renderers\IQuadNodeRendererFactory.cs" />
     <Compile Include="Renderers\QuadMeshRenderer.cs" />
     <Compile Include="Renderers\QuadMeshRendererFactory.cs" />
-    <Compile Include="Settings\ISettings.cs" />
     <Compile Include="Noise\NoiseFilter.cs" />
     <Compile Include="Noise\TurbulenceSpectralGenerator.cs" />
     <Compile Include="Domain\PhysicalConstants.cs" />
@@ -161,8 +143,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Genesis.cs" />
-    <Compile Include="Renderers\IPlanetRenderer.cs" />
-    <Compile Include="Renderers\IQuadNodeRenderer.cs" />
     <Compile Include="Renderers\IRenderer.cs" />
     <Compile Include="Renderers\QuadNodeRendererFactory.cs" />
     <Compile Include="Renderers\PlanetRenderer.cs" />
@@ -173,9 +153,7 @@
     <Compile Include="Threading\ITaskSchedulerFactory.cs" />
     <Compile Include="Threading\QueuedTaskSchedulerFactory.cs" />
     <Compile Include="Threading\CurrentThreadTaskSchedulerFactory.cs" />
-    <Compile Include="UI\IScreenCustodian.cs" />
     <Compile Include="UI\IView.cs" />
-    <Compile Include="UI\IWindowManager.cs" />
     <Compile Include="UI\ScreenCustodian.cs" />
     <Compile Include="UI\SettingsView.xaml.cs">
       <DependentUpon>SettingsView.xaml</DependentUpon>

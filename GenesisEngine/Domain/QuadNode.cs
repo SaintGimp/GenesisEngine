@@ -5,11 +5,21 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System.Diagnostics;
 
 namespace GenesisEngine
 {
+    public interface IQuadNode
+    {
+        void Initialize(double planetRadius, DoubleVector3 planeNormalVector, DoubleVector3 uVector, DoubleVector3 vVector, QuadNodeExtents extents, int level);
+
+        void Update(DoubleVector3 cameraLocation, DoubleVector3 planetLocation);
+
+        void Draw(DoubleVector3 cameraLocation, BoundingFrustum originBasedViewFrustum, Matrix originBasedViewMatrix, Matrix projectionMatrix);
+
+        // TODO: does this need to be exposed?
+        int Level { get; }
+    }
+
     public class QuadNode : IQuadNode, IDisposable
     {
         DoubleVector3 _locationRelativeToPlanet;

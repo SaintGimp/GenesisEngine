@@ -5,6 +5,11 @@ using System.Text;
 
 namespace GenesisEngine
 {
+    public interface IHeightmapGenerator
+    {
+        HeightmapSample[] GenerateHeightmapSamples(HeightmapDefinition definition);
+    }
+
     public class HeightmapGenerator : IHeightmapGenerator
     {
         readonly IHeightGenerator _heightGenerator;

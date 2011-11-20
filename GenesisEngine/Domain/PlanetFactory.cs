@@ -8,6 +8,11 @@ using StructureMap;
 
 namespace GenesisEngine
 {
+    public interface IPlanetFactory
+    {
+        IPlanet Create(GenesisEngine.DoubleVector3 location, double radius);
+    }
+
     public class PlanetFactory : IPlanetFactory
     {
         readonly ITerrainFactory _terrainFactory;
