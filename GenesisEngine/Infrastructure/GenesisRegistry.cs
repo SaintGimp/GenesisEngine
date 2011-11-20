@@ -34,6 +34,7 @@ namespace GenesisEngine
             MakeSingleton<ISettings>();
             MakeSingleton<Statistics>();
             MakeSingleton<MainPresenter>();
+            MakeSingleton<HeightmapGenerator>();
 
             For<IScreenCustodian<SettingsView, SettingsViewModel>>().Use<ScreenCustodian<SettingsView, SettingsViewModel>>();
             For<IScreenCustodian<StatisticsView, StatisticsViewModel>>().Use<ScreenCustodian<StatisticsView, StatisticsViewModel>>();

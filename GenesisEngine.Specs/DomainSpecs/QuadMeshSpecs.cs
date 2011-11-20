@@ -14,12 +14,12 @@ namespace GenesisEngine.Specs.DomainSpecs
     [Subject(typeof(QuadMesh))]
     public class when_the_mesh_is_initialized : QuadMeshContext
     {
-        Because of = () =>
-        {
+        Establish context = () =>
             _terrainColorizer.GetColor(Arg.Any<double>(), Arg.Any<int>(), Arg.Any<int>(), Arg.Any<int>(), Arg.Any<QuadNodeExtents>())
                 .Returns(Color.PapayaWhip);
+
+        Because of = () =>
             InitializeTopFacingMesh();
-        };
 
         It should_initialize_the_renderer = () =>
             _renderer.InitializeWasCalled.ShouldBeTrue();
@@ -176,7 +176,7 @@ namespace GenesisEngine.Specs.DomainSpecs
         public static DoubleVector3 _location;
         public static QuadNodeExtents _extents = new QuadNodeExtents(-1.0, 1.0, -1.0, 1.0);
 
-        public static ISurfaceGenerator _generator;
+        public static IHeightmapGenerator _heightmapGenerator;
         public static ITerrainColorizer _terrainColorizer;
         public static MockQuadMeshRenderer _renderer;
         public static ISettings _settings;
@@ -186,7 +186,9 @@ namespace GenesisEngine.Specs.DomainSpecs
 
         Establish context = () =>
         {
-            _generator = Substitute.For<ISurfaceGenerator>();
+            var heightGenerator = Substitute.For<IHeightGenerator>();
+            heightGenerator.GetHeight(DoubleVector3.Zero, 0, 0).ReturnsForAnyArgs(0.0);
+            _heightmapGenerator = new HeightmapGenerator(heightGenerator);
 
             _terrainColorizer = Substitute.For<ITerrainColorizer>();
 
@@ -199,7 +201,7 @@ namespace GenesisEngine.Specs.DomainSpecs
 
             _statistics = new Statistics();
 
-            _mesh = new QuadMesh(_generator, _terrainColorizer, _renderer, _settings);
+            _mesh = new QuadMesh(_heightmapGenerator, _terrainColorizer, _renderer, _settings);
         };
 
         public static void InitializeTopFacingMesh()
