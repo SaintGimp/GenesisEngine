@@ -24,7 +24,7 @@ namespace GenesisEngine
             // currently-visible nodes over non-visible nodes.  To do this we'd probably drop
             // QueuedTaskScheduler in favor of a custom scheduler that uses Task.AsyncState to get
             // information about each queued node and then sorts them accordingly.
-            _scheduler = new QueuedTaskScheduler(0, "", false, ThreadPriority.BelowNormal);
+            _scheduler = new QueuedTaskScheduler(Environment.ProcessorCount, "QueuedTaskScheduler", false, ThreadPriority.BelowNormal);
         }
 
         public TaskScheduler Create()
