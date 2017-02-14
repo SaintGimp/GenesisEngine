@@ -15,11 +15,11 @@ If you're looking to learn something about procedurally-generated terrain or ren
 
 This project is also not a good reference for high-performance game engines.  I'm explicitly choosing to favor clarity of code design over high performance when those two principles are in conflict.  My computer is reasonably fast and hardware is cheap - so there!
 
-I'm going to [blog](http://blogs.msdn.com/elee) occasionally about the journey so feel free to follow along.
+I'm going to [blog](https://blogs.msdn.microsoft.com/elee/tag/genesisengine/) occasionally about the journey so feel free to follow along.
 
 # How do I build and run it?
 
-The GenesisEngine project is a Visual Studio 2010 solution with dependencies on StructureMap, Machine.Specifications, and Rhino Mocks (all included) and Microsoft's [XNA Game Studio 4.0](http://creators.xna.com/en-US/downloads) (not included).  Right now the project is Windows-only and won't run on the Xbox or Zune.  There's no build script or anything; just load the solution in Visual Studio, build it, and run.  If you run into any problems, let me know.
+The GenesisEngine project is a Visual Studio 2015 solution with dependencies on StructureMap, Machine.Specifications, and Rhino Mocks (all included) and Microsoft's [XNA Game Studio 4.0](http://creators.xna.com/en-US/downloads) (not included).  Right now the project is Windows-only and won't run on the Xbox or Zune.  There's no build script or anything; just load the solution in Visual Studio, build it, and run.  If you run into any problems, let me know.
 
 # What are the controls?
 

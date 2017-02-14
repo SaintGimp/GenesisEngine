@@ -71,7 +71,6 @@ namespace GenesisEngine
 
             IsMouseVisible = true;
 
-            var foo = Bootstrapper.Container.GetInstance<IEventAggregator>();
             _mainPresenter = Bootstrapper.Container.GetInstance<MainPresenter>();
             _mainPresenter.Show();
 
