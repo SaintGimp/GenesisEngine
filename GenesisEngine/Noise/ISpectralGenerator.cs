@@ -7,7 +7,7 @@ namespace GenesisEngine
 {
     public interface ISpectralGenerator
     {
-        double GetNoise(DoubleVector3 location, double initialFrequencyMultiplier, int numberOfOctaves,
+        double GetSpectralNoise(DoubleVector3 location, double initialFrequencyMultiplier, int numberOfOctaves,
                         double lacunarity, double gain); 
     }
 }

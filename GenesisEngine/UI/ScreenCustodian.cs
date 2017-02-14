@@ -5,6 +5,11 @@ using System.Text;
 
 namespace GenesisEngine
 {
+    public interface IScreenCustodian<TView, TModel>
+    {
+        void ShowInactive();
+    }
+
     public class ScreenCustodian<TView, TModel> : IScreenCustodian<TView, TModel> where TView : IView
     {
         TView _view;

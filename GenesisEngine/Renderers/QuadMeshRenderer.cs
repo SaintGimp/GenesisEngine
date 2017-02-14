@@ -7,6 +7,11 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace GenesisEngine
 {
+    public interface IQuadMeshRenderer : IRenderer
+    {
+        void Initialize(VertexPositionNormalColor[] vertices, short[] indices, BoundingBox boundingBox);
+    }
+
     public class QuadMeshRenderer : IQuadMeshRenderer, IDisposable
     {
         readonly GraphicsDevice _graphicsDevice;
@@ -49,8 +54,7 @@ namespace GenesisEngine
             if (_indexBuffer == null)
             {
                 _numberOfIndices = indices.Length;
-                _indexBuffer = new IndexBuffer(_graphicsDevice, IndexElementSize.SixteenBits, _numberOfIndices,
-                                               BufferUsage.WriteOnly);
+                _indexBuffer = new IndexBuffer(_graphicsDevice, IndexElementSize.SixteenBits, _numberOfIndices, BufferUsage.WriteOnly);
                 _indexBuffer.SetData(indices);
             }
         }
@@ -99,7 +103,7 @@ namespace GenesisEngine
             {
                 var scaledViewSpace = _settings.FarClippingPlaneDistance - unscaledViewSpace;
                 double scaledDistanceFromCamera = unscaledViewSpace + (scaledViewSpace * (1.0 - Math.Exp((scaledViewSpace - distanceFromCamera) / 1000000000)));
-                DoubleVector3 scaledLocationRelativeToCamera = DoubleVector3.Normalize(locationRelativeToCamera) * scaledDistanceFromCamera;
+                var scaledLocationRelativeToCamera = DoubleVector3.Normalize(locationRelativeToCamera) * scaledDistanceFromCamera;
                 
                 scaleMatrix = Matrix.CreateScale((float)(scaledDistanceFromCamera / distanceFromCamera));
                 translationMatrix = Matrix.CreateTranslation(scaledLocationRelativeToCamera);

@@ -5,6 +5,13 @@ using System.Text;
 
 namespace GenesisEngine
 {
+    public interface IEventAggregator
+    {
+        void AddListener(object listener);
+
+        void SendMessage<T>(T message);
+    }
+
     public class EventAggregator : IEventAggregator
     {
         object _lockObject = new object();

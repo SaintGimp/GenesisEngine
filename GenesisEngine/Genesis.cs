@@ -6,18 +6,15 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using StructureMap;
+using Microsoft.ConcurrencyVisualizer.Instrumentation;
 
 namespace GenesisEngine
 {
-    public class Genesis : Game,
-                           IListener<ExitApplication>,
-                           IListener<GarbageCollect>
+    public class Genesis : Game, IListener<ExitApplication>, IListener<GarbageCollect>
     {
         MainPresenter _mainPresenter;
         IInputState _inputState;
         IInputMapper _inputMapper;
-        Scenario.Scenario _drawMarker = new Scenario.Scenario(0, "Draw pass");
-        Scenario.Scenario _updateMarker = new Scenario.Scenario(0, "Update pass");
 
         public Genesis()
         {
@@ -28,7 +25,7 @@ namespace GenesisEngine
             GraphicsDeviceManager.SynchronizeWithVerticalRetrace = true;
 
             GraphicsDeviceManager.PreferredDepthStencilFormat = DepthFormat.Depth24;
-            GraphicsDeviceManager.PreferMultiSampling = true;
+            GraphicsDeviceManager.PreferMultiSampling = false;
 
             Window.AllowUserResizing = true;
             Window.ClientSizeChanged += Window_ClientSizeChanged;
@@ -38,15 +35,28 @@ namespace GenesisEngine
 
         void Window_ClientSizeChanged(object sender, EventArgs e)
         {
+            Window.ClientSizeChanged -= Window_ClientSizeChanged;
+
             SetViewportDependentParameters();
+
+            Window.ClientSizeChanged += Window_ClientSizeChanged;
         }
 
         private void SetViewportDependentParameters()
         {
+            // http://stackoverflow.com/questions/8396677/uniformly-resizing-a-window-in-xna
+
+            this.GraphicsDeviceManager.PreferredBackBufferWidth = Window.ClientBounds.Width;
+            this.GraphicsDeviceManager.PreferredBackBufferHeight = Window.ClientBounds.Height;
+            this.GraphicsDeviceManager.ApplyChanges();
+
             var width = GraphicsDevice.Viewport.Width;
             var height = GraphicsDevice.Viewport.Height;
-            
-            _mainPresenter.SetViewportSize(width, height);
+
+            if (_mainPresenter != null)
+            {
+                _mainPresenter.SetViewportSize(width, height);
+            }
         }
 
         /// <summary>
@@ -57,15 +67,16 @@ namespace GenesisEngine
         /// </summary>
         protected override void Initialize()
         {
-            Thread.CurrentThread.Priority = ThreadPriority.AboveNormal;
+            //Thread.CurrentThread.Priority = ThreadPriority.AboveNormal;
 
             IsMouseVisible = true;
 
-            _mainPresenter = ObjectFactory.GetInstance<MainPresenter>();
+            var foo = Bootstrapper.Container.GetInstance<IEventAggregator>();
+            _mainPresenter = Bootstrapper.Container.GetInstance<MainPresenter>();
             _mainPresenter.Show();
 
-            _inputState = ObjectFactory.GetInstance<IInputState>();
-            _inputMapper = ObjectFactory.GetInstance<IInputMapper>();
+            _inputState = Bootstrapper.Container.GetInstance<IInputState>();
+            _inputMapper = Bootstrapper.Container.GetInstance<IInputMapper>();
             
             SetInputBindings();
 
@@ -129,9 +140,10 @@ namespace GenesisEngine
             _inputMapper.HandleInput(_inputState);
 
             //Debug.WriteLine(Stopwatch.StartNew().Measure(() => _mainPresenter.Update(gameTime.ElapsedGameTime)));
-            _updateMarker.Begin();
-            _mainPresenter.Update(gameTime.ElapsedGameTime);
-            _updateMarker.End();
+            using (Markers.EnterSpan("Update pass"))
+            {
+                _mainPresenter.Update(gameTime.ElapsedGameTime);
+            }
             
             base.Update(gameTime);
         }
@@ -144,9 +156,10 @@ namespace GenesisEngine
         {
             GraphicsDeviceManager.GraphicsDevice.Clear(Color.Black);
 
-            _drawMarker.Begin();
-            _mainPresenter.Draw();
-            _drawMarker.End();
+            using (Markers.EnterSpan("Draw pass"))
+            {
+                _mainPresenter.Draw();
+            }
 
             base.Draw(gameTime);
         }

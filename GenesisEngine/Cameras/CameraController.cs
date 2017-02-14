@@ -5,6 +5,11 @@ using Microsoft.Xna.Framework.Input;
 
 namespace GenesisEngine
 {
+    public interface ICameraController
+    {
+        void AttachToPlanet(IPlanet planet);
+    }
+
     public class CameraController : ICameraController,
                                     IListener<MoveForward>,
                                     IListener<MoveBackward>,

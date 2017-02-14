@@ -6,6 +6,11 @@ using Microsoft.Xna.Framework;
 
 namespace GenesisEngine
 {
+    public interface ITerrainFactory
+    {
+        ITerrain Create(double planetRadius);
+    }
+
     public class TerrainFactory : ITerrainFactory
     {
         IQuadNodeFactory _quadNodeFactory;
@@ -17,13 +22,15 @@ namespace GenesisEngine
             // face orientations is a map between the face normal vectors and their
             // UV vectors.  UV is row-major so they should be face-local south then
             // face-local east vectors.
-            _faceOrientations = new Dictionary<Vector3, Vector3[]>();
-            _faceOrientations.Add(Vector3.Up, new Vector3[] { Vector3.Backward, Vector3.Right });
-            _faceOrientations.Add(Vector3.Left, new Vector3[] { Vector3.Down, Vector3.Backward });
-            _faceOrientations.Add(Vector3.Right, new Vector3[] { Vector3.Down, Vector3.Forward });
-            _faceOrientations.Add(Vector3.Forward, new Vector3[] { Vector3.Down, Vector3.Left });
-            _faceOrientations.Add(Vector3.Backward, new Vector3[] { Vector3.Down, Vector3.Right });
-            _faceOrientations.Add(Vector3.Down, new Vector3[] { Vector3.Forward, Vector3.Right });
+            _faceOrientations = new Dictionary<Vector3, Vector3[]>
+            {
+                {Vector3.Up, new[] {Vector3.Backward, Vector3.Right}},
+                {Vector3.Left, new[] {Vector3.Down, Vector3.Backward}},
+                {Vector3.Right, new[] {Vector3.Down, Vector3.Forward}},
+                {Vector3.Forward, new[] {Vector3.Down, Vector3.Left}},
+                {Vector3.Backward, new[] {Vector3.Down, Vector3.Right}},
+                {Vector3.Down, new[] {Vector3.Forward, Vector3.Right}}
+            };
         }
 
         public TerrainFactory(IQuadNodeFactory quadNodeFactory)
@@ -34,7 +41,7 @@ namespace GenesisEngine
         public ITerrain Create(double planetRadius)
         {
             var faces = new List<IQuadNode>();
-            var faceNormals = new Vector3[] { Vector3.Up, Vector3.Left, Vector3.Right, Vector3.Forward, Vector3.Backward, Vector3.Down };
+            var faceNormals = new [] { Vector3.Up, Vector3.Left, Vector3.Right, Vector3.Forward, Vector3.Backward, Vector3.Down };
 
             for (int x = 0; x < 6; x++)
             {

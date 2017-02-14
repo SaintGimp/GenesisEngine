@@ -2,21 +2,29 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Microsoft.Xna.Framework;
 
 namespace GenesisEngine
 {
+    public interface IPlanet
+    {
+        void Update(DoubleVector3 cameraLocation);
+
+        void Draw(ICamera camera);
+
+        double GetGroundHeight(DoubleVector3 observerLocation);
+    }
+
     public class Planet : IPlanet
     {
         DoubleVector3 _location;
         readonly double _radius;
         readonly ITerrain _terrain;
         readonly IPlanetRenderer _renderer;
-        readonly IHeightfieldGenerator _generator;
+        readonly IHeightGenerator _generator;
         readonly ISettings _settings;
         readonly Statistics _statistics;
         
-        public Planet(DoubleVector3 location, double radius, ITerrain terrain, IPlanetRenderer renderer, IHeightfieldGenerator generator, ISettings settings, Statistics statistics)
+        public Planet(DoubleVector3 location, double radius, ITerrain terrain, IPlanetRenderer renderer, IHeightGenerator generator, ISettings settings, Statistics statistics)
         {
             _location = location;
             _radius = radius;

@@ -79,7 +79,7 @@ namespace GenesisEngine.Specs.DomainSpecs
         public static IPlanetRenderer _planetRenderer;
         public static ITerrainFactory _terrainFactory;
         public static ITerrain _terrain;
-        public static IHeightfieldGenerator _generator;
+        public static IHeightGenerator _generator;
         public static ISettings _settings;
         public static Statistics _statistics;
         public static IPlanet _planet;
@@ -91,7 +91,7 @@ namespace GenesisEngine.Specs.DomainSpecs
 
             _terrain = Substitute.For<ITerrain>();
             _planetRenderer = Substitute.For<IPlanetRenderer>();
-            _generator = Substitute.For<IHeightfieldGenerator>();
+            _generator = Substitute.For<IHeightGenerator>();
             _settings = Substitute.For<ISettings>();
             _statistics = new Statistics();
 

@@ -5,8 +5,8 @@ using System.Text;
 
 namespace GenesisEngine
 {
-    public interface ITerrainFactory
+    public interface IHeightGenerator
     {
-        ITerrain Create(double planetRadius);
+        double GetHeight(DoubleVector3 location, int level, double scale);
     }
 }

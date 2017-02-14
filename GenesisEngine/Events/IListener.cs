@@ -5,7 +5,11 @@ using System.Text;
 
 namespace GenesisEngine
 {
-    public interface IListener<T>
+    public interface IListener
+    {
+    }
+
+    public interface IListener<T> : IListener
     {
         void Handle(T message);
     }

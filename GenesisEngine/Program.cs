@@ -1,22 +1,24 @@
 using System;
-using StructureMap;
 
 namespace GenesisEngine
 {
+#if WINDOWS || LINUX
     static class Program
     {
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
-        static void Main(string[] args)
+        [STAThread]
+        static void Main()
         {
             Bootstrapper.BootstrapStructureMap();
 
-            using (var game = ObjectFactory.GetInstance<Genesis>())
+            using (var game = Bootstrapper.Container.GetInstance<Genesis>())
             {
                 game.Run();
             }
         }
     }
+#endif
 }
 

@@ -8,6 +8,10 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace GenesisEngine
 {
+    public interface IQuadNodeRenderer : IRenderer
+    {
+    }
+
     public class QuadNodeRenderer : IQuadNodeRenderer, IDisposable
     {
         private ContentManager _contentManager;

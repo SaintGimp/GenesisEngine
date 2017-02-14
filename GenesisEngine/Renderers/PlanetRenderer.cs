@@ -9,6 +9,10 @@ using System.Diagnostics;
 
 namespace GenesisEngine
 {
+    public interface IPlanetRenderer : IRenderer
+    {
+    }
+
     public class PlanetRenderer : IPlanetRenderer
     {
         readonly double _radius;
