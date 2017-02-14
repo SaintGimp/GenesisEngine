@@ -16,5 +16,6 @@ _ReSharper*/
 *.app.ctl
 *.krn.ctl
 *.docstates
+packages/
 
 /Specs/*.xml

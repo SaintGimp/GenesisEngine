@@ -15,6 +15,6 @@ namespace GenesisEngine.Specs.InfrastructureSpecs
             Bootstrapper.BootstrapStructureMap();
 
         It should_create_a_valid_container_configuration = () =>
-            ObjectFactory.AssertConfigurationIsValid();
+            Bootstrapper.Container.AssertConfigurationIsValid();
     }
 }

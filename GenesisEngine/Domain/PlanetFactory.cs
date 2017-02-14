@@ -32,8 +32,8 @@ namespace GenesisEngine
 
             var terrain = _terrainFactory.Create(radius);
             var renderer = CreateRenderer(radius);
-            var generator = ObjectFactory.GetInstance<IHeightGenerator>();
-            var statistics = ObjectFactory.GetInstance<Statistics>();
+            var generator = Bootstrapper.Container.GetInstance<IHeightGenerator>();
+            var statistics = Bootstrapper.Container.GetInstance<Statistics>();
 
             var planet = new Planet(location, radius, terrain, renderer, generator, _settings, statistics);
 
@@ -43,8 +43,8 @@ namespace GenesisEngine
         IPlanetRenderer CreateRenderer(double radius)
         {
             // TODO: put this in a separate factory class
-            var contentManager = ObjectFactory.GetInstance<ContentManager>();
-            var graphicsDevice = ObjectFactory.GetInstance<GraphicsDevice>();
+            var contentManager = Bootstrapper.Container.GetInstance<ContentManager>();
+            var graphicsDevice = Bootstrapper.Container.GetInstance<GraphicsDevice>();
 
             return new PlanetRenderer(radius, contentManager, graphicsDevice);
         }

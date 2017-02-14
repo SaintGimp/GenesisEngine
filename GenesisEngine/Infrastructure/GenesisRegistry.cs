@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Content;
 using StructureMap;
 using StructureMap.TypeRules;
+using StructureMap.Building.Interception;
 
 namespace GenesisEngine
 {
@@ -39,16 +40,16 @@ namespace GenesisEngine
             For<IScreenCustodian<SettingsView, SettingsViewModel>>().Use<ScreenCustodian<SettingsView, SettingsViewModel>>();
             For<IScreenCustodian<StatisticsView, StatisticsViewModel>>().Use<ScreenCustodian<StatisticsView, StatisticsViewModel>>();
             
-            For<ContentManager>().Use(x => ObjectFactory.GetInstance<Genesis>().Content);
-            For<GraphicsDevice>().Use(x => ObjectFactory.GetInstance<Genesis>().GraphicsDeviceManager.GraphicsDevice);
+            For<ContentManager>().Use(x => Bootstrapper.Container.GetInstance<Genesis>().Content);
+            For<GraphicsDevice>().Use(x => Bootstrapper.Container.GetInstance<Genesis>().GraphicsDeviceManager.GraphicsDevice);
             For<IInputState>().Use<XnaInputState>();
-            For<ITerrainColorizer>().Use(x => new EdgeColorizer(ObjectFactory.GetInstance<TerrainColorizer>(), ObjectFactory.GetInstance<ISettings>()));
+            For<ITerrainColorizer>().Use(x => new EdgeColorizer(Bootstrapper.Container.GetInstance<TerrainColorizer>(), Bootstrapper.Container.GetInstance<ISettings>()));
 
             For<IHeightGenerator>().Use<LayeredHeightGenerator>();
             For<ISplitMergeStrategy>().Use<DefaultSplitMergeStrategy>();
             For<ITaskSchedulerFactory>().Use<QueuedTaskSchedulerFactory>();
 
-            RegisterInterceptor(new EventAggregatorTypeInterceptor());
+            For<IListener>().OnCreationForAll(o => Bootstrapper.Container.GetInstance<IEventAggregator>().AddListener(o));
         }
 
         private void MakeSingleton<T>()

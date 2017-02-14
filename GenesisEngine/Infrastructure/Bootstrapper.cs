@@ -8,9 +8,11 @@ namespace GenesisEngine
 {
     public static class Bootstrapper
     {
+        public static Container Container { get; private set; }
+
         public static void BootstrapStructureMap()
         {
-            ObjectFactory.Initialize(x => x.AddRegistry<GenesisRegistry>());
+            Container = new Container(new GenesisRegistry());
         }
     }
 }

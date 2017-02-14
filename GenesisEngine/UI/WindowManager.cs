@@ -24,20 +24,20 @@ namespace GenesisEngine
         public WindowManager(IContainer container)
         {
             _container = container;
+        }
 
+        public void ShowAllWindows()
+        {
             StartUIThread();
 
-            _windowDispatcher.Invoke((Action)(() =>
+            _windowDispatcher.Invoke(() =>
             {
                 // We pull these out of the container here instead of doing normal
                 // constructor injection because we need them to be created on this thread.
                 _settingsCustodian = _container.GetInstance<IScreenCustodian<SettingsView, SettingsViewModel>>();
                 _statisticsCustodian = _container.GetInstance<IScreenCustodian<StatisticsView, StatisticsViewModel>>();
-            }));
-        }
+            });
 
-        public void ShowAllWindows()
-        {
             _windowDispatcher.Invoke((Action)(() =>
             {
                 _settingsCustodian.ShowInactive();
