@@ -19,7 +19,13 @@ I'm going to [blog](https://blogs.msdn.microsoft.com/elee/tag/genesisengine/) oc
 
 # How do I build and run it?
 
-The GenesisEngine project is a Visual Studio 2015 solution with dependencies on StructureMap, Machine.Specifications, and Rhino Mocks (all included) and Microsoft's [XNA Game Studio 4.0](http://creators.xna.com/en-US/downloads) (not included).  Right now the project is Windows-only and won't run on the Xbox or Zune.  There's no build script or anything; just load the solution in Visual Studio, build it, and run.  If you run into any problems, let me know.
+The GenesisEngine project is a Visual Studio 2015 solution with a dependency on [MonoGame](http://www.monogame.net).
+
+* Install the DirectX Runtime from https://www.microsoft.com/en-us/download/details.aspx?id=35
+* Install the most recent stable version of Monogame from http://www.monogame.net/downloads/
+* Open the solution in Visual Studio
+* Set GenesisEngine as the startup project
+* Press F5 to build and run
 
 # What are the controls?
 
